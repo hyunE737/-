@@ -1,4 +1,4 @@
-/* 누리 키우기 프롤로그 · 선택에 따라 출발 능력치와 이야기 기록 반영 */
+/* 누리 키우기 · 로그인 다음 프롤로그, 그다음 가족 선택 */
 (function(){
 'use strict';
 const OPTIONS=[
@@ -7,64 +7,84 @@ const OPTIONS=[
  {icon:'🚦',title:'신호와 차의 움직임을 살핀다',description:'차의 움직임을 확인하며 안전한 곳에서 기다린다.',outcome:'누리는 신호와 차의 움직임을 확인하고 안전을 택했어.',effect:{intelligence:4,happiness:2},caption:'신중한 선택'},
  {icon:'🌿',title:'가까운 안전한 곳으로 이동한다',description:'주변 공간을 확인하고 인도 쪽 안전한 위치로 옮긴다.',outcome:'누리는 재빨리 안전한 위치로 이동해 위기를 넘겼어.',effect:{health:3,creativity:3},caption:'빠른 대처'}
 ];
-let busy=false;
-function open(){
+let selected=null,completed=false,opened=false;
+function isReady(){
+ const account=document.getElementById('nuriAccountGate');
  const family=document.getElementById('familyScreen');
- if(!family||family.style.display==='none')return;
- const root=document.getElementById('nuriPrologue');if(!root)return;
- root.hidden=false;
- document.body.classList.add('nuri-prologue-active');
- root.querySelector('.nuri-prologue-choice')?.focus();
+ const game=document.getElementById('gameMain');
+ if(!account||!family||!game||!account.hidden)return false;
+ if(family.style.display==='none'||game.style.display==='block')return false;
+ return true;
 }
-function choose(index){
- if(busy)return;
- const opt=OPTIONS[index],root=document.getElementById('nuriPrologue');
- if(!opt||!root||root.hidden)return;
- busy=true;
- root.hidden=true;
- document.body.classList.remove('nuri-prologue-active');
- try{
-  if(typeof startGame!=='function')throw new Error('게임 시작 함수를 찾을 수 없어.');
-  startGame();
-  if(typeof state!=='undefined'&&state){
-   state.prologueChoice=index;
-   Object.entries(opt.effect).forEach(([key,bonus])=>{
-    if(state.stats && Number.isFinite(Number(state.stats[key])))state.stats[key]=((key==='health'||key==='happiness')?Math.min(100,Number(state.stats[key])+bonus):Number(state.stats[key])+bonus);
-   });
-   if(!Array.isArray(state.storyJournal))state.storyJournal=[];
-   state.storyJournal.push({
-    age:'프롤로그',title:'멈춰 선 시간',intro:'누리가 횡단보도를 건너다 다가오는 트럭을 발견한 순간, 시간이 잠시 멈췄어.',
-    choice:opt.title,outcome:opt.outcome+' 그리고 시간은 다시 흘러, 누리의 새로운 인생이 시작됐어.'
-   });
-   if(!Array.isArray(state.log))state.log=[];
-   state.log.push('📖 프롤로그 · '+opt.caption+': '+opt.outcome);
-   if(typeof render==='function')render();
-   if(typeof save==='function')save();
-  }
- }catch(error){
-  console.error('[누리 키우기] 프롤로그 시작 실패',error);
-  root.hidden=false;document.body.classList.add('nuri-prologue-active');
-  alert('게임 시작에 문제가 있어. 새로고침 후 다시 시도해 줘.');
- }finally{busy=false;}
-}
-window.nuriShowPrologue=open;
-window.nuriChoosePrologue=choose;
-function mount(){
+function show(){
+ if(completed||opened||!isReady())return;
  const root=document.getElementById('nuriPrologue');
  if(!root)return;
- const options=root.querySelector('#nuriPrologueChoices');
- if(!options)return;
- const statNames={intelligence:'지능',health:'체력',social:'인간관계',charm:'매력',happiness:'행복',creativity:'창의력'};
- options.innerHTML='';
- OPTIONS.forEach((opt,i)=>{
-  const b=document.createElement('button');b.type='button';b.className='nuri-prologue-choice';
-  const title=document.createElement('strong');title.textContent=(i+1).toString().padStart(2,'0')+'  '+opt.icon+'  '+opt.title;
-  const description=document.createElement('span');description.textContent=opt.description;
-  const bonus=document.createElement('small');bonus.textContent=Object.entries(opt.effect).map(([key,n])=>statNames[key]+' +'+n).join(' · ');
-  b.append(title,description,bonus);
-  b.addEventListener('click',()=>choose(i));
-  options.append(b);
+ opened=true;root.hidden=false;
+ document.body.classList.add('nuri-prologue-active');
+ const first=root.querySelector('.nuri-prologue-choice');
+ if(first)first.focus();
+}
+function choose(index){
+ const option=OPTIONS[index],root=document.getElementById('nuriPrologue');
+ if(!option||!root||root.hidden||completed)return;
+ selected=index;completed=true;opened=false;
+ root.hidden=true;document.body.classList.remove('nuri-prologue-active');
+ const family=document.getElementById('familyScreen');
+ if(family){family.style.display='';family.scrollIntoView({block:'start',behavior:'instant'});}
+}
+function applyChoice(){
+ if(selected===null)return;
+ const option=OPTIONS[selected];selected=null;
+ if(!option||typeof state==='undefined'||!state)return;
+ state.prologueChoice=OPTIONS.indexOf(option);
+ for(const [key,bonus] of Object.entries(option.effect)){
+  if(state.stats && Number.isFinite(Number(state.stats[key]))){
+   const next=Number(state.stats[key])+bonus;
+   state.stats[key]=(key==='health'||key==='happiness')?Math.min(100,next):next;
+  }
+ }
+ if(!Array.isArray(state.storyJournal))state.storyJournal=[];
+ state.storyJournal.push({
+  age:'프롤로그',title:'멈춰 선 시간',
+  intro:'누리가 횡단보도를 건너다 다가오는 트럭을 발견한 순간, 시간이 잠시 멈췄어.',
+  choice:option.title,
+  outcome:option.outcome+' 새로운 인생의 첫 페이지가 열렸어.'
  });
+ if(!Array.isArray(state.log))state.log=[];
+ state.log.push('📖 프롤로그 · '+option.caption+': '+option.outcome);
+}
+function resetFlow(){
+ selected=null;completed=false;opened=false;
+ const root=document.getElementById('nuriPrologue');
+ if(root)root.hidden=true;
+ document.body.classList.remove('nuri-prologue-active');
+ setTimeout(show,0);
+}
+window.nuriApplyPrologueChoice=applyChoice;
+window.nuriResetPrologueFlow=resetFlow;
+function mount(){
+ const root=document.getElementById('nuriPrologue');
+ const grid=root&&root.querySelector('#nuriPrologueChoices');
+ if(!grid)return;
+ const statNames={intelligence:'지능',health:'체력',social:'인간관계',charm:'매력',happiness:'행복',creativity:'창의력'};
+ grid.replaceChildren();
+ OPTIONS.forEach((option,index)=>{
+  const button=document.createElement('button');
+  button.type='button';button.className='nuri-prologue-choice';
+  const title=document.createElement('strong');title.textContent=String(index+1).padStart(2,'0')+'  '+option.icon+'  '+option.title;
+  const description=document.createElement('span');description.textContent=option.description;
+  const effects=document.createElement('small');effects.textContent=Object.entries(option.effect).map(([k,v])=>statNames[k]+' +'+v).join(' · ');
+  button.append(title,description,effects);
+  button.addEventListener('click',()=>choose(index));
+  grid.append(button);
+ });
+ // 로그인 완료 시 계정 화면이 숨겨지는 것을 감지해 프롤로그 자동 시작.
+ const account=document.getElementById('nuriAccountGate');
+ const family=document.getElementById('familyScreen');
+ if(account)new MutationObserver(show).observe(account,{attributes:true,attributeFilter:['hidden']});
+ if(family)new MutationObserver(show).observe(family,{attributes:true,attributeFilter:['style']});
+ setTimeout(show,0);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
