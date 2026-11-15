@@ -1,0 +1,20 @@
+/* 누리 키우기 선택형 프롤로그 */
+#nuriPrologue[hidden]{display:none!important}
+#nuriPrologue{position:fixed;inset:0;z-index:14000;display:grid;place-items:center;padding:18px;background:#192e29e8;color:#243c32;overflow:auto;overscroll-behavior:contain}
+#nuriPrologue .nuri-prologue-panel{width:min(100%,660px);max-height:calc(100dvh - 36px);overflow:auto;background:#fffdf7;border:1px solid #d1ddd1;border-radius:23px;padding:clamp(18px,4vw,30px);box-shadow:0 20px 65px #071d1760}
+#nuriPrologue .nuri-prologue-kicker{font-size:12px;font-weight:850;color:#24594b;letter-spacing:1.1px}
+#nuriPrologue h2{color:#213c34!important;margin:8px 0 15px;font-size:clamp(25px,5vw,36px);letter-spacing:-1px}
+#nuriPrologue .nuri-prologue-scene{background:#f3f5ec;border:1px solid #d9e1d7;border-radius:16px;padding:18px;line-height:1.8;color:#33483d;font-size:15px}
+#nuriPrologue .nuri-prologue-scene p{margin:6px 0;color:inherit}
+#nuriPrologue .nuri-prologue-alert{color:#94542e;font-weight:800}
+#nuriPrologue .nuri-prologue-caption{color:#405e53;font-size:12px;margin:15px 0 10px}
+#nuriPrologue #nuriPrologueChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#nuriPrologue .nuri-prologue-choice{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;min-height:116px;text-align:left;border:1px solid #cad8ce;border-radius:14px;background:#fff;color:#203c34;padding:14px;font:inherit;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+#nuriPrologue .nuri-prologue-choice strong{font-size:14px;color:#163c32}
+#nuriPrologue .nuri-prologue-choice span{font-size:12px;line-height:1.5;color:#445b52}
+#nuriPrologue .nuri-prologue-choice small{font-size:11px;font-weight:800;color:#1d6a4c}
+#nuriPrologue .nuri-prologue-choice:hover,#nuriPrologue .nuri-prologue-choice:focus-visible{background:#e9f4e9;border-color:#39816b;outline:2px solid #79bba5;outline-offset:2px}
+#nuriPrologue .nuri-prologue-foot{font-size:12px;color:#52655b;margin:16px 0 0}
+body.nuri-prologue-active{overflow:hidden}
+@media(max-width:560px){#nuriPrologue{padding:10px}#nuriPrologue .nuri-prologue-panel{max-height:calc(100dvh - 20px);padding:17px}#nuriPrologue #nuriPrologueChoices{grid-template-columns:1fr}#nuriPrologue .nuri-prologue-choice{min-height:0;padding:12px;gap:4px}}
+@media(prefers-reduced-motion:reduce){#nuriPrologue .nuri-prologue-choice{transition:none}}
