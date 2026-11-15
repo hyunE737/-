@@ -41,7 +41,7 @@ const agePortraits=['assets/nuri-c346d54008291831.webp','assets/nuri-c346d540082
 const labels={intelligence:"지능",health:"체력",social:"인간관계",creativity:"창의력",charm:"매력",happiness:"행복",money:"재산"};
 const families={
  ordinary:{name:"평범한 가정집 아들",money:100,stats:{intelligence:5,health:10,social:5,creativity:5,charm:5,happiness:50},preview:"시작 100,000원 · 평범한 환경 · 특출난 혜택이나 제약 없이 스스로 성장"},
- wealthy:{name:"재벌집 막내아들",money:300,stats:{intelligence:7,health:10,social:6,creativity:7,charm:7,happiness:45},preview:"시작 300,000원 · 엄격한 부모님 · 주위의 관심과 위험에 주의"},
+ wealthy:{name:"재벌집 막내아들",money:500,stats:{intelligence:7,health:10,social:6,creativity:7,charm:7,happiness:45},preview:"시작 500,000원 · 엄격한 부모님 · 주위의 관심과 위험에 주의"},
  frugal:{name:"찢어지게 가난한 집 첫째 아들",money:30,stats:{intelligence:20,health:10,social:5,creativity:20,charm:5,happiness:56},preview:"시작 30,000원 · 기초생활수급 가정 · 다정한 부모님 · 압도적인 재능"},
  supportive:{name:"꿈을 응원해주는 집 외동아들",money:100,stats:{intelligence:5,health:10,social:12,creativity:9,charm:7,happiness:66},preview:"시작 100,000원 · 꿈을 전폭 지원 · 꿈을 포기하면 지원도 중단"}
 };
@@ -643,7 +643,7 @@ function ensureStory(){
 // Family options use the same two-growth/health-cost balancing as the rest of the game.
 const FAMILY_CHAPTERS={
  ordinary:{
- 5:{title:"평범한 집의 주말",text:"특별한 일정이 없는 토요일. 부모님은 누리에게 오늘 하고 싶은 일을 골라 보라고 해.",options:[
+ 5:{title:"평범한 집의 주말",text:"첫 앨범을 채우던 작은 거실에서 다섯 번째 생일 사진을 찍었어. 특별한 일정이 없는 토요일, 부모님은 오늘 하고 싶은 일을 누리에게 골라 보라고 해.",options:[
   {label:"동네 도서관에서 그림책 보기",effect:["intelligence",3,"creativity",2],outcome:"작은 도서관에서 생각보다 큰 세상을 발견했어.",careerId:"research"},
   {label:"가족과 공원에서 시간 보내기",effect:["social",3,"charm",2],outcome:"평범한 하루가 따뜻한 추억으로 남았어.",careerId:"people"},
   {label:"집에서 새로운 장난감 만들어 보기",effect:["creativity",3,"intelligence",2],outcome:"스스로 무언가를 만드는 즐거움을 알았어.",careerId:"art"}]},
@@ -665,7 +665,7 @@ const FAMILY_CHAPTERS={
   {label:"다음 목표를 계획하기",effect:["intelligence",3,"creativity",2],outcome:"오래 쌓인 경험을 바탕으로 목표를 새로 세웠어."}]}
  },
  wealthy:{
- 5:{title:"엄격한 집안의 규칙",text:"부모님은 일정표를 만들어 공부·예절·외출 시간을 정했어. 누리는 어떻게 반응할까?",options:[
+ 5:{title:"엄격한 집안의 규칙",text:"아기 방에 붙어 있던 시간표는 이제 공부·예절·외출까지 빼곡해졌어. 막내 누리에게도 집안의 규칙은 예외가 아니래. 넉넉한 환경 속에서 자기 시간을 어떻게 지킬까?",options:[
   {label:"왜 그런 규칙인지 부모님께 물어보기",effect:["social",3,"intelligence",2],outcome:"규칙을 이해하고 스스로 의견을 말하는 법을 배웠어.",familyAction:"dialogue"},
   {label:"일정을 지키면서 나만의 시간 만들기",effect:["intelligence",3,"creativity",2],outcome:"엄격한 환경에서도 자기 시간을 지키는 법을 찾았어."},
   {label:"원하는 취미를 차분히 설득해 보기",effect:["charm",3,"social",2],outcome:"부모님이 관심사를 조금 더 이해하게 됐어.",familyAction:"dialogue"}]},
@@ -687,7 +687,7 @@ const FAMILY_CHAPTERS={
   {label:"나만의 일을 유지하겠다고 말하기",effect:["charm",3,"social",2],outcome:"서로 다른 기대를 인정하고 자신만의 기준을 지켰어.",familyAction:"dialogue"}]}
  },
  frugal:{
- 5:{title:"따뜻한 집, 부족한 형편",text:"기초생활수급 지원을 받는 집이라 새 장난감을 사기 어렵지만, 부모님은 매일 누리의 이야기를 들어 줘.",options:[
+ 5:{title:"따뜻한 집, 부족한 형편",text:"아기 때 덮던 담요를 동생에게 물려준 누리는 이제 집안의 첫째야. 기초생활수급 지원을 받는 형편이라 새 장난감은 어렵지만, 부모님은 누리의 빠른 배움과 풍부한 상상력을 알아보고 매일 이야기를 들어 줘.",options:[
   {label:"헌 종이로 그림과 이야기 만들기",effect:["creativity",4,"intelligence",3],outcome:"작은 재료로 놀라운 그림을 만들어 재능의 싹을 보여줬어.",careerId:"art",familyAction:"talent"},
   {label:"오래된 책으로 혼자 새로운 것 배우기",effect:["intelligence",4,"creativity",3],outcome:"누리의 빠른 이해력에 가족이 놀랐어.",careerId:"research",familyAction:"talent"},
   {label:"부모님과 동네 무료 문화 프로그램 가기",effect:["social",3,"creativity",3],outcome:"돈을 많이 쓰지 않아도 즐거운 배움이 있다는 걸 알았어.",familyAction:"talent"}]},
@@ -709,7 +709,7 @@ const FAMILY_CHAPTERS={
   {label:"부모님과 조용한 휴일 보내기",effect:["social",4,"charm",3],outcome:"경제적 형편과 별개로 깊은 애정을 나누는 가족이었어."}]}
  },
  supportive:{
- 5:{title:"꿈을 밀어 주는 부모님",text:"부모님은 누리가 관심 보이는 활동에 시간과 도구를 아끼지 않아. 어떤 꿈의 씨앗을 키워 볼까?",options:[
+ 5:{title:"꿈을 밀어 주는 부모님",text:"아기 때 좋아하던 악기와 블록 사진을 부모님이 꺼내 보여 줬어. 이제 누리가 직접 고른 활동에 시간과 도구를 보태 주겠대. 어떤 꿈의 씨앗을 키워 볼까?",options:[
   {label:"그림과 영상 만들기 시작하기",effect:["creativity",4,"charm",3],outcome:"부모님이 작업 도구를 마련해 주며 계속 해 보라고 응원했어.",familyAction:"dream",careerId:"art"},
   {label:"실험과 코딩 놀이 시작하기",effect:["intelligence",4,"creativity",3],outcome:"배우고 싶다는 말에 부모님이 공부 환경을 마련해 줬어.",familyAction:"dream",careerId:"technology"},
   {label:"사람들 앞에서 발표 연습하기",effect:["social",4,"charm",3],outcome:"부모님은 발표를 보고 박수를 보내 줬어.",familyAction:"dream",careerId:"people"}]},
@@ -788,9 +788,74 @@ function familyBackgroundEvent(){
  return true;
 }
 
+// Family openings retain the original first-choice effects and story flags.
+const FAMILY_OPENINGS={
+ "ordinary": {
+  "title": "작은 거실에서 시작한 인생",
+  "text": "작은 거실에 가족이 모여 누리의 첫 앨범을 펼쳤어. 부모님은 시작 자금 100,000원을 차곡차곡 모아 두었어. 특별한 혜택이나 정해진 진로 없이, 일상 속 작은 선택으로 누리만의 길을 만들어 갈 거야.",
+  "labels": [
+   "가족이 흥얼거리는 노래 듣기",
+   "거실 장난감의 모양 살펴보기",
+   "퇴근한 부모님의 손 꼭 잡기"
+  ],
+  "outcomes": [
+   "평범한 거실이 누리의 첫 공연장이 됐어.",
+   "익숙한 장난감에서 새로운 궁금증을 발견했어.",
+   "바쁜 하루 끝에 함께한 시간이 앨범 첫 장에 남았어."
+  ]
+ },
+ "wealthy": {
+  "title": "큰 저택, 첫 번째 시간표",
+  "text": "커다란 저택의 아기 방에서 누리가 눈을 떴어. 가족은 막내아들을 위해 시작 자금 500,000원을 마련했지만, 벌써 교육과 예절 시간표를 정하고 있어. 넉넉한 기회 속에서도 자신의 목소리를 찾고, 집안 이름 때문에 다가오는 사람을 구별해야 할 거야.",
+  "labels": [
+   "정해진 음악 시간에 리듬 즐기기",
+   "고급 장난감의 구조 살펴보기",
+   "시간표 틈에 부모님의 손 잡기"
+  ],
+  "outcomes": [
+   "정해진 수업 속에서도 누리만의 리듬이 피어났어.",
+   "비싼 장난감의 가격보다 작동 원리가 궁금해졌어.",
+   "엄격한 일정 속 짧은 포옹이 가족의 첫 추억이 됐어."
+  ]
+ },
+ "frugal": {
+  "title": "물려받은 담요와 빛나는 눈",
+  "text": "물려받은 담요를 덮은 누리 곁에서 부모님이 조용히 노래해. 생활 형편은 빠듯하고 시작 자금은 30,000원이지만, 가족은 서로를 다정히 돌봐. 누리는 소리와 모양을 유난히 빨리 익혀. 무료 배움터와 장학 기회를 찾아 이 재능을 키워 갈 수 있을 거야.",
+  "labels": [
+   "부모님이 불러 주는 노래 따라 웃기",
+   "물려받은 장난감의 규칙 찾아보기",
+   "고생한 부모님의 손 꼭 잡기"
+  ],
+  "outcomes": [
+   "한 번 들은 가락에 반응하는 누리를 보고 부모님이 놀랐어.",
+   "낡은 장난감에서도 규칙을 찾아내며 재능의 싹을 보였어.",
+   "넉넉하지 않아도 따뜻한 손길은 늘 누리 곁에 있었어."
+  ]
+ },
+ "supportive": {
+  "title": "네가 좋아하는 걸 찾아보자",
+  "text": "부모님은 누리 앞에 그림책과 작은 악기, 블록을 놓고 어떤 것에 눈을 반짝이는지 지켜봐. 시작 자금 100,000원과 함께 꿈을 찾는 시간을 선물했어. 목표가 생기면 수업과 활동을 응원해 주지만, 스스로 꿈을 포기하면 프로젝트 지원도 멈춰. 다른 꿈을 찾는 대화는 언제든 열려 있어.",
+  "labels": [
+   "작은 악기 소리에 반응하기",
+   "응원 속에서 블록 모양 탐색하기",
+   "박수치는 부모님의 손 잡기"
+  ],
+  "outcomes": [
+   "부모님은 누리가 좋아하는 소리를 기억해 두었어.",
+   "궁금한 것을 마음껏 살펴보도록 가족이 기다려 줬어.",
+   "작은 시도에도 돌아오는 응원이 첫 앨범에 담겼어."
+  ]
+ }
+};
+function familyOpeningChapter(){
+ const opening=FAMILY_OPENINGS[state.family];
+ if(!opening)return STORY_CHAPTERS[0];
+ return {title:opening.title,text:opening.text,options:STORY_CHAPTERS[0].options.map((option,index)=>({...option,label:opening.labels[index],outcome:opening.outcomes[index]}))};
+}
+
 function maybeStartStory(age){
  ensureStory();
- const chapter=STORY_CHAPTERS[age] || FAMILY_CHAPTERS[state.family]?.[age];
+ const chapter=age===0?familyOpeningChapter():(STORY_CHAPTERS[age] || FAMILY_CHAPTERS[state.family]?.[age]);
  if(!chapter||state.storySeen.includes(age))return;
  state.storySeen.push(age);
  state.pendingStory={age,title:chapter.title,text:((age>=13&&Number(state.detourPoints)>0)?"지난 선택 중에는 후회되는 일도 있었어. "+(state.detourPoints>=3?"누리는 잃어버린 신뢰를 회복할 방법을 고민하고 있어. ":"누리는 다른 선택을 해볼 수 있을지 생각해. "):"")+(typeof chapter.text==="function"?chapter.text():chapter.text),options:chapter.options};
