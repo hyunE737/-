@@ -101,3 +101,49 @@ input::placeholder,textarea::placeholder{color:#63766f!important;opacity:1}
   #gameMain .tempo-hintline small{font-size:12px!important;line-height:1.5!important}
   #gameMain .progress-head b,#gameMain #progressText{font-size:12px!important}
 }
+
+/* v1.0.9: health, progress and small numbers with solid contrast */
+#gameMain #healthRiskPanel,
+#gameMain #healthRiskPanel .risk-head,
+#gameMain #healthRiskPanel .risk-head b,
+#gameMain #healthRiskValue,
+#gameMain #healthRiskHint,
+#gameMain #healthStatus,
+#gameMain #healthValue,
+#gameMain #fatigueEffect,
+#gameMain #wealthPercent,
+#gameMain #wealthDetail,
+#gameMain #wealthTotal,
+#gameMain #healthRiskPanel small,
+#gameMain .health-panel small,
+#gameMain .health-panel .health-foot,
+#gameMain .health-panel .health-foot span,
+#gameMain .wealth-progress-panel .wealth-progress-foot,
+#gameMain .wealth-progress-panel .wealth-progress-foot strong,
+#gameMain .wealth-progress-panel .wealth-progress-foot span,
+#gameMain .risk-head span,
+#gameMain .health-risk-panel small,
+#gameMain #statsSection .stat,
+#gameMain #statsSection .stat span,
+#gameMain #statsSection .stat b,
+#gameMain #statsSection .stat small {
+ color:#25493f!important;
+ -webkit-text-fill-color:#25493f!important;
+ opacity:1!important;
+ text-shadow:none!important;
+}
+#gameMain #healthRiskValue,#gameMain #healthStatus,#gameMain #fatigueEffect,#gameMain #wealthPercent{
+ font-weight:750!important;
+}
+#gameMain #healthRiskHint,#gameMain #wealthDetail,#gameMain #healthStatus{font-size:12px!important;line-height:1.55!important}
+#gameMain .health-risk-panel.is-warning #healthRiskValue{color:#8d4b21!important;-webkit-text-fill-color:#8d4b21!important}
+#gameMain .health-risk-panel.is-danger #healthRiskValue{color:#95362f!important;-webkit-text-fill-color:#95362f!important}
+#gameMain .health-risk-panel,
+#gameMain .health-panel,
+#gameMain .wealth-progress-panel{background:#f5f7f1!important;border:1px solid #d0dbd1!important}
+#gameMain #restButton,#gameMain #restButton *{
+ color:#fffdf7!important;-webkit-text-fill-color:#fffdf7!important;
+ background-color:#245e52!important;
+ opacity:1!important;
+}
+#gameMain .health-foot,#gameMain .risk-head,#gameMain .wealth-progress-foot{gap:8px}
