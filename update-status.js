@@ -27,7 +27,7 @@ const overlay=document.createElement('div');overlay.id='nuriUpdateOverlay';overl
 overlay.innerHTML='<section id="nuriUpdateCard" role="dialog" aria-modal="true" aria-labelledby="nuriUpdateTitle"><h2 id="nuriUpdateTitle">📢 누리 키우기 업데이트</h2><p>배포된 최신 게임 버전을 45초마다 확인해.</p><div class="nuri-update-row"><span>현재 화면</span><b id="nuriUpdateCurrent"></b></div><div class="nuri-update-row"><span>서버 최신 버전</span><b id="nuriUpdateLatest"></b></div><div class="nuri-update-row"><span>최근 배포</span><b id="nuriUpdateDate"></b></div><p id="nuriUpdateState" class="nuri-update-status" role="status"></p><b>최근 업데이트 내용</b><ul id="nuriUpdateNotes"></ul><div class="nuri-update-actions"><button type="button" id="nuriUpdateCheck">지금 확인</button><button type="button" id="nuriUpdateApply" class="primary" hidden>새 버전 적용</button><button type="button" id="nuriUpdateClose">닫기</button></div></section>';
 function init(){
 document.body.appendChild(overlay);
-installMenuLink();
+window.nuriOpenUpdateStatus=showUpdatePanel;
 overlay.querySelector('#nuriUpdateClose').addEventListener('click',()=>{overlay.hidden=true;});
 overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.hidden=true;});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){overlay.hidden=true;}});
@@ -50,23 +50,6 @@ function updateMenuLabel(){
  if(title)title.textContent=changed()?'📣 새 업데이트 있음':'업데이트 현황';
  if(summary)summary.textContent=changed()?'새 버전이 배포됐어 · 적용하기':error?'최신 배포 확인 실패 · 다시 확인하기':loading?'최신 배포 확인 중…':latest?'최신 배포 확인 완료 · 변경 내용 보기':'버전 · 업데이트 내역 확인';
 }
-function installMenuLink(){
- const target=document.getElementById('appModalBody');
- if(!target)return;
- const attach=()=>{
-  const grid=target.querySelector('.menu-grid');
-  if(!grid||grid.querySelector('#nuriUpdateMenuTile'))return;
-  const btn=document.createElement('button');
-  btn.type='button';btn.id='nuriUpdateMenuTile';btn.className='menu-tile';
-  btn.innerHTML='<span class="tile-icon" aria-hidden="true">📢</span><span><b>업데이트 현황</b><small>최신 게임 버전 · 변경 내역</small></span>';
-  btn.addEventListener('click',showUpdatePanel);
-  grid.insertBefore(btn,grid.firstChild);
-  updateMenuLabel();
- };
- new MutationObserver(attach).observe(target,{childList:true});
- attach();
-}
-
 function changed(){return !!(latest&&latest.buildId&&current!=='local'&&latest.buildId!==current);}
 function fmt(dt){if(!dt)return '확인 전';const d=new Date(dt);return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('ko-KR',{dateStyle:'medium',timeStyle:'short'}).format(d):'확인 전';}
 function text(id,value){const e=overlay.querySelector('#'+id);if(e)e.textContent=value;}
