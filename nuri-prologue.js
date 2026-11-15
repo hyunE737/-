@@ -17,6 +17,7 @@ function isReady(){
  return true;
 }
 function show(forcePreview=false){
+ if(forcePreview&&typeof window.closeAppModal==='function')window.closeAppModal();
  if(!forcePreview&&(completed||opened||!isReady()))return;
  const root=document.getElementById('nuriPrologue');
  if(!root)return;
