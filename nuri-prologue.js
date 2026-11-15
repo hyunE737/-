@@ -4,7 +4,7 @@
 const OPTIONS=[
  {icon:'↩',title:'한 걸음 뒤로 물러선다',description:'순간적으로 주변을 살피며 안전하게 멈춰 선다.',outcome:'누리는 침착하게 뒤로 물러나 위험을 피했어.',effect:{intelligence:3,health:2},caption:'침착한 판단'},
  {icon:'📣',title:'주변 사람들에게 알려준다',description:'큰 소리로 위험을 알리고 함께 안전한 곳으로 이동한다.',outcome:'누리의 외침 덕분에 주변 사람들도 상황을 알아차렸어.',effect:{social:4,charm:2},caption:'함께하는 선택'},
- {icon:'🚦',title:'신호와 차의 움직임을 살핀다',description:'차가 완전히 멈출 때까지 횡단보도 밖에서 기다린다.',outcome:'누리는 신호와 차의 움직임을 확인하고 안전을 택했어.',effect:{intelligence:4,happiness:2},caption:'신중한 선택'},
+ {icon:'🚦',title:'신호와 차의 움직임을 살핀다',description:'차의 움직임을 확인하며 안전한 곳에서 기다린다.',outcome:'누리는 신호와 차의 움직임을 확인하고 안전을 택했어.',effect:{intelligence:4,happiness:2},caption:'신중한 선택'},
  {icon:'🌿',title:'가까운 안전한 곳으로 이동한다',description:'주변 공간을 확인하고 인도 쪽 안전한 위치로 옮긴다.',outcome:'누리는 재빨리 안전한 위치로 이동해 위기를 넘겼어.',effect:{health:3,creativity:3},caption:'빠른 대처'}
 ];
 let busy=false;
@@ -33,7 +33,7 @@ function choose(index){
    });
    if(!Array.isArray(state.storyJournal))state.storyJournal=[];
    state.storyJournal.push({
-    age:'프롤로그',title:'멈춰 선 시간',intro:'누리가 횡단보도 앞에서 다가오는 트럭을 발견한 순간, 시간이 잠시 멈췄어.',
+    age:'프롤로그',title:'멈춰 선 시간',intro:'누리가 횡단보도를 건너다 다가오는 트럭을 발견한 순간, 시간이 잠시 멈췄어.',
     choice:opt.title,outcome:opt.outcome+' 그리고 시간은 다시 흘러, 누리의 새로운 인생이 시작됐어.'
    });
    if(!Array.isArray(state.log))state.log=[];
