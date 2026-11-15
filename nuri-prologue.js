@@ -29,10 +29,10 @@ function choose(index){
   if(typeof state!=='undefined'&&state){
    state.prologueChoice=index;
    Object.entries(opt.effect).forEach(([key,bonus])=>{
-    if(state.stats && Number.isFinite(Number(state.stats[key])))state.stats[key]=Math.min(100,Number(state.stats[key])+bonus);
+    if(state.stats && Number.isFinite(Number(state.stats[key])))state.stats[key]=((key==='health'||key==='happiness')?Math.min(100,Number(state.stats[key])+bonus):Number(state.stats[key])+bonus);
    });
    if(!Array.isArray(state.storyJournal))state.storyJournal=[];
-   state.storyJournal.unshift({
+   state.storyJournal.push({
     age:'프롤로그',title:'멈춰 선 시간',intro:'누리가 횡단보도 앞에서 다가오는 트럭을 발견한 순간, 시간이 잠시 멈췄어.',
     choice:opt.title,outcome:opt.outcome+' 그리고 시간은 다시 흘러, 누리의 새로운 인생이 시작됐어.'
    });
