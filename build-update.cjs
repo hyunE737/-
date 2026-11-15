@@ -10,8 +10,8 @@ try {
  const str=child.execFileSync('git',['log','-1','--pretty=%s'],{encoding:'utf8',timeout:3500}).trim();
  if(str)subject=str.slice(0,160);
 }catch(e){/* git metadata unavailable in local builds */}
-const notes=[subject,'진로별 면접과 20살 입대 · 22살 전역 시스템','주식 거래와 게임 인터페이스 개선','건의함 완료 페이지 주소 수정'];
-const manifest={version:'1.0.4',buildId,deployedAt:now,commit:commit||null,notes};
+const notes=['프롤로그: 로그인 후 횡단보도에서 4가지 선택 → 가족 선택 → 본게임 시작','프롤로그 다시 보기 및 가족 선택 화면 바로가기 추가','건강 위험도·체력·순자산 등 흐린 글자 대비 개선','게임 메뉴 내 업데이트 현황 및 새 버전 알림',subject];
+const manifest={version:'1.0.12',buildId,deployedAt:now,commit:commit||null,notes};
 fs.writeFileSync('nuri-update.json',JSON.stringify(manifest,null,2)+'\n','utf8');
 const filename='index.html';
 const html=fs.readFileSync(filename,'utf8');
