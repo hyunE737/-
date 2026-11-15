@@ -1094,7 +1094,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
   <p>더 재미있는 누리 키우기를 위해 의견을 보내줘. 내용은 Netlify 접수함에 저장돼. 운영자가 ChatGPT 연동을 설정하면 새로운 접수를 AI가 요약하거나 분류할 수도 있어.</p>
  </div>
  <div class="feedback-grid">
-  <form class="feedback-card" name="nuri-suggestion" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="suggestion-bot-field">
+  <form class="feedback-card" name="nuri-suggestion" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="suggestion-bot-field">
    <input type="hidden" name="form-name" value="nuri-suggestion">
     <input type="hidden" name="subject" value="[누리 키우기] 새 건의 (%{submissionId})">
     <input type="hidden" name="game-context" value="게임 시작 전">
@@ -1108,7 +1108,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
    </label>
    <button class="feedback-submit" type="submit">건의 보내기 <span>→</span></button>
   </form>
-  <form class="feedback-card" name="nuri-bug-report" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="bug-bot-field">
+  <form class="feedback-card" name="nuri-bug-report" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bug-bot-field">
    <input type="hidden" name="form-name" value="nuri-bug-report">
     <input type="hidden" name="subject" value="[누리 키우기] 새 버그 신고 (%{submissionId})">
     <input type="hidden" name="game-context" value="게임 시작 전">
