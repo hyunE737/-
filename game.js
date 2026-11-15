@@ -894,7 +894,7 @@ function renderStoryJournal(){
  const journal=state.storyJournal.slice().reverse();
  document.getElementById("appModalBody").innerHTML=`
  <p class="modal-hint">어릴 때의 선택, 하린과의 우정, 직업 적성이 이어지는 누리의 이야기야. 주요 나이마다 새로운 장이 열려.</p>
- <div class="settings-list">${journal.length?journal.map(ch=>`<article class="story-journal-entry"><h3>📖 ${ch.age}살 · ${ch.title}</h3><p>${ch.intro}</p><p><b>선택:</b> ${ch.choice}</p><p><b>그 후:</b> ${ch.outcome}</p></article>`).join(""):'<p class="modal-hint">아직 기록된 이야기가 없어. 누리의 첫 이야기를 선택해 줘.</p>'}</div>
+ <div class="settings-list">${journal.length?journal.map(ch=>`<article class="story-journal-entry"><h3>📖 ${typeof ch.age==='number'?ch.age+'살':ch.age} · ${ch.title}</h3><p>${ch.intro}</p><p><b>선택:</b> ${ch.choice}</p><p><b>그 후:</b> ${ch.outcome}</p></article>`).join(""):'<p class="modal-hint">아직 기록된 이야기가 없어. 누리의 첫 이야기를 선택해 줘.</p>'}</div>
  <div class="menu-actions"><button class="modal-action" onclick="renderMenuModal()">← 메뉴로 돌아가기</button></div>`;
 }
 
