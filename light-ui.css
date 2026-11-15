@@ -1,0 +1,358 @@
+/* NURI LIFE — bright, accessible 2026 UI. Visual layer only: existing game logic remains unchanged. */
+:root{
+  color-scheme:light;
+  --ink:#202838;--muted:#788396;--purple:#477ff0;--pink:#ed77a4;
+  --bg:#f2f4f8;--card:#ffffff;--card-strong:#fff;--line:#e5eaf2;
+  --blue:#477ff0;--blue-strong:#2f6ceb;--blue-pale:#eaf2ff;
+  --soft:#f7f9fd;--shadow:0 12px 32px rgba(32,49,79,.055);
+}
+html{background:#f2f4f8}
+body{background:#f2f4f8!important;color:#202838!important;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;}
+body::before{display:none!important}
+button{font-family:inherit!important;touch-action:manipulation;cursor:pointer}
+a{color:#386fdd}
+.wrap{max-width:1150px;padding:24px 20px 75px}
+h1,h2,h3{letter-spacing:-.8px;color:#202838!important}
+h1{font-size:clamp(29px,4.3vw,42px)!important;line-height:1.25}
+h2{font-size:21px}
+p{line-height:1.65}
+.sub,.story,.family-note,.notice,.log,.modal-hint,.wealth-intro-caption,.stat-limit-note,.feedback-heading p,
+.feedback-note,.stock-main-head p,.feedback-card-title small{color:#7b879b!important}
+.card,#familyScreen .card,.feedback-card,.app-modal-card{background:#fff!important;color:#222b3a!important;border:1px solid #e7ebf3!important;box-shadow:var(--shadow)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:26px!important}
+.card::before,#familyScreen .card::before,.app-modal-card::before{display:none!important}
+#familyScreen{max-width:1000px;margin:30px auto 50px;padding:0 18px}
+#familyScreen > .card{padding:32px 34px 38px!important;background:transparent!important;border:none!important;box-shadow:none!important}
+#familyScreen>.card>.pill{font-size:12px!important;background:#e9f0ff!important;color:#4276d9!important;border:1px solid #dbe6ff!important;letter-spacing:.6px;padding:8px 12px!important}
+.wealth-intro{position:relative;padding:37px 38px 30px!important;margin:16px 0 18px!important;border-radius:28px!important;background:#fff!important;border:1px solid #e9edf4!important;color:#202838!important;box-shadow:var(--shadow)!important;overflow:hidden}
+.wealth-intro::after{content:'100억'!important;position:absolute;right:-8px;top:-20px;color:#eaf1ff!important;font-size:130px;letter-spacing:-12px;opacity:.72;transform:rotate(-12deg);font-weight:950;pointer-events:none}
+.wealth-intro-kicker,.stock-eyebrow{color:#417de9!important;letter-spacing:.6px!important;font-size:12px!important;font-weight:800}
+.wealth-intro h1{position:relative;z-index:2;font-size:clamp(34px,5vw,54px)!important;max-width:650px;font-weight:900!important;letter-spacing:-2.6px;margin:12px 0 15px!important;color:#1e293b!important}
+.wealth-intro h1 span{display:block!important;background:none!important;color:#417df0!important;-webkit-text-fill-color:#417df0!important}
+.wealth-intro p{position:relative;z-index:2;color:#667386!important;font-size:15px;line-height:1.75;max-width:720px}
+.wealth-intro strong{color:#2c65d2}
+.wealth-intro-meter{position:relative;z-index:2;background:#f4f7fc!important;border:1px solid #e8edf7!important;color:#667386!important;border-radius:16px!important;gap:12px;margin-top:25px!important}
+.wealth-intro-meter strong{color:#3574e9!important}
+.wealth-intro-track{background:#e0e6f2!important}
+.wealth-intro-track i{background:#4781f4!important}
+.wealth-intro-caption{font-size:12px!important;margin-top:12px!important}
+.nuri-start-journey{background:white;border:1px solid #e9edf4;border-radius:25px;padding:23px 26px;margin-bottom:20px;box-shadow:var(--shadow);position:relative;display:grid;grid-template-columns:1fr 175px;align-items:center;gap:14px}
+.nuri-start-journey>div:first-child{min-width:0}
+.nuri-start-journey .journey-eyebrow{font-size:12px;font-weight:750;color:#7f8a9d}
+.nuri-start-journey h2{margin:7px 0 17px!important;font-size:23px}
+.nuri-start-journey img{width:140px;height:150px;object-fit:contain;image-rendering:pixelated;justify-self:center;filter:drop-shadow(0 12px 18px rgba(36,81,155,.12))}
+.nuri-timeline{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:6px 0 0}
+.nuri-timeline:before{content:"";position:absolute;z-index:0;left:9%;right:9%;top:16px;height:4px;background:#e5eaf3;border-radius:50px}
+.nuri-timeline .timeline-stage{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;z-index:1;min-width:0;font-size:12px;font-weight:700;color:#a0acbe;text-align:center}
+.nuri-timeline .timeline-dot{display:block;width:21px;height:21px;border-radius:100%;background:#d3dded;border:5px solid #fff;outline:1px solid #d7e0ee;box-shadow:0 0 0 2px #fff;transition:.15s}
+.nuri-timeline .timeline-stage.done .timeline-dot{background:#8fb4fb;outline-color:#a5c0f6}
+.nuri-timeline .timeline-stage.current{color:#3978ec;font-weight:900}
+.nuri-timeline .timeline-stage.current .timeline-dot{background:#477ff0;outline:5px solid #dae6ff;border-color:#477ff0;box-shadow:0 0 0 2px white}
+.family-heading{padding:16px 5px 6px;align-items:center}
+.family-heading h2{font-size:23px;color:#202838!important}
+.family-heading p{color:#7c8798!important;font-size:14px}
+.family-step{color:#4783f1!important;background:#eaf1ff;padding:8px 12px;border-radius:30px;font-size:11px!important}
+.family-grid{gap:14px!important;margin-top:12px}
+.family-option,.choice,.upgrade,.smallbtn,.tempo-mode,.modal-action,.menu-tile,.setting-row,.inventory-item,.feedback-card{
+  background:#fff!important;color:#222c3c!important;border:1px solid #e4e9f1!important;border-radius:18px!important;box-shadow:0 2px 9px rgba(26,43,77,.027)!important;
+}
+.family-option{position:relative;padding:19px 21px!important;min-height:145px;border:2px solid #e6eaf1!important}
+.family-option b{font-size:17px;color:#233044!important}
+.family-option small{color:#7f899a!important;font-size:13px;line-height:1.6}
+.family-option .family-cash{color:#3876eb!important;font-weight:850!important;margin:6px 0!important}
+.family-option.selected{background:#f2f7ff!important;border-color:#477ff0!important;box-shadow:0 0 0 3px #e4edff!important}
+.family-option.selected:after{content:'선택됨';position:absolute;top:14px;right:14px;font-size:10px;font-weight:900;border-radius:20px;color:#fff;background:#477ff0;padding:6px 8px}
+.family-option:hover,.choice:hover,.menu-tile:hover,.upgrade:hover,.modal-action:hover,.tempo-mode:hover{background:#f7faff!important;border-color:#abc9ff!important;box-shadow:0 9px 22px rgba(54,107,190,.08)!important;transform:translateY(-1px)}
+.family-note{padding:13px!important;font-size:13px}
+.startbtn,.menu-open-btn,.stock-primary,.feedback-submit,.feedback-submit.bug,.nuri-auth-primary,.nuri-auth-guest,.rest-button{
+  background:#477ff0!important;color:#fff!important;border:0!important;border-radius:17px!important;box-shadow:0 8px 20px rgba(54,109,224,.16)!important;font-weight:850!important;
+}
+.startbtn{min-height:64px;font-size:18px!important}
+.startbtn:hover,.menu-open-btn:hover,.stock-primary:hover,.nuri-auth-primary:hover,.nuri-auth-guest:hover{background:#356feb!important}
+.top{position:relative!important;z-index:2!important;background:none!important;backdrop-filter:none!important;display:flex;align-items:center;padding:2px 0 16px;margin-bottom:14px}
+.top h1{font-size:30px!important;letter-spacing:-1.7px}
+.top h1 span{color:#4783ee!important}
+.top .sub{color:#788599!important;font-size:12px;line-height:1.6}
+.top-actions{gap:8px}
+.pill,.hero .tag,.hero .age,.tempo-quick,.tab,.tab.active,.switch-btn{
+  background:#f2f6fd!important;color:#3972de!important;border:1px solid #e1eafb!important;border-radius:100px!important;box-shadow:none!important;
+}
+.menu-open-btn{padding:11px 18px!important;white-space:nowrap}
+.layout{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:18px}
+#gameMain>.nuri-dashboard-journey{margin-bottom:18px;background:#fff;border:1px solid #e9edf5;box-shadow:var(--shadow);border-radius:24px;padding:20px 25px}
+.nuri-dashboard-journey .nuri-timeline{max-width:820px;margin:auto}
+.nuri-dashboard-journey .journey-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.nuri-dashboard-journey h2{font-size:16px!important;margin:0}
+.nuri-dashboard-journey .journey-head small{color:#8d99aa}
+.hero{min-height:360px!important;background:radial-gradient(circle at 52% 40%,#f7faff 5%,#e9f2ff 68%,#e2eaff)!important;border-radius:26px!important;border:1px solid #dce8fa!important;box-shadow:var(--shadow)!important}
+.hero:before{display:none!important}
+.hero img{height:350px;width:280px;max-width:100%;image-rendering:pixelated;filter:drop-shadow(0 13px 17px rgba(42,73,127,.13))!important}
+.hero .tag{left:18px;top:17px!important;padding:9px 14px!important;background:rgba(255,255,255,.91)!important;font-weight:850;color:#4578d8!important;font-size:11px!important;letter-spacing:.45px}
+.hero .age{background:#fff!important;color:#427be9!important;font-size:13px;box-shadow:0 5px 15px #b5c8e531!important}
+.hero #lifeLabel{color:#6f83a5!important}
+.growth-age-tag,.life-path-pill{background:#fff!important;color:#516d9e!important;border:1px solid #e0e8f7!important;box-shadow:none!important}
+#statsSection,#storySection,#shopSection,#stockMarketSection,#worldMainSummary{padding:22px!important}
+#statsSection .row h2,#storySection h2{font-size:21px}
+.money{color:#3976ea!important}
+.wealth-progress-panel,.health-panel,.health-risk-panel,.year-progress,.tempo-settings,.notice,.story-path,.romance-glance,.nuri-comedy,.stock-main-summary span,.stock-disclaimer,.inventory-balance,.setting-row{
+  background:#f7f9fd!important;border:1px solid #e8edf5!important;border-radius:17px!important;color:#38465e!important;box-shadow:none!important;
+}
+.wealth-progress-panel{padding:17px!important}
+.wealth-progress-heading,.health-head,.health-foot,.risk-head{color:#34425c!important}
+.wealth-progress-heading b,.health-head b{color:#202a3e!important}
+.wealth-track,.health-track,.risk-track,.progress-track,.bar{background:#e3eaf4!important;border:0!important;box-shadow:none!important}
+#wealthFill,.progress-fill,.fill{background:#477ff0!important;box-shadow:none!important}
+.health-fill{background:linear-gradient(90deg,#4ec5aa,#6edba0)!important}
+.health-fill.medium{background:#efb85f!important}.health-fill.low{background:#f08089!important}
+.wealth-progress-foot,.health-foot,.health-risk-panel small{color:#8a97a8!important}
+.fatigue-effect{color:#687e9a!important}
+.rest-button{min-height:44px;padding:9px 12px!important}
+.stats{gap:10px}
+.stat{background:#fff!important;border:1px solid #e9edf4!important;color:#253349!important;border-radius:16px!important}
+.statline{color:#38465c!important;font-size:12px!important}
+.stat-limit-note{font-size:12px}
+.stat-limit-note b{color:#3777e8}
+.story{color:#455167!important;font-size:15px!important;line-height:1.75}
+#chapter{font-size:21px!important}
+.story-path-text,.romance-mini-text,.nuri-comedy #comedyLine{color:#5e6e83!important}
+.story-path-head strong,.romance-status{color:#2a3950!important}
+.nuri-comedy .comedy-label{background:#e6efff!important;color:#4177e2!important;border-radius:30px!important;padding:5px 9px}
+.choice,.turning-choice,.arc-choice,.story-choice{min-height:91px;color:#253148!important;text-align:left!important;padding:15px 15px 15px 48px!important}
+.choices{gap:10px;grid-template-columns:1fr 1fr}
+.choice:before{background:#eaf1ff!important;color:#3977ea!important;border-radius:10px!important}
+.choice::after{background:transparent!important}
+.choice strong,.choice b{color:#202f44!important;font-size:14px!important}
+.choice span,.choice small,.choice p{color:#8090a4!important}
+.choice:hover{border-color:#7dacfa!important;background:#f6faff!important}
+.choice:active,.family-option:active,.menu-tile:active{transform:scale(.992)}
+.choice:focus-visible,.family-option:focus-visible,.menu-tile:focus-visible,button:focus-visible{outline:3px solid #9bbbf7!important;outline-offset:3px}
+.year-progress{padding:13px 15px!important}
+.progress-head,.year-progress small{color:#7b879b!important}
+.tempo-quick{font-size:12px!important}
+.upgrade,.smallbtn,.tab{font-size:13px!important}
+.tab{background:#f4f6fb!important;color:#748399!important}
+.tab.active,.tempo-mode.selected{background:#e8f1ff!important;color:#3674e5!important;border-color:#bbd1fc!important}
+.stock-main-head h2{color:#233149!important}.stock-eyebrow{color:#427ff1!important}
+.stock-main-summary span{padding:13px 15px}
+.stock-main-summary strong{color:#233149!important}
+.stock-disclaimer{color:#97a2b1!important}
+.stock-primary{min-height:45px!important;padding:10px 16px!important}
+.log{color:#7c8898!important}
+.mobile-status-strip{background:#fff!important;color:#3d73d9!important}
+/* Navigation and modals */
+.app-modal{background:rgba(31,47,73,.40)!important}
+.app-modal-card{background:#fff!important;border-radius:25px!important;box-shadow:0 24px 72px rgba(28,45,73,.18)!important;max-width:min(680px,calc(100vw - 24px))}
+.app-modal-head{border-bottom:1px solid #ecf0f6!important;padding-bottom:15px!important;margin-bottom:16px}
+.app-modal-head h2{color:#202b3d!important;font-size:22px!important}
+.app-modal-head small{color:#7d8da7!important}
+.modal-x{background:#f2f5fb!important;border:0!important;color:#53617a!important}
+.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}
+.menu-tile{min-height:84px!important;padding:13px!important;gap:11px!important}
+.menu-tile b{font-size:14px!important;color:#253148!important}
+.menu-tile small{font-size:11px!important;color:#8290a5!important}
+.tile-icon{background:#eaf2ff!important;border:1px solid #e0eafb!important;color:#477ff0!important;border-radius:12px!important}
+.menu-actions{display:flex;gap:10px;flex-wrap:wrap}
+.modal-action{min-height:43px;padding:10px 14px!important;color:#3e6dcc!important;background:#f5f9ff!important}
+.inventory-item,.inventory-balance,.setting-row,.upgrade,.feedback-card,.tempo-mode,.stock-trade-card,.stock-history,.stock-overview>div,.world-panel,.world-action{background:#fff!important;border:1px solid #e8edf4!important;color:#2a354a!important;box-shadow:none!important}
+.inventory-item b,.stock-overview b,.stock-trade-title b,.stock-trade-price,.feedback-card-title h3{color:#253249!important}
+.inventory-item small,.stock-trade-title small,.stock-trade-meta,.stock-note,.stock-history li,.setting-row small,.tempo-mode small{color:#7b889c!important}
+.stock-overview,.stock-market-grid,.world-grid{gap:10px}
+.stock-controls button,.world-action button,.item-button{border-radius:12px!important}
+.feedback-area .feedback-heading h2{color:#253249!important}.feedback-area .feedback-card{background:#fff!important}
+.feedback-label,.feedback-label input,.feedback-label textarea,.feedback-label select{color:#35445d!important}
+.feedback-label input,.feedback-label textarea,.feedback-label select,.stock-controls input{background:#fff!important;color:#202838!important;border:1px solid #dfe6f1!important}
+.feedback-label input:focus,.feedback-label textarea:focus,.feedback-label select:focus{border-color:#7aa8ff!important;box-shadow:0 0 0 3px #e0ebff!important}
+.feedback-submit{min-height:49px}
+.turning-overlay,.story-overlay{background:rgba(34,47,75,.45)!important}
+.turning-card,.story-card,.life-end{background:#fff!important;color:#233149!important;border:1px solid #e9edf4!important;border-radius:24px!important;box-shadow:0 20px 64px rgba(41,54,80,.16)!important}
+.turning-card h2,.story-card h2{color:#243145!important}.turning-card>p,.story-card p{color:#728096!important}
+.life-review-cover{background:#eef4ff!important;border:1px solid #e1eaff!important;color:#243149!important}
+.life-review-cover::after{color:#d8e6fc!important}
+.life-review-cover h3{color:#223149!important}
+.life-review-cover p,.life-review-cover small{color:#697a93!important}
+.life-review-eyebrow{color:#3976e9!important}
+.life-review-stat,.life-review-timeline-entry,.life-review-moment{background:#fff!important;border:1px solid #e8edf5!important;color:#27344b!important}
+.photo-unlock-banner{background:#eef4ff!important;border:1px solid #dfebff!important}
+.photo-unlock-banner b{color:#3467ce!important}
+.photo-progress-bar{background:#dce6f4!important}.photo-progress-bar span{background:#4784ef!important}
+.photo-big-preview,.special-photo-card,.absurd-album-entry{background:#fff!important;border:1px solid #e8edf5!important;color:#2b384f!important}
+.photo-big-preview h3,.special-photo-card h3,.absurd-album-entry h3{color:#263349!important}
+.photo-big-preview p,.special-photo-card p,.absurd-album-entry p{color:#7b8aa0!important}
+.photo-big-preview small,.special-photo-card small,.absurd-album-entry small{color:#4179e8!important}
+.special-photo-card{cursor:pointer;min-width:0}
+.special-photo-card.locked img{filter:grayscale(1) blur(5px) brightness(.5)}
+.growth-gallery-tile{background:#f8faff!important;border-color:#e6ebf3!important;color:#53617a!important}
+.toast{background:#26395d!important;color:#fff!important;border:0!important;box-shadow:0 14px 38px rgba(28,44,70,.22)!important}
+/* Account access — match the rest of the light game */
+.nuri-account-gate{background:#f2f4f8!important;color:#243149!important}
+.nuri-account-shell{width:min(100%,470px)!important;padding:32px 34px!important;background:#fff!important;border:1px solid #e4eaf3!important;border-radius:29px!important;box-shadow:0 18px 55px rgba(27,47,84,.085)!important}
+.nuri-account-eyebrow{color:#457fe9!important;letter-spacing:1px!important}
+.nuri-account-heading h1{color:#1f293a!important;font-size:40px!important}
+.nuri-account-heading p{color:#758296!important;font-size:14px!important}
+.nuri-auth-tabs{background:#f2f5fa!important;border:1px solid #e8edf5!important}
+.nuri-auth-tabs button{color:#8e99aa!important}
+.nuri-auth-tabs button.selected{background:#fff!important;color:#3977e8!important;box-shadow:0 3px 10px rgba(31,59,109,.08)!important}
+.nuri-auth-form label{color:#5a6880!important}
+.nuri-auth-form input{background:#f9fbfe!important;border:1px solid #e1e8f3!important;color:#202a3c!important}
+.nuri-auth-form input::placeholder{color:#a1adbd!important}
+.nuri-auth-form input:focus{border-color:#80a8f5!important;box-shadow:0 0 0 3px #e3edff!important}
+.nuri-auth-link{color:#3576e9!important}
+.nuri-auth-divider{color:#96a1b1!important}
+.nuri-auth-divider:before{border-color:#e1e8f2!important}
+.nuri-auth-divider span{background:#fff!important}
+.nuri-auth-guest{background:#ebf3ff!important;color:#3c76dc!important;border:1px solid #dae8ff!important;box-shadow:none!important}
+.nuri-auth-guest:hover{background:#dceaff!important;color:#285ec5!important}
+.nuri-auth-note{color:#8a96a7!important}
+.nuri-account-panel b{color:#1f2b40!important}.nuri-account-panel small{color:#758296!important}
+.nuri-account-panel .nuri-auth-action{background:#f5f8fd!important;border:1px solid #e5ecf6!important;color:#3d6ec6!important}
+.nuri-account-panel .nuri-auth-action.danger{color:#cb5766!important}
+/* desktop startup splash */
+@media(min-width:900px) and (pointer:fine){html.nuri-pc-loading #nuriPcIntro{background:#f2f4f8!important;color:#223149!important}}
+#nuriPcIntro:before{opacity:.45!important;background-image:linear-gradient(#dde6f5 1px,transparent 1px),linear-gradient(90deg,#dde6f5 1px,transparent 1px)!important}
+.nuri-pc-boot-heading,.nuri-pc-boot-heading em{color:#243149!important;text-shadow:none!important}
+.nuri-pc-boot-heading em{color:#427ded!important}
+.nuri-pc-boot-brand,.nuri-pc-boot-sub,.nuri-pc-boot-status,.nuri-pc-boot-progress-info{color:#77869b!important}
+.nuri-pc-boot-brand i{background:#477ff0!important;box-shadow:0 0 0 5px #dce8ff!important}
+.nuri-pc-boot-goal{color:#4274d5!important;background:#eaf2ff!important;border-color:#dfebff!important}
+.nuri-pc-boot-goal strong{color:#2f6bd9!important}
+.nuri-pc-boot-progress-track{background:#dee7f4!important;border:0!important}
+#nuriPcIntroBar{background:#477ff0!important;box-shadow:none!important}
+.nuri-pc-boot-skip{background:#fff!important;border:1px solid #e5ebf4!important;color:#3978de!important}
+.nuri-pc-boot-coin{background:linear-gradient(135deg,#a3bdfa,#477ff0)!important;color:white!important}
+.nuri-pc-boot-rim{border-color:#d5e4ff!important}
+.nuri-pc-boot-chip{background:#fff!important;color:#4178e5!important;border-color:#e2eafb!important}
+/* responsive */
+@media(max-width:900px){
+ .wrap{padding:16px 13px 92px}
+ .layout{grid-template-columns:1fr}
+ #familyScreen{margin:10px auto 30px;padding:0 12px}
+ #familyScreen>.card{padding:9px 0 30px!important}
+ .nuri-start-journey{grid-template-columns:1fr 110px;padding:18px}
+ .nuri-start-journey img{width:100px;height:115px}
+ .wealth-intro{padding:28px 24px!important}
+ .wealth-intro h1{font-size:38px!important}
+ .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .top{flex-wrap:wrap}
+ .hero{min-height:280px!important}
+ .hero img{height:265px;width:228px}
+ .mobile-dock{background:rgba(255,255,255,.96)!important;border-top:1px solid #e9edf4!important;box-shadow:0 -12px 28px rgba(31,54,88,.07)!important;padding-bottom:max(8px,env(safe-area-inset-bottom))!important}
+ .mobile-dock button{color:#8793a5!important;border-radius:13px!important}
+ .mobile-dock button.active{background:#edf4ff!important;color:#3774e8!important;border:1px solid #e3eeff!important}
+ .dock-icon{font-size:19px!important}
+ .mobile-status-strip{display:none!important}
+}
+@media(max-width:520px){
+ #familyScreen{padding:0 12px}
+ .wealth-intro{padding:27px 20px!important}
+ .wealth-intro h1{font-size:36px!important}
+ .wealth-intro::after{right:-35px;font-size:100px;opacity:.52}
+ .wealth-intro p{font-size:14px}
+ .nuri-start-journey{display:block;text-align:center;padding:18px 15px 8px}
+ .nuri-start-journey img{width:110px;height:115px;margin:8px auto 0}
+ .nuri-start-journey h2{font-size:20px!important}
+ .nuri-timeline .timeline-stage{font-size:11px;gap:9px}
+ .family-grid{grid-template-columns:1fr}
+ .family-option{min-height:120px;padding:17px 19px!important}
+ .family-heading{gap:10px;align-items:flex-start}
+ .family-heading h2{font-size:20px!important}
+ .family-step{white-space:nowrap;font-size:10px!important}
+ .startbtn{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom));z-index:5;min-height:60px;box-shadow:0 8px 28px #4c7ed246!important}
+ .wrap{padding:13px 10px 105px}
+ .top h1{font-size:28px!important}
+ .top-actions{gap:6px;flex-wrap:wrap}
+ .top .sub{font-size:11px}
+ .pill{font-size:11px!important;padding:7px 9px!important}
+ .menu-open-btn{padding:9px 12px!important}
+ .nuri-dashboard-journey{padding:17px 12px!important;margin-bottom:12px!important}
+ .hero{min-height:255px!important}
+ .hero img{height:249px;width:199px}
+ .hero .tag{font-size:10px!important}
+ #statsSection,#storySection,#shopSection,#stockMarketSection,#worldMainSummary{padding:16px!important}
+ .card{padding:16px!important;border-radius:22px!important}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .choices{grid-template-columns:1fr!important;gap:9px!important}
+ .choice{min-height:79px!important}
+ .menu-grid{grid-template-columns:1fr!important}
+ .menu-tile{min-height:65px!important}
+ .app-modal-card{max-width:calc(100vw - 20px)!important;padding:18px 15px!important;max-height:calc(100dvh - 26px)!important}
+ .nuri-account-shell{padding:27px 20px!important;border-radius:23px!important}
+ .nuri-account-heading h1{font-size:34px!important}
+ .special-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .special-photo-card{padding:9px!important}
+ .special-photo-card p{font-size:11px!important}
+ .stock-controls{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.choice,.family-option,.menu-tile,.startbtn{transition:none!important}}
+/* Personal top skills (an honest ranking of this save, not fictional online players) */
+.nuri-skill-ranking{margin-top:19px;padding:18px;background:#fff;border:1px solid #e9edf4;border-radius:19px}
+.nuri-skill-heading{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:14px}
+.nuri-skill-heading h3{font-size:18px!important;margin:0;color:#293449!important}
+.nuri-skill-heading span{font-size:11px;color:#8794a7}
+.nuri-skill-rows{display:grid;gap:9px}
+.nuri-skill-item{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:11px;padding:9px 4px}
+.nuri-skill-number{font-weight:900;color:#467fe9;font-size:18px}
+.nuri-skill-name{font-size:14px;font-weight:750;color:#38465c}
+.nuri-skill-value{font-weight:850;color:#68768b;font-size:14px;font-variant-numeric:tabular-nums}
+.nuri-skill-note{font-size:11px;color:#8c97a8;margin:8px 0 0}
+.nuri-account-emblem{width:57px;height:57px;display:grid;place-items:center;margin:0 auto 16px;background:#477ff0;border-radius:18px;color:#fff;font-size:31px;font-weight:900;box-shadow:0 12px 24px #477ff02e}
+.nuri-account-heading{margin-bottom:20px!important}
+.nuri-start-journey .journey-eyebrow{display:block}
+/* Critical readability correction: old dark-mode option specificity had !important overrides. */
+.choice.nuri-option-card,
+.turning-options .choice.nuri-option-card{
+  --option-highlight:#477ff0;
+  background:#fff!important;color:#243047!important;
+  border:1px solid #e1e8f2!important;
+  border-radius:19px!important;
+  box-shadow:0 4px 14px rgba(43,64,101,.065)!important;
+  min-height:140px!important;padding:17px 17px 15px!important;
+  display:flex!important;align-items:stretch!important;justify-content:flex-start!important;
+}
+.choice.nuri-option-card:nth-child(2){--option-highlight:#359e9b}
+.choice.nuri-option-card:nth-child(3){--option-highlight:#9162d5}
+.choice.nuri-option-card:nth-child(4){--option-highlight:#dc9669}
+.choice.nuri-option-card::after{display:none!important}
+.choice.nuri-option-card::before{left:16px!important;right:16px!important;top:0!important;height:3px!important;background:var(--option-highlight)!important;opacity:.82!important;border:0!important;border-radius:0 0 6px 6px!important;content:""!important;width:auto!important;position:absolute!important}
+.choice.nuri-option-card:hover{background:#f7faff!important;border-color:#adc7f6!important;box-shadow:0 8px 20px rgba(49,91,160,.09)!important}
+.choice.nuri-option-card .nuri-option-top{color:#7e8da4!important;margin-bottom:10px!important}
+.choice.nuri-option-card .nuri-option-number{color:var(--option-highlight)!important;background:color-mix(in srgb,var(--option-highlight) 10%,white)!important;border-color:color-mix(in srgb,var(--option-highlight) 24%,white)!important}
+.choice.nuri-option-card .nuri-option-kind{color:#91a0b5!important;font-size:10px!important}
+.choice.nuri-option-card .nuri-option-title{color:#263247!important;font-size:15px!important;line-height:1.4!important;font-weight:850!important}
+.choice.nuri-option-card .nuri-option-description{color:#7c899b!important;font-size:12px!important}
+.choice.nuri-option-card .nuri-option-effects{border-top:1px solid #eef1f6!important;gap:6px!important}
+.choice.nuri-option-card .nuri-option-stat{font-size:11px!important}
+.choice.nuri-option-card .nuri-option-stat.is-gain{color:#188a65!important;background:#e5f8ef!important;border-color:#d9f2e6!important}
+.choice.nuri-option-card .nuri-option-stat.is-cost{color:#c65b64!important;background:#fff0f2!important;border-color:#ffdee2!important}
+@media(max-width:520px){
+ .choice.nuri-option-card,.turning-options .choice.nuri-option-card{min-height:116px!important;padding:13px 15px!important}
+ .choice.nuri-option-card .nuri-option-title{font-size:14px!important}
+}
+/* Additional management panels: make all text and controls legible on white. */
+.world-main-top>span{background:#eaf3ff!important;border:1px solid #dfecff!important;color:#3474e4!important}
+.world-mini-grid>div,.world-moneybar>span,.world-feature,.world-item,.world-empty,.world-history,.world-meter{background:#f8faff!important;border:1px solid #e7edf7!important;color:#536178!important;border-radius:15px!important}
+.world-mini-grid b,.world-moneybar b,.world-item b,.world-feature b,.world-meter b{color:#26344c!important}
+.world-main-actions button,.world-button{background:#eaf2ff!important;border:1px solid #d7e7ff!important;color:#3772dc!important;box-shadow:none!important;border-radius:12px!important}
+.world-main-actions button:hover,.world-button:hover:not(:disabled){background:#dceaff!important;border-color:#a8cbff!important}
+.world-button:disabled{opacity:.45!important;cursor:not-allowed}
+.world-item.unlocked{background:#eef9f5!important;border-color:#c9eee1!important}
+.world-history,.world-history li,.world-empty{color:#74839b!important}
+.world-meter .world-meter-bar{background:#dce7f7!important}
+.world-meter .world-meter-fill{background:#477ff0!important}
+/* Some older secondary panels retain neon colors with very light typography; normalize. */
+.story-journal-entry h3,.growth-gallery-heading,.absurd-intro h3,.stock-history h3{color:#26344b!important}
+.story-journal-entry p,.absurd-intro p{color:#74849b!important}
+.story-journal-entry{border-color:#e8edf5!important}
+.stock-trade-meta span,.stock-trade-card small{color:#728096!important}
+.stock-up{color:#168c60!important}.stock-down{color:#d15e72!important}
+.stock-spark{opacity:.9}
+.setting-row label,.setting-row span,.tempo-settings b,.tempo-mode b{color:#34425a!important}
+.setting-row p,.setting-row small,.modal-hint{color:#7a889c!important}
+/* Fixed mobile primary CTA, as in the user's reference; hidden with the family page after start. */
+@media(max-width:520px){
+ #familyScreen{padding-bottom:110px}
+ #familyScreen .startbtn{
+  position:fixed!important;left:14px!important;right:14px!important;bottom:max(14px,env(safe-area-inset-bottom))!important;
+  width:calc(100% - 28px)!important;max-width:540px!important;margin:0 auto!important;
+  z-index:50!important;border-radius:17px!important;min-height:59px!important;
+  box-shadow:0 14px 30px #477ff04a!important;
+ }
+}

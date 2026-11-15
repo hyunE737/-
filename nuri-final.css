@@ -1,0 +1,301 @@
+/* NURI LIFE — final original "life journal" art direction
+   Visual-only override. Core engine, account logic, state and callbacks remain untouched. */
+:root{
+  color-scheme:light;
+  --ink:#243c3c;--muted:#788683;--purple:#285f59;--pink:#dc856e;
+  --bg:#f4f0e7;--card:#fffdf6;--card-strong:#fffdf6;--line:#dedfd4;
+  --blue:#285f59;--blue-strong:#244d47;--blue-pale:#e4f0e8;
+  --paper:#fffdf6;--mint:#d6eee1;--deep:#234540;--coral:#dc856e;--butter:#f8e6b7;
+  --shadow:0 15px 40px rgba(34,65,61,.075);
+}
+html{background:#f4f0e7!important}
+body{background:
+ radial-gradient(circle at 9% 4%,rgba(252,218,169,.45),transparent 26%),
+ radial-gradient(circle at 92% 26%,rgba(197,226,211,.55),transparent 24%),
+ #f4f0e7!important;color:#243c3c!important;
+ font-family:system-ui,-apple-system,"Apple SD Gothic Neo", "Malgun Gothic",sans-serif!important;
+}
+body::before{content:""!important;display:block!important;z-index:0;position:fixed;inset:0;
+ background-image:radial-gradient(#8eada016 .75px,transparent .75px);background-size:16px 16px;
+ pointer-events:none;}
+body>*{position:relative}button{font-family:inherit!important;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #91cbbb!important;outline-offset:3px}
+a{color:#286760!important}
+.wrap{max-width:1210px!important}
+h1,h2,h3{color:#243c3c!important;letter-spacing:-1.2px!important}
+.card,#familyScreen .card,.feedback-card,.app-modal-card{
+ background:#fffdf7!important;color:#243c3c!important;border:1px solid #e1e1d8!important;
+ border-radius:23px!important;box-shadow:0 8px 0 #e7e7dc,0 16px 36px rgba(32,65,57,.06)!important;
+}
+.pill{background:#e6f0e8!important;color:#2c6257!important;border-color:#d8e7dc!important}
+.top{align-items:center!important;margin-bottom:20px!important}
+.top h1{font-size:clamp(25px,3vw,36px)!important;letter-spacing:-1.9px!important}
+.top .sub{color:#818e87!important}
+.top .pill{font-size:11px!important}
+.menu-open-btn,.startbtn,.rest-button,.stock-primary,.feedback-submit,.nuri-auth-primary{
+ background:#285f59!important;color:#fffdf7!important;border:1px solid #244b46!important;
+ box-shadow:0 5px 0 #163d38!important;border-radius:14px!important;
+ font-weight:850!important;transition:transform .16s ease,box-shadow .16s ease,background .16s ease!important;
+}
+.menu-open-btn:hover,.startbtn:hover,.rest-button:hover,.stock-primary:hover,.feedback-submit:hover,.nuri-auth-primary:hover{background:#35766a!important;transform:translateY(-2px)}
+.menu-open-btn:active,.startbtn:active,.rest-button:active,.stock-primary:active{transform:translateY(3px)!important;box-shadow:0 2px 0 #163d38!important}
+/* First chapter: editorial cover, completely different from a ranking-site intro */
+#familyScreen{max-width:1100px!important;margin:24px auto 50px!important}
+#familyScreen>.card{background:transparent!important;border:0!important;box-shadow:none!important;padding:25px!important}
+#familyScreen>.card>.pill{background:#284f4a!important;color:#fff7e7!important;border-color:#284f4a!important;padding:9px 16px!important;border-radius:9px 9px 9px 2px!important;font-size:11px!important;letter-spacing:1.2px}
+.wealth-intro{position:relative;isolation:isolate;overflow:hidden;margin-top:18px!important;
+ padding:46px 48px 43px!important;border:2px solid #294f49!important;border-radius:28px 28px 95px 28px!important;
+ background:
+ radial-gradient(circle at 86% 22%,#fbd8bc 0 12%,transparent 12.2%),
+ linear-gradient(120deg,#fff7e8 10%,#fbeed7 65%,#fae7d0)!important;
+ box-shadow:12px 12px 0 #c1dcd1!important;
+}
+.wealth-intro::before{content:""!important;display:block!important;position:absolute;z-index:-1;width:260px;height:260px;right:0;bottom:-140px;
+ border:35px solid rgba(124,161,145,.22);border-radius:50%;transform:rotate(-15deg)}
+.wealth-intro::after{content:"N / L"!important;right:26px!important;top:10px!important;opacity:.18!important;
+ transform:rotate(-8deg)!important;color:#cc9773!important;font-size:100px!important;letter-spacing:-14px!important;font-weight:950!important}
+.wealth-intro-kicker{color:#296359!important;letter-spacing:1.5px!important;font-size:11px!important;font-weight:900!important}
+.mini-star{color:#d8765f;font-size:20px;margin-right:6px;vertical-align:-1px}
+.wealth-intro h1{font-size:clamp(35px,5.9vw,66px)!important;line-height:1.15!important;letter-spacing:-3.7px!important;font-weight:950!important;
+ max-width:760px;margin:17px 0 21px!important;color:#263e3b!important}
+.wealth-intro h1 span{background:none!important;color:#d67b60!important;-webkit-text-fill-color:#d67b60!important}
+.wealth-intro p{max-width:740px;color:#606e63!important;font-size:15px!important;line-height:1.85!important}
+.wealth-intro strong{color:#225f54!important}
+.nuri-goal-stamp{display:inline-flex;gap:8px;align-items:baseline;position:relative;padding:10px 14px;margin:3px 0 12px;
+ border:1px dashed #cb8469;border-radius:11px;background:#fffcf7bb;color:#9b614e;font-size:12px;font-weight:700;transform:rotate(-2deg)}
+.nuri-goal-stamp strong{font-size:21px!important;color:#b7634e!important;letter-spacing:-1px}
+.wealth-intro-meter{background:#fff7e7!important;border:1px solid #e7d6be!important;border-radius:12px!important;max-width:650px;margin-top:23px!important}
+.wealth-intro-meter strong{color:#2a6258!important}
+.wealth-intro-track{background:#e1dbcc!important}
+.wealth-intro-track i{background:#d88266!important}
+.wealth-intro-caption{color:#8a8377!important;font-size:11px!important;max-width:720px}
+/* Chapter bookmarks instead of dot-only achievement line */
+.nuri-start-journey{background:#e0ece2!important;border:1px solid #b8cfbf!important;box-shadow:7px 7px 0 #c7d4c7!important;
+ border-radius:16px 65px 16px 16px!important;padding:24px 28px!important;gap:20px!important;grid-template-columns:1fr 156px!important}
+.nuri-start-journey .journey-eyebrow{color:#397067!important;font-size:11px!important;letter-spacing:1.1px;text-transform:uppercase}
+.nuri-start-journey h2{color:#2c4a44!important;margin:7px 0 18px!important;font-size:22px!important}
+.nuri-start-journey img{max-width:155px!important;image-rendering:pixelated;filter:drop-shadow(6px 8px 0 #accabd)}
+.nuri-timeline{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px!important;padding:0!important}
+.nuri-timeline:before{display:none!important}
+.nuri-timeline .timeline-stage{background:#f8fcf5b8;border:1px solid #c9d9cc;border-radius:11px;padding:10px 4px 8px;
+ gap:6px!important;font-size:11px!important;color:#70897f!important;min-height:67px;justify-content:center}
+.nuri-timeline .timeline-dot{width:9px!important;height:9px!important;border:0!important;border-radius:3px!important;outline:none!important;
+ background:#b4d2c1!important;box-shadow:none!important;transform:rotate(45deg)}
+.nuri-timeline .timeline-stage.done{background:#e1f3e9;border-color:#a8cfc0;color:#386d61}
+.nuri-timeline .timeline-stage.current{background:#2c6157!important;color:#fff!important;border-color:#2c6157!important}
+.nuri-timeline .timeline-stage.current .timeline-dot{background:#f8d894!important;border:0!important;outline:none!important;box-shadow:none!important}
+.family-heading{padding:23px 6px 10px!important}
+.family-heading h2{font-size:25px!important;color:#2b4942!important}
+.family-heading p{color:#879088!important}
+.family-step{background:#f5d7b8!important;color:#a96249!important;border:0;border-radius:10px!important}
+.family-grid{gap:14px!important}
+.family-option{border:1px solid #ddded4!important;border-radius:14px!important;background:#fffdf5!important;padding:21px!important;
+ min-height:147px!important;box-shadow:0 5px 0 #e5e4d8!important;transition:all .17s ease!important}
+.family-option b{color:#2e4943!important;font-size:16px!important}
+.family-option small{color:#88938c!important}
+.family-option .family-cash{color:#b46d4e!important}
+.family-option.selected{background:#e6f2e7!important;border:2px solid #347469!important;box-shadow:0 5px 0 #b3d5c7!important}
+.family-option.selected:after{content:'START';background:#2c665c!important;color:#fff!important;border-radius:8px!important}
+.family-option:hover{background:#fff8e9!important;border-color:#d1a988!important;transform:translateY(-2px)}
+.family-note{color:#7b897f!important}
+.startbtn{font-size:16px!important;letter-spacing:-.3px!important;min-height:62px!important}
+/* Core scene: game chapter / portrait / stat panels */
+#gameMain>.nuri-dashboard-journey{background:#e0ece2!important;border:1px solid #c6d9c9!important;box-shadow:0 6px 0 #d5dace!important;border-radius:19px!important}
+.nuri-dashboard-journey .journey-head h2{color:#285348!important}
+.nuri-dashboard-journey .journey-head small{color:#698077!important}
+.hero{min-height:345px!important;background:
+ radial-gradient(circle at 50% 32%,#f5edd9 0 18%,transparent 65%),
+ linear-gradient(140deg,#e6efe1 5%,#d3e5de 55%,#bed7d0)!important;
+ border:2px solid #93baae!important;border-radius:30px 30px 110px 30px!important;box-shadow:8px 8px 0 #d2dbd2!important;}
+.hero img{height:338px!important;width:268px!important;image-rendering:pixelated;filter:drop-shadow(7px 13px 2px #729d8e42)!important}
+.hero .tag{background:#265c55!important;border:0!important;border-radius:9px!important;color:#fff9e8!important;letter-spacing:.8px}
+.hero .age{background:#fff7e9!important;color:#b87552!important;border:1px solid #edcfac!important;border-radius:12px!important}
+.growth-age-tag,.life-path-pill{background:#fff9e8!important;color:#446c5e!important;border:1px solid #dadcc8!important}
+#statsSection,#storySection,#shopSection,#stockMarketSection,#worldMainSummary{padding:22px!important}
+#statsSection h2,#storySection h2{color:#273f3d!important}
+#chapter{font-size:23px!important}
+.story{color:#596c66!important;font-size:15px!important}
+.money{color:#b76d4a!important}
+.wealth-progress-panel,.health-panel,.health-risk-panel,.year-progress,.tempo-settings,.notice,.story-path,.romance-glance,.nuri-comedy,.stock-main-summary span,.stock-disclaimer,.inventory-balance,.setting-row{
+ background:#f6f7ec!important;border:1px solid #e0e4d6!important;color:#45615a!important;border-radius:14px!important}
+.wealth-track,.health-track,.risk-track,.progress-track,.bar{background:#dfe7db!important}
+#wealthFill,.progress-fill,.fill{background:linear-gradient(90deg,#348477,#9fc5a3)!important;box-shadow:none!important}
+.health-fill{background:linear-gradient(90deg,#6bb797,#c8d68d)!important}
+.health-fill.medium{background:#d6a85b!important}.health-fill.low{background:#d6726a!important}
+.stat{background:#fffdf6!important;border:1px solid #e3e8db!important;border-radius:13px!important;box-shadow:none!important}
+.statline{color:#445f56!important}
+.stat-limit-note b{color:#2a7667!important}
+.nuri-skill-ranking{background:#fef9ed!important;border:1px dashed #dacbad!important;border-radius:14px!important}
+.nuri-skill-heading h3{color:#2d5048!important}
+.nuri-skill-number{color:#ba7051!important}
+.nuri-skill-name{color:#426458!important}
+.nuri-skill-value{color:#285f59!important}
+.nuri-comedy .comedy-label{background:#fbe2c5!important;color:#a76045!important;border-radius:7px!important}
+.story-path-head strong,.romance-status{color:#295a51!important}
+/* Choices: individual journal strips, not generic blue ranking cards */
+.choice.nuri-option-card,.turning-options .choice.nuri-option-card{
+ --option-highlight:#3b8073; min-height:131px!important;
+ border:1px solid #dcded3!important;border-left:5px solid var(--option-highlight)!important;
+ border-radius:10px 18px 18px 10px!important;
+ background:#fffdf6!important;box-shadow:0 3px 0 #e7e7da!important;
+ padding:15px 16px!important;
+}
+.choice.nuri-option-card:nth-child(2){--option-highlight:#da9863}
+.choice.nuri-option-card:nth-child(3){--option-highlight:#9b85b6}
+.choice.nuri-option-card:nth-child(4){--option-highlight:#d47f76}
+.choice.nuri-option-card::before{display:none!important}
+.choice.nuri-option-card:hover{background:#f9f5e8!important;border-color:#c2cfc5!important;box-shadow:0 5px 0 #d6e1d6!important;transform:translateY(-2px)}
+.choice.nuri-option-card .nuri-option-top{color:#809087!important;margin-bottom:9px!important}
+.choice.nuri-option-card .nuri-option-number{background:#f0eee3!important;color:var(--option-highlight)!important;border-color:#e7e4d5!important;border-radius:6px!important}
+.choice.nuri-option-card .nuri-option-kind{color:#8c948d!important}
+.choice.nuri-option-card .nuri-option-title{color:#2c4640!important;font-size:15px!important}
+.choice.nuri-option-card .nuri-option-description{color:#879188!important}
+.choice.nuri-option-card .nuri-option-effects{border-top:1px dashed #e3e2d5!important}
+.choice.nuri-option-card .nuri-option-stat.is-gain{background:#e6f3e7!important;color:#286c57!important;border-color:#cde5d0!important}
+.choice.nuri-option-card .nuri-option-stat.is-cost{background:#fff0e4!important;color:#b97750!important;border-color:#f1ddc5!important}
+.choice:focus-visible,.family-option:focus-visible,.menu-tile:focus-visible{outline:3px solid #69ab96!important}
+/* Shop, money, achievement & scene controls */
+.tab{background:#f0eee3!important;color:#698179!important;border-radius:10px!important}
+.tab.active,.tempo-mode.selected{background:#dcefe3!important;color:#28695c!important;border-color:#9ccbb8!important}
+.tempo-quick{background:#e5f0e6!important;color:#326e62!important;border-color:#cfe0d2!important;border-radius:9px!important}
+.stock-eyebrow,.wealth-intro-kicker{color:#2b7768!important}
+.stock-main-head h2{color:#274941!important}
+.stock-main-summary strong{color:#2d4c44!important}
+.world-main-top>span{background:#e2efe3!important;border-color:#cce0d1!important;color:#337467!important}
+.world-mini-grid>div,.world-moneybar>span,.world-feature,.world-item,.world-empty,.world-history,.world-meter{
+ background:#f8f7ed!important;border-color:#e3e5d9!important;color:#5f756c!important}
+.world-main-actions button,.world-button{background:#e5f0e5!important;border-color:#bfd9c8!important;color:#306e5e!important}
+.world-main-actions button:hover,.world-button:hover:not(:disabled){background:#d8e8d9!important}
+.world-meter .world-meter-fill{background:#479a82!important}
+.world-item.unlocked{background:#e7f2df!important;border-color:#bad8b6!important}
+/* Menu: spacious editorial tiles, retains all feature buttons */
+.app-modal{background:rgba(28,54,49,.38)!important}
+.app-modal-card{background:#fffdf6!important;border:1px solid #dfe4d7!important;border-radius:25px!important;
+ box-shadow:0 28px 72px #223d3b44!important;}
+.app-modal-head{border-bottom:1px dashed #dce4d8!important}
+.app-modal-head h2{color:#294a44!important}
+.app-modal-head small{color:#8b998b!important;letter-spacing:1px}
+.modal-x{background:#edf2e8!important;color:#315e54!important;border:1px solid #d7e5d9!important}
+.menu-grid{gap:11px!important}
+.menu-tile,.family-option,.upgrade,.smallbtn,.modal-action,.tempo-mode,.setting-row,.inventory-item,.feedback-card{
+ background:#fffaf1!important;border:1px solid #e4e5d9!important;box-shadow:0 3px 0 #e9e8dd!important;color:#2a4942!important}
+.menu-tile{min-height:87px!important;border-radius:12px!important;text-align:left}
+.menu-tile:nth-child(4n + 2){background:#f2f7eb!important}
+.menu-tile:nth-child(4n + 3){background:#fcf1e6!important}
+.menu-tile b{color:#304c45!important}
+.menu-tile small{color:#7e9087!important}
+.tile-icon{background:#dceee2!important;border-color:#c6e1d2!important;color:#366f61!important;border-radius:8px!important}
+.menu-tile:nth-child(4n + 3) .tile-icon{background:#f7e3ca!important;border-color:#eed3ae!important;color:#a9694d!important}
+.menu-tile:hover,.upgrade:hover,.smallbtn:hover,.modal-action:hover{background:#edf3e8!important;border-color:#a6cabb!important}
+.modal-action{background:#edf3e8!important;color:#336d5e!important;border-radius:11px!important}
+.inventory-item,.inventory-balance,.setting-row,.upgrade,.feedback-card,.tempo-mode,.stock-trade-card,.stock-history,.stock-overview>div,.world-panel,.world-action{
+ background:#fffaf0!important;border-color:#e1e5d8!important;color:#3b534a!important}
+.stock-trade-title b,.inventory-item b,.feedback-card-title h3{color:#29483f!important}
+.feedback-label input,.feedback-label textarea,.feedback-label select,.stock-controls input{background:#fffdf7!important;color:#243f37!important;border-color:#dbe2d5!important}
+.feedback-label input:focus,.feedback-label textarea:focus,.feedback-label select:focus{border-color:#80b6a0!important;box-shadow:0 0 0 3px #e0eee6!important}
+.turning-card,.story-card,.life-end{background:#fffaf0!important;border-color:#dae4d8!important;color:#25463e!important;border-radius:19px!important}
+.turning-card h2,.story-card h2{color:#29473f!important}
+.life-review-cover{background:#e6f2e4!important;border-color:#c4dcc5!important;color:#29493e!important}
+.life-review-cover h3{color:#2e4b43!important}
+.life-review-eyebrow{color:#3a826f!important}
+.life-review-stat,.life-review-timeline-entry,.life-review-moment{background:#fff9ef!important;border-color:#e8e6dc!important;color:#34483d!important}
+.photo-unlock-banner{background:#ecf4e7!important;border-color:#d2e5cf!important}
+.photo-unlock-banner b{color:#2a6e5a!important}
+.photo-progress-bar{background:#d8e6d4!important}.photo-progress-bar span{background:#4c9b7d!important}
+.photo-big-preview,.special-photo-card,.absurd-album-entry{background:#fffaf0!important;border-color:#e4e6d8!important;color:#324f44!important}
+.photo-big-preview h3,.special-photo-card h3,.absurd-album-entry h3{color:#314c43!important}
+.photo-big-preview small,.special-photo-card small,.absurd-album-entry small{color:#3a8b70!important}
+.toast{background:#244c43!important;color:#fff9e8!important;box-shadow:0 12px 24px #24443c3d!important}
+/* Account and desktop loading screen */
+.nuri-account-gate{background:
+ radial-gradient(circle at 25% 0%,#fce5c7,transparent 42%),
+ radial-gradient(circle at 88% 85%,#d7ede1,transparent 44%),
+ #f3efe5!important;color:#24483d!important}
+.nuri-account-shell{background:#fff9ec!important;border:2px solid #b9d0bc!important;border-radius:27px 27px 66px 27px!important;
+ box-shadow:9px 10px 0 #d4e4d3!important}
+.nuri-account-emblem{background:#2e6a5e!important;border-radius:13px!important;box-shadow:5px 5px 0 #c8dfd0!important}
+.nuri-account-eyebrow{color:#9f7256!important}
+.nuri-account-heading h1{color:#26473f!important}
+.nuri-account-heading p{color:#7d8d82!important}
+.nuri-auth-tabs{background:#eaf0e6!important;border-color:#d7e1d5!important;border-radius:12px!important}
+.nuri-auth-tabs button{color:#73887b!important}
+.nuri-auth-tabs button.selected{background:#fff9ed!important;color:#2f6e60!important}
+.nuri-auth-form label{color:#436055!important}
+.nuri-auth-form input{background:#fffdf7!important;border-color:#dce5d9!important;color:#2d4d44!important;border-radius:11px!important}
+.nuri-auth-form input:focus{border-color:#7bad96!important;box-shadow:0 0 0 3px #e1ede0!important}
+.nuri-auth-link{color:#286c5d!important}
+.nuri-auth-divider span{background:#fff9ec!important}
+.nuri-auth-guest{background:#e1efe5!important;color:#306f60!important;border:1px solid #bddacc!important;box-shadow:0 4px 0 #bdd9c7!important;border-radius:14px!important}
+.nuri-auth-guest:hover{background:#d8eadb!important}
+.nuri-auth-note{color:#84938a!important}
+.nuri-account-panel b{color:#285245!important}
+.nuri-account-panel .nuri-auth-action{background:#eef5ec!important;border-color:#d6e5d7!important;color:#376c5c!important}
+@media(min-width:900px) and (pointer:fine){html.nuri-pc-loading #nuriPcIntro{background:#f3eee3!important;color:#27483f!important}}
+#nuriPcIntro:before{background-image:radial-gradient(#8eada038 1px,transparent 1px)!important;background-size:21px 21px!important}
+.nuri-pc-boot-heading,.nuri-pc-boot-heading em{color:#284f44!important}
+.nuri-pc-boot-heading em{color:#d47e63!important}
+.nuri-pc-boot-brand,.nuri-pc-boot-sub,.nuri-pc-boot-status,.nuri-pc-boot-progress-info{color:#75857b!important}
+.nuri-pc-boot-brand i{background:#e1a578!important;box-shadow:0 0 0 5px #f5dfc2!important}
+.nuri-pc-boot-goal{background:#e1efe2!important;border-color:#cfe1d1!important;color:#2e6658!important}
+.nuri-pc-boot-goal strong{color:#2e6658!important}
+.nuri-pc-boot-progress-track{background:#d8e2d7!important}
+#nuriPcIntroBar{background:#4d9d85!important}
+.nuri-pc-boot-skip{background:#fffaf0!important;border-color:#dbe5d8!important;color:#326b5d!important}
+.nuri-pc-boot-coin{background:linear-gradient(135deg,#f0cc86,#d98569)!important}
+.nuri-pc-boot-rim{border-color:#d8e6d6!important}.nuri-pc-boot-chip{background:#fffaf0!important;color:#316a58!important;border-color:#d6e6d5!important}
+/* Mobile: warm, usable, one-tap navigation */
+@media(max-width:900px){
+ .mobile-dock{background:#fffaf0ef!important;border-top:1px solid #d8e2d6!important;box-shadow:0 -10px 28px #3351461a!important}
+ .mobile-dock button{color:#789186!important}
+ .mobile-dock button.active{background:#dfeddf!important;color:#2b6c5d!important;border-color:#c5dccd!important}
+ .nuri-start-journey{grid-template-columns:1fr 105px!important;padding:17px!important}
+ .nuri-start-journey img{width:105px!important;height:120px!important}
+ .hero{min-height:280px!important}
+ .hero img{height:264px!important;width:218px!important}
+}
+@media(max-width:520px){
+ body{background:#f5f1e9!important}
+ #familyScreen{padding:0 10px 112px!important;margin-top:7px!important}
+ #familyScreen>.card{padding:7px 0 16px!important}
+ .wealth-intro{padding:28px 20px 27px!important;border-radius:21px 21px 68px 21px!important;box-shadow:6px 7px 0 #bddacc!important}
+ .wealth-intro h1{font-size:36px!important;line-height:1.18!important;letter-spacing:-2.1px!important;margin:13px 0 17px!important}
+ .wealth-intro p{font-size:13px!important;line-height:1.7!important}
+ .wealth-intro::after{font-size:70px!important;right:-15px!important;top:3px!important}
+ .nuri-goal-stamp{margin-bottom:7px!important}
+ .nuri-goal-stamp strong{font-size:18px!important}
+ .wealth-intro-meter{margin-top:17px!important}
+ .nuri-start-journey{display:grid!important;grid-template-columns:1fr 92px!important;text-align:left!important;border-radius:14px 47px 14px 14px!important;
+ padding:16px 11px 13px 15px!important;gap:6px!important;align-items:center!important}
+ .nuri-start-journey h2{font-size:17px!important;line-height:1.3!important;margin-bottom:13px!important}
+ .nuri-start-journey img{margin:0!important;width:92px!important;height:112px!important}
+ .nuri-timeline{gap:3px!important}
+ .nuri-timeline .timeline-stage{min-height:49px!important;padding:6px 1px!important;font-size:9px!important;gap:4px!important;border-radius:7px!important}
+ .nuri-timeline .timeline-dot{width:7px!important;height:7px!important}
+ .family-heading h2{font-size:20px!important}
+ .family-option{min-height:115px!important}
+ #familyScreen .startbtn{background:#285f59!important;border:1px solid #244c46!important;box-shadow:0 7px 0 #163c37,0 16px 29px #285f5929!important;border-radius:14px!important}
+ .wrap{padding:13px 10px 111px!important}
+ .top{align-items:flex-start!important}
+ .top h1{font-size:27px!important}
+ .hero{min-height:248px!important;border-radius:20px 20px 65px 20px!important}
+ .hero img{height:238px!important;width:199px!important}
+ .choice.nuri-option-card,.turning-options .choice.nuri-option-card{min-height:112px!important;padding:13px 14px!important}
+ .menu-grid{grid-template-columns:1fr!important}
+ .menu-tile{min-height:69px!important}
+ .nuri-account-shell{padding:25px 19px!important;border-radius:23px 23px 48px 23px!important}
+ .app-modal-card{max-height:calc(100dvh - 22px)!important;border-radius:21px!important}
+ .special-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(prefers-reduced-motion:reduce){.family-option,.choice,.menu-tile,.startbtn{transition:none!important}}
+/* Final mobile usability fix: the primary action follows the four family cards;
+   it must never cover or intercept taps on a family choice. */
+@media(max-width:520px){
+ #familyScreen{padding-bottom:32px!important}
+ #familyScreen .startbtn{
+   position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+   display:block!important;width:100%!important;max-width:none!important;margin:18px auto 25px!important;
+   z-index:1!important;min-height:62px!important;
+ }
+}
+.feedback-submit.bug,.feedback-submit.bug:hover{background:#c77961!important;color:#fffdf7!important;border:1px solid #ac5d49!important;box-shadow:0 5px 0 #9b5042!important}
+.nuri-auth-message{color:#ae6a50!important}

@@ -1,0 +1,67 @@
+/* v1.0.2 · 읽기 편한 차분한 색감과 명확한 게임 진행 안내 */
+:root{--ink:#253b37!important;--muted:#536962!important;--paper:#fffdf8;--line:#d9ded5;--purple:#2c625b!important;--pink:#bc7158!important;}
+body{background:#f2f1eb!important;color:#253b37!important}
+body::before{opacity:.28!important}
+.card,.app-modal-card,.stock-trade-card,.stat,.nuri-account-shell{box-shadow:0 4px 18px rgba(35,67,60,.055)!important}
+.top .sub,.family-heading p,.wealth-intro p,.wealth-intro-caption,.story,.modal-hint,.stock-note,.stock-main-head p,.stock-trade-title small,.stock-history li,.world-item small,.nuri-account-heading p{color:#536862!important}
+.nuri-account-eyebrow,.nuri-auth-note,.family-note,.menu-tile small,.nuri-option-description,.nuri-option-kind,.nuri-skill-heading small{color:#5c7068!important}
+.nuri-option-card,.menu-tile,.stock-trade-card,.family-option,.upgrade{border-color:#d6ded4!important}
+/* 모든 카드에 반복되던 강한 장식색을 제거하고 명도를 일관되게 조절 */
+.wealth-intro{background:linear-gradient(110deg,#fff9ed,#f5ede1)!important;border-color:#466b62!important;box-shadow:7px 7px 0 #d3ded3!important}
+.wealth-intro h1 span{color:#a9654f!important;-webkit-text-fill-color:#a9654f!important}
+.nuri-start-journey{background:#e6eee7!important;box-shadow:4px 4px 0 #d0dcd0!important}
+.nuri-dashboard-journey,.year-progress,.wealth-progress-panel,.health-panel,.notice,.stock-main-summary span{background:#f4f6f1!important;border-color:#d9e1d7!important}
+.nuri-timeline .timeline-stage.current{background:#35675e!important;border-color:#35675e!important}
+.choice.nuri-option-card{background:#fffefa!important;box-shadow:0 2px 0 #e2e8df!important}
+.choice.nuri-option-card:nth-child(1){--option-highlight:#468274!important}
+.choice.nuri-option-card:nth-child(2){--option-highlight:#b88756!important}
+.choice.nuri-option-card:nth-child(3){--option-highlight:#82719b!important}
+.choice.nuri-option-card:nth-child(4){--option-highlight:#b87370!important}
+.choice.nuri-option-card .nuri-option-top{color:#5d7069!important}
+.choice.nuri-option-card .nuri-option-title,.stock-trade-title b{color:#273d37!important}
+.choice.nuri-option-card .nuri-option-description{color:#596c64!important}
+.choice.nuri-option-card .nuri-option-kind{color:#596c64!important}
+.choice.nuri-option-card .nuri-option-number{color:#315f56!important}
+.choice.nuri-option-card .nuri-option-stat.is-gain{background:#e9f3ec!important;color:#276449!important}
+.choice.nuri-option-card .nuri-option-stat.is-cost{background:#f9ede4!important;color:#8c563f!important}
+.menu-tile:nth-child(n){background:#fffdfa!important}
+.menu-tile:nth-child(2n){background:#f5f8f3!important}
+.menu-tile small{color:#53685f!important}
+.nuri-skill-ranking{background:#fbfaf3!important;border-color:#d9ddce!important}
+/* 속도 버튼은 장식이 아닌 명확한 설정 컨트롤 */
+.year-progress{padding:15px 16px!important;border:1px solid #cbd9ce!important}
+.year-progress .progress-head{display:flex;align-items:center;gap:10px;margin-bottom:11px!important}
+.year-progress .progress-head b{font-size:14px!important;font-weight:850!important;color:#273f38!important}
+#progressText{font-size:13px!important;color:#245e54!important;font-weight:900!important;font-variant-numeric:tabular-nums}
+.progress-track{height:10px!important;background:#dce6dd!important}
+.progress-fill{background:#478579!important;box-shadow:none!important}
+.tempo-hintline{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-top:12px!important}
+#tempoHint{display:block!important;font-size:12px!important;color:#4b6259!important;line-height:1.5!important;margin:0!important;flex:1}
+#tempoQuickButton{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:39px!important;padding:9px 12px!important;background:#e2ede7!important;border:1px solid #9db8ac!important;border-radius:11px!important;color:#225448!important;font-size:12px!important;font-weight:850!important;white-space:nowrap;box-shadow:none!important}
+#tempoQuickButton:active{background:#cde2d6!important}
+.tempo-mode small{font-size:11px!important;color:#415b50!important}
+.tempo-mode.selected{border:2px solid #357566!important;background:#e1eee5!important;color:#245d50!important}
+/* 매수·매도: 의미가 분명한 고대비 단색 버튼 */
+.stock-controls button{font-size:13px!important;font-weight:850!important;border:1px solid #cad9d0!important;background:#f0f5f0!important;color:#2d5549!important}
+.stock-controls button.buy:not(:disabled){background:#276a5d!important;color:#ffffff!important;border-color:#1d554a!important;box-shadow:0 2px 0 #16483e!important}
+.stock-controls button.sell:not(:disabled){background:#b45c49!important;color:#ffffff!important;border-color:#924737!important;box-shadow:0 2px 0 #873b30!important}
+.stock-controls button.buy:not(:disabled):hover{background:#20584e!important}
+.stock-controls button.sell:not(:disabled):hover{background:#984b3b!important}
+.stock-controls button:disabled{opacity:1!important;color:#7d8981!important;background:#e6e9e4!important;border-color:#d7ddd7!important;box-shadow:none!important;cursor:not-allowed!important}
+.stock-controls input{color:#223d34!important;background:#fff!important;border:1px solid #aabeb1!important;font-size:14px!important}
+.stock-trade-meta span{background:#eaf0e9!important;color:#415d51!important}
+.stock-trade-price{color:#2a5f53!important}
+.stock-up{color:#1f7554!important}.stock-down{color:#b04f4e!important}.stock-flat{color:#566c63!important}
+.stock-note,.stock-history li{color:#526a60!important}
+@media(max-width:440px){.tempo-hintline{align-items:stretch!important;flex-wrap:wrap!important}#tempoHint{flex-basis:100%}#tempoQuickButton{width:100%!important}.year-progress{padding:13px!important}}
+@media(prefers-reduced-motion:reduce){.progress-fill,.choice,.stock-controls button{transition:none!important}}
+
+/* 1.0.3: gentle surfaces and strong text/action contrast */
+.stock-up{color:#207257!important;font-weight:750}.stock-down{color:#ab463d!important;font-weight:750}
+.stock-flat{color:#53687a!important}
+.stock-trade-meta span{color:#293e4b!important;background:#eff3ef!important}
+.stock-note{color:#344954!important;background:#f3f6f1!important;border-color:#d8e2da!important}
+.stock-spark polyline{opacity:.9}
+.stock-controls button.buy:not(:disabled){background:#276a5d!important;color:#fff!important;border-color:#1e594e!important}
+.stock-controls button.sell:not(:disabled){background:#a94b3e!important;color:#fff!important;border-color:#873a30!important}
+.stock-trade-title b,.stock-trade-price{color:#1b303a!important}
