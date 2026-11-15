@@ -938,7 +938,8 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 <link rel="stylesheet" href="./nuri-final.css?v=1.0.0">
 <link rel="stylesheet" href="./nuri-readable.css?v=1.0.3">
 <link rel="stylesheet" href="./hero-layout-fix.css?v=1.0.7">
-<link rel="stylesheet" href="./readability-contrast.css?v=1.0.8">
+<link rel="stylesheet" href="./readability-contrast.css?v=1.0.9">
+<link rel="stylesheet" href="./nuri-prologue.css?v=1.0.0">
 <script src="./auth-config.js?v=1.0.1"></script>
 <script src="./account.js?v=1.0.1"></script>
 </head>
@@ -1029,7 +1030,21 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
    <button class="family-option" data-family="supportive" onclick="selectFamily('supportive')"><b>꿈을 응원해주는 집 외동아들</b><small class="family-cash">시작 자금 100,000원</small><small>부모님은 누리의 꿈을 전폭 지원해. 다만 꿈을 포기하면 그 지원도 멈춰.</small></button>
   </div>
   <div class="family-note" id="familyPreview">시작 100,000원 · 균형 잡힌 기본 능력치</div>
-  <button class="startbtn" onclick="startGame()">이번 생은 100억 가보자고!  ↗</button>
+  <button class="startbtn" onclick="nuriShowPrologue()">이번 생은 100억 가보자고!  ↗</button>
+ </div>
+</section>
+<section id="nuriPrologue" role="region" aria-label="누리 키우기 프롤로그" hidden>
+ <div class="nuri-prologue-panel">
+  <span class="nuri-prologue-kicker">NURI LIFE · PROLOGUE 00</span>
+  <h2>모든 것은 한순간의 선택에서</h2>
+  <div class="nuri-prologue-scene">
+   <p>어느 평범한 오후, 누리가 횡단보도 앞에 섰어.</p>
+   <p>신호가 바뀌려던 찰나, 저쪽에서 트럭이 다가오는 게 보였지. 누리는 위험을 알아차리고 발걸음을 멈췄어.</p>
+   <p class="nuri-prologue-alert">⏳ 마치 시간이 잠시 멈춘 듯한 순간. 누리는 어떻게 할까?</p>
+  </div>
+  <p class="nuri-prologue-caption">네 선택은 누리의 첫 능력치와 이야기 기록에 반영돼.</p>
+  <div id="nuriPrologueChoices" aria-label="프롤로그 선택지 네 가지"></div>
+  <p class="nuri-prologue-foot">안전을 선택한 뒤, 누리의 새로운 인생이 시작돼.</p>
  </div>
 </section>
 <main class="wrap" id="gameMain" style="display:none">
@@ -1154,6 +1169,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 </nav>
 
 <script src="./game.js?v=1.0.6"></script>
+<script src="./nuri-prologue.js?v=1.0.1"></script>
 <script src="./light-ui.js?v=1.0.0"></script>
 <script id="nuriPcIntroRuntime">
 (function(){
