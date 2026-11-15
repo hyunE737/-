@@ -18,3 +18,8 @@
 body.nuri-prologue-active{overflow:hidden}
 @media(max-width:560px){#nuriPrologue{padding:10px}#nuriPrologue .nuri-prologue-panel{max-height:calc(100dvh - 20px);padding:17px}#nuriPrologue #nuriPrologueChoices{grid-template-columns:1fr}#nuriPrologue .nuri-prologue-choice{min-height:0;padding:12px;gap:4px}}
 @media(prefers-reduced-motion:reduce){#nuriPrologue .nuri-prologue-choice{transition:none}}
+
+/* Fallback entry, in case browser restores an older family-selection screen */
+#familyScreen .nuri-prologue-reopen{display:flex;justify-content:flex-end;margin:4px 0 12px}
+#familyScreen .nuri-prologue-reopen button{font:800 13px system-ui,-apple-system,sans-serif;border:1px solid #a9c6b6;background:#eaf5ea;color:#245347;border-radius:13px;padding:11px 16px;cursor:pointer;max-width:100%}
+#familyScreen .nuri-prologue-reopen button:hover,#familyScreen .nuri-prologue-reopen button:focus-visible{background:#d8eddf;border-color:#4b8974;outline-offset:3px}
