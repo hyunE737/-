@@ -7,7 +7,7 @@ const OPTIONS=[
  {icon:'🚦',title:'신호와 차의 움직임을 살핀다',description:'차의 움직임을 확인하며 안전한 곳에서 기다린다.',outcome:'누리는 신호와 차의 움직임을 확인하고 안전을 택했어.',effect:{intelligence:4,happiness:2},caption:'신중한 선택'},
  {icon:'🌿',title:'가까운 안전한 곳으로 이동한다',description:'주변 공간을 확인하고 인도 쪽 안전한 위치로 옮긴다.',outcome:'누리는 재빨리 안전한 위치로 이동해 위기를 넘겼어.',effect:{health:3,creativity:3},caption:'빠른 대처'}
 ];
-let selected=null,completed=false,opened=false;
+let selected=null,completed=false,opened=false,previewMode=false;
 function isReady(){
  const account=document.getElementById('nuriAccountGate');
  const family=document.getElementById('familyScreen');
@@ -16,10 +16,11 @@ function isReady(){
  if(family.style.display==='none'||game.style.display==='block')return false;
  return true;
 }
-function show(){
- if(completed||opened||!isReady())return;
+function show(forcePreview=false){
+ if(!forcePreview&&(completed||opened||!isReady()))return;
  const root=document.getElementById('nuriPrologue');
  if(!root)return;
+ previewMode=!!forcePreview;
  opened=true;root.hidden=false;
  document.body.classList.add('nuri-prologue-active');
  const first=root.querySelector('.nuri-prologue-choice');
@@ -28,8 +29,10 @@ function show(){
 function choose(index){
  const option=OPTIONS[index],root=document.getElementById('nuriPrologue');
  if(!option||!root||root.hidden||completed)return;
- selected=index;completed=true;opened=false;
+ if(!previewMode){selected=index;completed=true;}
+ opened=false;
  root.hidden=true;document.body.classList.remove('nuri-prologue-active');
+ if(previewMode){previewMode=false;return;}
  const family=document.getElementById('familyScreen');
  if(family){family.style.display='';family.scrollIntoView({block:'start',behavior:'instant'});}
 }
@@ -55,7 +58,7 @@ function applyChoice(){
  state.log.push('📖 프롤로그 · '+option.caption+': '+option.outcome);
 }
 function resetFlow(){
- selected=null;completed=false;opened=false;
+ selected=null;completed=false;opened=false;previewMode=false;
  const root=document.getElementById('nuriPrologue');
  if(root)root.hidden=true;
  document.body.classList.remove('nuri-prologue-active');
@@ -63,6 +66,7 @@ function resetFlow(){
 }
 window.nuriApplyPrologueChoice=applyChoice;
 window.nuriResetPrologueFlow=resetFlow;
+window.nuriPreviewPrologue=()=>show(true);
 function mount(){
  const root=document.getElementById('nuriPrologue');
  const grid=root&&root.querySelector('#nuriPrologueChoices');
@@ -82,8 +86,8 @@ function mount(){
  // 로그인 완료 시 계정 화면이 숨겨지는 것을 감지해 프롤로그 자동 시작.
  const account=document.getElementById('nuriAccountGate');
  const family=document.getElementById('familyScreen');
- if(account)new MutationObserver(show).observe(account,{attributes:true,attributeFilter:['hidden']});
- if(family)new MutationObserver(show).observe(family,{attributes:true,attributeFilter:['style']});
+ if(account)new MutationObserver(()=>show()).observe(account,{attributes:true,attributeFilter:['hidden']});
+ if(family)new MutationObserver(()=>show()).observe(family,{attributes:true,attributeFilter:['style']});
  setTimeout(show,0);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
