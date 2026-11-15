@@ -1,0 +1,103 @@
+/* 누리 키우기 · 읽기 쉬운 명도/대비 정리 v1.0.8
+   밝은 카드에는 짙은 글씨, 진한 버튼에는 밝은 글씨를 사용한다. */
+:root{--ink:#213a36!important;--muted:#405b53!important;}
+body,#gameMain,#familyScreen,.app-modal-card,.feedback-area{color:#213a36!important}
+#gameMain .card:not(.hero),#familyScreen .card,.app-modal-card,.feedback-card,
+.nuri-dashboard-journey,.nuri-start-journey,.stock-trade-card,.stock-note,.year-progress,
+.stock-main-summary span,.health-panel,.wealth-progress-panel,.story-path,.nuri-comedy,
+.notice,.menu-tile,.family-option,.tempo-mode,.setting-row{
+  color:#233a35!important;
+}
+#gameMain h1,#gameMain h2,#gameMain h3,.app-modal h2,.app-modal h3,
+.feedback-area h2,.feedback-area h3,.stock-trade-title b,
+.stock-trade-price,.wealth-progress-heading b,.nuri-skill-value,
+.story-path-head strong,.story-path-text,.comedy-label,
+#story,#chapter,#comedyLine,#statusText,#wealthTotal,#cash,#day{
+  color:#1d3832!important;
+}
+.top .sub,.family-heading p,.wealth-intro p,.wealth-intro-caption,
+.story,.modal-hint,.stock-note,.stock-main-head p,.stock-trade-title small,
+.stock-history li,.world-item small,.feedback-heading p,.feedback-note,
+.feedback-card-title small,.nuri-account-heading p,
+#storyPathProgress,.story-path-text,#stockMainNote,
+.wealth-progress-foot,.wealth-progress-foot span,
+.nuri-skill-heading small,.stock-disclaimer,.stat-limit-note,
+.stock-trade-meta,.nuri-option-description,.nuri-option-kind{
+  color:#425c53!important;
+}
+#gameMain .nuri-dashboard-journey small,
+#gameMain .nuri-timeline .timeline-stage:not(.current) span,
+#gameMain .nuri-dashboard-journey .journey-head small,
+#gameMain .health-foot,
+#gameMain .tempo-hintline small,
+#gameMain #tempoHint,
+#gameMain .progress-head,
+#gameMain .progress-head span,
+#gameMain .stat small,
+#gameMain .stock-main-summary span,
+#gameMain .stock-main-summary strong,
+.app-modal .menu-tile small,
+.app-modal .setting-row small,
+.app-modal .modal-hint,
+.feedback-label,
+.feedback-card small{
+  color:#3c5b52!important;
+  opacity:1!important;
+}
+#gameMain .choice.nuri-option-card{
+  background:#fffefa!important;border:1px solid #cad8cc!important;
+  color:#203d34!important;opacity:1;
+}
+#gameMain .choice.nuri-option-card .nuri-option-title,
+#gameMain .choice.nuri-option-card strong,
+#gameMain .choice.nuri-option-card .nuri-option-number{color:#213b35!important;text-shadow:none!important}
+#gameMain .choice.nuri-option-card .nuri-option-top,
+#gameMain .choice.nuri-option-card .nuri-option-description,
+#gameMain .choice.nuri-option-card .nuri-option-kind,
+#gameMain .choice.nuri-option-card small{color:#405d53!important;opacity:1!important}
+.app-modal .menu-tile{
+  background:#fffdf7!important;border:1px solid #cfdbce!important;
+}
+.app-modal .menu-tile b{color:#1e3a34!important}
+.app-modal .menu-tile small{color:#405e53!important}
+.app-modal .modal-action:not(:disabled),.app-modal .switch-btn.on,
+.menu-open-btn,.startbtn,.feedback-submit,.nuri-auth-primary,
+#gameMain .rest-button,#gameMain .stock-primary,
+.stock-controls button.buy:not(:disabled){
+  background:#205b50!important;color:#ffffff!important;
+  border-color:#16483f!important;text-shadow:none!important;
+}
+.stock-controls button.sell:not(:disabled),
+.feedback-submit.bug:not(:disabled){
+  background:#a74636!important;color:#fff!important;
+  border-color:#843628!important;
+}
+.stock-controls button:disabled,.app-modal button:disabled,.stock-trade-card button:disabled{
+  opacity:1!important;background:#e3e9e2!important;
+  color:#526158!important;border-color:#cbd6cb!important;
+  box-shadow:none!important;cursor:not-allowed!important;
+}
+.stock-up{color:#116449!important}.stock-down{color:#9c302b!important}
+.stock-flat{color:#435e57!important}
+.stock-trade-meta span,.stock-note,.stock-disclaimer{
+  color:#3f584f!important;
+}
+input,select,textarea{
+  color:#1b3931!important;
+}
+input::placeholder,textarea::placeholder{color:#63766f!important;opacity:1}
+#gameMain .pill,#gameMain .top .pill{color:#244e43!important}
+#gameMain .nuri-timeline .timeline-stage.current,
+#gameMain .nuri-timeline .timeline-stage.current span{color:#ffffff!important}
+#gameMain .card.hero .tag{color:#fff!important}
+#gameMain .card.hero #lifeLabel,#gameMain .card.hero .growth-age-tag{
+  color:#294d42!important;
+}
+#gameMain .year-progress,.stock-trade-card,.feedback-card,
+.app-modal .menu-tile{border-color:#cbd8cf!important}
+@media(max-width:640px){
+  #gameMain .nuri-option-description,
+  .app-modal .menu-tile small,
+  #gameMain .tempo-hintline small{font-size:12px!important;line-height:1.5!important}
+  #gameMain .progress-head b,#gameMain #progressText{font-size:12px!important}
+}
