@@ -7,10 +7,6 @@ let latest=null, checkedAt=null, loading=false, error=false;
 let current=(document.querySelector('meta[name="nuri-live-deploy"]')||{}).content||'local';
 const style=document.createElement('style');
 style.textContent=`
-#nuriUpdateButton{position:fixed;z-index:12010;right:14px;bottom:20px;border:1px solid #adc8bc;background:#fffdf7;color:#234940;box-shadow:0 5px 18px #16362d25;border-radius:999px;padding:11px 15px;font:800 12px/1.3 system-ui,-apple-system,sans-serif;cursor:pointer;max-width:calc(100vw - 28px)}
-#nuriUpdateButton.is-new{background:#174b42;color:#fff;border-color:#174b42;animation:nuriUpdatePulse 2s ease-in-out infinite}
-#nuriUpdateButton.is-error{color:#795a37}
-@keyframes nuriUpdatePulse{50%{box-shadow:0 5px 24px #1f816b88}}
 #nuriUpdateOverlay[hidden]{display:none!important}
 #nuriUpdateOverlay{position:fixed;inset:0;z-index:13000;display:grid;place-items:center;background:#172c27a8;padding:18px;font:14px/1.6 system-ui,-apple-system,sans-serif;color:#263d38}
 #nuriUpdateCard{width:min(100%,470px);max-height:min(85vh,680px);overflow:auto;background:#fffdf7;border:1px solid #c9d8cb;border-radius:22px;padding:22px;box-shadow:0 20px 60px #081d1750}
@@ -24,31 +20,57 @@ style.textContent=`
 #nuriUpdateCard button:disabled{opacity:.55;cursor:wait}
 #nuriUpdateCard ul{margin:8px 0 0;padding-left:21px;color:#3b554c}
 #nuriUpdateCard .nuri-update-status{font-weight:800;color:#205b4e}
-@media(max-width:850px){#nuriUpdateButton{bottom:86px;right:12px;padding:10px 12px;font-size:11px}#nuriUpdateCard{padding:19px}}
+@media(max-width:850px){#nuriUpdateCard{padding:19px}}
 `;
 document.head.appendChild(style);
-const btn=document.createElement('button');
-btn.type='button';btn.id='nuriUpdateButton';btn.textContent='↻ 업데이트 확인 중';
-btn.setAttribute('aria-label','게임 업데이트 현황 보기');
 const overlay=document.createElement('div');overlay.id='nuriUpdateOverlay';overlay.hidden=true;
 overlay.innerHTML='<section id="nuriUpdateCard" role="dialog" aria-modal="true" aria-labelledby="nuriUpdateTitle"><h2 id="nuriUpdateTitle">📢 누리 키우기 업데이트</h2><p>배포된 최신 게임 버전을 45초마다 확인해.</p><div class="nuri-update-row"><span>현재 화면</span><b id="nuriUpdateCurrent"></b></div><div class="nuri-update-row"><span>서버 최신 버전</span><b id="nuriUpdateLatest"></b></div><div class="nuri-update-row"><span>최근 배포</span><b id="nuriUpdateDate"></b></div><p id="nuriUpdateState" class="nuri-update-status" role="status"></p><b>최근 업데이트 내용</b><ul id="nuriUpdateNotes"></ul><div class="nuri-update-actions"><button type="button" id="nuriUpdateCheck">지금 확인</button><button type="button" id="nuriUpdateApply" class="primary" hidden>새 버전 적용</button><button type="button" id="nuriUpdateClose">닫기</button></div></section>';
 function init(){
-document.body.appendChild(btn);document.body.appendChild(overlay);
-btn.addEventListener('click',()=>{overlay.hidden=false;render();check();});
-overlay.querySelector('#nuriUpdateClose').addEventListener('click',()=>{overlay.hidden=true;btn.focus();});
+document.body.appendChild(overlay);
+installMenuLink();
+overlay.querySelector('#nuriUpdateClose').addEventListener('click',()=>{overlay.hidden=true;});
 overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.hidden=true;});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){overlay.hidden=true;btn.focus();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){overlay.hidden=true;}});
 overlay.querySelector('#nuriUpdateCheck').addEventListener('click',check);
 overlay.querySelector('#nuriUpdateApply').addEventListener('click',()=>window.location.reload());
 check();window.setInterval(()=>{if(document.visibilityState!=='hidden')check();},CHECK_MS);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&(!checkedAt||Date.now()-checkedAt>CHECK_MS))check();});
 }
+
+function showUpdatePanel(){
+ overlay.hidden=false;render();check();
+ const focus=overlay.querySelector('#nuriUpdateClose');if(focus)focus.focus();
+}
+function updateMenuLabel(){
+ const tile=document.getElementById('nuriUpdateMenuTile');
+ if(!tile)return;
+ const title=tile.querySelector('b');
+ const summary=tile.querySelector('small');
+ if(title)title.textContent=changed()?'📣 새 업데이트 있음':'업데이트 현황';
+ if(summary)summary.textContent=changed()?'새 버전이 배포됐어 · 적용하기':error?'최신 배포 확인 실패 · 다시 확인하기':loading?'최신 배포 확인 중…':latest?'최신 배포 확인 완료 · 변경 내용 보기':'버전 · 업데이트 내역 확인';
+}
+function installMenuLink(){
+ const target=document.getElementById('appModalBody');
+ if(!target)return;
+ const attach=()=>{
+  const grid=target.querySelector('.menu-grid');
+  if(!grid||grid.querySelector('#nuriUpdateMenuTile'))return;
+  const btn=document.createElement('button');
+  btn.type='button';btn.id='nuriUpdateMenuTile';btn.className='menu-tile';
+  btn.innerHTML='<span class="tile-icon" aria-hidden="true">📢</span><span><b>업데이트 현황</b><small>최신 게임 버전 · 변경 내역</small></span>';
+  btn.addEventListener('click',showUpdatePanel);
+  grid.insertBefore(btn,grid.firstChild);
+  updateMenuLabel();
+ };
+ new MutationObserver(attach).observe(target,{childList:true});
+ attach();
+}
+
 function changed(){return !!(latest&&latest.buildId&&current!=='local'&&latest.buildId!==current);}
 function fmt(dt){if(!dt)return '확인 전';const d=new Date(dt);return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('ko-KR',{dateStyle:'medium',timeStyle:'short'}).format(d):'확인 전';}
 function text(id,value){const e=overlay.querySelector('#'+id);if(e)e.textContent=value;}
 function render(){
-btn.classList.toggle('is-new',changed());btn.classList.toggle('is-error',error);
-btn.textContent=changed()?'⬆ 새 업데이트 있음':error?'↻ 업데이트 재확인':loading?'↻ 업데이트 확인 중':'✓ 업데이트 현황';
+updateMenuLabel();
 text('nuriUpdateCurrent',current==='local'?'초기 버전 / 확인 중':current.slice(0,9));
 text('nuriUpdateLatest',latest?(latest.buildId||'알 수 없음').slice(0,9):'확인 전');
 text('nuriUpdateDate',latest?fmt(latest.deployedAt):'확인 전');
