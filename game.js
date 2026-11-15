@@ -1989,6 +1989,7 @@ function renderMenuModal(){
  document.getElementById("appModalBody").innerHTML=`
   <div class="menu-grid">
    <button type="button" class="menu-tile" id="nuriUpdateMenuTile" onclick="window.nuriOpenUpdateStatus&&window.nuriOpenUpdateStatus()"><span class="tile-icon">📢</span><span><b>업데이트 현황</b><small>최신 버전 · 배포 내역 확인</small></span></button>
+   <button type="button" class="menu-tile" onclick="window.nuriPreviewPrologue&&window.nuriPreviewPrologue()"><span class="tile-icon">📖</span><span><b>프롤로그 다시 보기</b><small>기존 저장을 유지하며 횡단보도 이야기 감상</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('account')"><span class="tile-icon">●</span><span><b>내 계정</b><small>로그인 상태 · 저장 동기화 · 로그아웃</small></span></button>
    <button class="menu-tile" onclick="openAppModal('absurd')"><span class="tile-icon">ㅋㅋ</span><span><b>황당 사건록</b><small>지나온 병맛 사건과 결과 모아보기</small></span></button>
    <button class="menu-tile" onclick="openAppModal('realestate')"><span class="tile-icon">🏠</span><span><b>부동산</b><small>매입 · 매도 · 임대 수익</small></span></button>
