@@ -38,6 +38,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 }
 
 function showUpdatePanel(){
+ if(typeof window.closeAppModal==='function')window.closeAppModal();
  overlay.hidden=false;render();check();
  const focus=overlay.querySelector('#nuriUpdateClose');if(focus)focus.focus();
 }
