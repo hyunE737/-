@@ -940,6 +940,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 <link rel="stylesheet" href="./hero-layout-fix.css?v=1.0.7">
 <link rel="stylesheet" href="./readability-contrast.css?v=1.0.9">
 <link rel="stylesheet" href="./nuri-prologue.css?v=1.0.12">
+<link rel="stylesheet" href="./nuri-mobile.css?v=1.0.16">
 <script src="./auth-config.js?v=1.0.1"></script>
 <script src="./account.js?v=1.0.1"></script>
 </head>
@@ -1075,7 +1076,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
   <div class="health-fill" id="healthFill"></div>
  </div>
  <div class="health-foot"><span id="healthStatus">체력 상태 확인 중</span><span>최대 100</span></div>
- <div class="fatigue-controls"><span id="fatigueEffect" class="fatigue-effect" role="status" aria-live="polite">건강한 상태 · 능력치 정상 성장</span><button id="restButton" class="rest-button" type="button" onclick="restNow()">🛏️ 하루 쉬기 <small>체력 +22</small></button></div>
+ <div class="fatigue-controls"><span id="fatigueEffect" class="fatigue-effect" role="status" aria-live="polite">건강한 상태 · 능력치 정상 성장</span><button id="restButton" class="rest-button" type="button" onclick="restNow()">🛏️ 하루 쉬기 <small>체력 +12</small></button></div>
 </div>
 <div class="health-risk-panel" id="healthRiskPanel"><div class="risk-head"><b>🩺 장기 건강 상태</b><span id="healthRiskValue">건강 위험도 5/100</span></div><div class="risk-track"><div class="risk-fill" id="healthRiskFill"></div></div><small id="healthRiskHint">휴식과 건강 관리로 위험을 낮출 수 있어. 게임 안의 가상 수치야.</small></div>
 <div class="stats" id="stats"></div><p class="stat-limit-note">지능 · 창의력 · 인간관계 · 매력은 <b>성장 한계 없음</b> / 체력 · 행복은 최대 100</p>
@@ -1087,7 +1088,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
     <div class="notice" id="statusText">누리가 태어났어! 이제 아기 시절부터 하나씩 선택하며 함께 키워보자.</div></div>
 </section>
 <section>
- <div class="card" id="storySection"><div class="row"><h2 id="chapter">새로운 하루</h2><span class="pill" id="day">DAY 1</span></div><p class="story" id="story">누리가 세상에 호기심을 보이기 시작했다. 오늘은 어떤 경험을 하게 해줄까?</p>
+ <div class="card" id="storySection"><div class="row"><h2 id="chapter">새로운 하루</h2><span class="pill" id="day">DAY 1</span></div><div class="mobile-play-tools" aria-label="플레이 중 체력 관리"><div class="mobile-health-readout"><span>체력</span><b id="mobileHealthValue">— / 100</b></div><button id="mobileRestButton" type="button" onclick="restNow()" disabled>하루 쉬기 <small>체력 +12</small></button></div><p class="story" id="story">누리가 세상에 호기심을 보이기 시작했다. 오늘은 어떤 경험을 하게 해줄까?</p>
 <p class="scene-result" id="sceneResult" aria-live="polite"></p>
 <div class="story-path" id="storyPathPanel">
  <div class="story-path-head"><strong>📖 누리 키우기 이야기</strong><button class="smallbtn" onclick="openAppModal('story')">스토리 기록 보기</button></div>
@@ -1169,9 +1170,10 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 <button type="button" onclick="openAppModal('menu')"><span class="dock-icon" aria-hidden="true">☰</span><span>메뉴</span></button>
 </nav>
 
-<script src="./game.js?v=1.0.15"></script>
+<script src="./game.js?v=1.0.16"></script>
 <script src="./nuri-prologue.js?v=1.0.14"></script>
 <script src="./light-ui.js?v=1.0.0"></script>
+<script src="./nuri-mobile.js?v=1.0.16" defer></script>
 <script id="nuriPcIntroRuntime">
 (function(){
  var root=document.documentElement;

@@ -2037,7 +2037,7 @@ function restNow(){
  if(!state.alive||state.pendingTurningPoint||state.pendingStory)return;
  if(state.stats.health>=85)return toast("체력이 충분해서 지금은 휴식이 필요하지 않아!");
  const previous=state.stats.health;
- state.stats.health=limitStat("health",previous+22);
+ state.stats.health=limitStat("health",previous+12);
  state.stats.happiness=limitStat("happiness",state.stats.happiness+1);
  adjustHealthRisk(-7);
  const beforeAge=state.age;
@@ -2736,7 +2736,7 @@ function render(){
  document.getElementById("healthRiskHint").textContent=state.illnessSeverity?"건강 문제가 생겼어. 휴식과 회복으로 위험을 낮춰 보자.":"휴식과 건강 관리로 위험을 낮출 수 있어. 게임 안의 가상 수치야.";
  const restButton=document.getElementById("restButton");
  restButton.disabled=!state.alive||hp>=85||!!state.pendingTurningPoint||!!state.pendingStory;
- restButton.title=hp>=85?"체력이 85 이상이면 쉴 필요가 없어":"하루를 사용해 체력을 22 회복하고 행복을 1 올려";
+ restButton.title=hp>=85?"체력이 85 이상이면 쉴 필요가 없어":"하루를 사용해 체력을 12 회복하고 행복을 1 올려";
  hpStatus.className=hpLevel==="good"?"":" "+hpLevel;
  document.getElementById("day").textContent="DAY "+((Number(state.yearDay)||0)+1);
  document.getElementById("stats").innerHTML=Object.entries(labels).filter(([k])=>k!=="money"&&k!=="health").map(([k,n])=>{
