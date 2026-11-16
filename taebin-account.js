@@ -22,7 +22,7 @@ let revision=0;
 let uploadPromise=null;
 let lastStatus='게스트는 이 기기에 저장돼.';
 const $=id=>document.getElementById(id);
-const cfg={}; // 독립 게스트 버전: 기존 누리 클라우드 저장소 접근 금지
+const cfg=window.NURI_AUTH_CONFIG||{}; // 공개 가능한 Supabase 연결 정보만 사용. 태빈 전용 테이블 사용.
 const baseUrl=String(cfg.supabaseUrl||'').trim().replace(/\/+$/,'');
 const apiKey=String(cfg.supabaseAnonKey||'').trim();
 const enabled=/^https:\/\/[\w.-]+\.supabase\.co$/i.test(baseUrl) && apiKey.length>20;
@@ -37,6 +37,9 @@ function legacyKey(user){return user&&user.mode==='member'&&typeof user.id==='st
 window.nuriCurrentSaveKey=()=>saveKey(active());
 window.nuriCurrentLegacyKey=()=>legacyKey(active());
 window.nuriCloudStatus=()=>lastStatus;
+window.taebinAccountInfo=()=>({mode:active()?.mode||'none',email:active()?.email||'',id:active()?.mode==='member'?active().id:null,enabled});
+window.taebinAccountToken=async()=>{if(active()?.mode!=='member'||!authVerified)return null;return (await validToken()).access_token;};
+window.taebinAccountSync=async()=>{const x=active();if(x?.mode!=='member'||!authVerified)throw new Error('회원 로그인이 필요해.');window.nuriCloudSchedule();await flush();if(safeGet(dirtyKey(x.id)))throw new Error('클라우드 저장에 실패했어. 잠시 후 다시 시도해 줘.');return true;};
 function message(text,good=false){const el=$('nuriAuthMessage');if(el){el.textContent=text;el.style.color=good?'#7cf4d3':'#ffd3a3'}}
 function gate(on){const el=$('nuriAccountGate');if(el)el.hidden=!on}
 function setBusy(on){
@@ -105,7 +108,7 @@ function dirtyKey(id){return CLOUD_DIRTY_PREFIX+id}
 function localObject(key){return readJson(key)}
 async function cloudDownload(id){
  const t=await validToken();
- const rows=await request('/rest/v1/nuri_saves?user_id=eq.'+encodeURIComponent(id)+'&select=save_data',{accessToken:t.access_token});
+ const rows=await request('/rest/v1/taebin_saves?user_id=eq.'+encodeURIComponent(id)+'&select=save_data',{accessToken:t.access_token});
  return Array.isArray(rows)&&rows[0]?rows[0].save_data:null;
 }
 async function cloudUpload(){
@@ -117,11 +120,11 @@ async function cloudUpload(){
  try{
    const t=await validToken();
    const legacy=localObject(legacyKey(user));
-   await request('/rest/v1/nuri_saves?on_conflict=user_id',{method:'POST',accessToken:t.access_token,
+   await request('/rest/v1/taebin_saves?on_conflict=user_id',{method:'POST',accessToken:t.access_token,
      prefer:'resolution=merge-duplicates,return=minimal',body:[{user_id:user.id,save_data:{game,legacy,version:1},updated_at:new Date().toISOString()}]});
    if(revision===previousRevision)safeRemove(dirtyKey(user.id));
    lastStatus='클라우드 저장 완료';
- }catch(e){lastStatus='클라우드 저장 실패 · 이 기기에는 저장됨';console.warn('[NURI] cloud save:',humanError(e));}
+ }catch(e){lastStatus='클라우드 저장 실패 · 이 기기에는 저장됨';console.warn('[TAEBIN] cloud save:',humanError(e));}
  finally{uploadRunning=false;}
 }
 window.nuriCloudSchedule=function(){
@@ -172,7 +175,7 @@ async function syncBeforeEnter(user){
       if(game){safeSet(accountKey,JSON.stringify(game));if(remote.legacy)safeSet(legacyKey(user),JSON.stringify(remote.legacy));}
    }
   }
- }catch(e){lastStatus='클라우드 연결 불가 · 이 기기 데이터 사용';console.warn('[NURI] cloud download:',humanError(e));}
+ }catch(e){lastStatus='클라우드 연결 불가 · 이 기기 데이터 사용';console.warn('[TAEBIN] cloud download:',humanError(e));}
 }
 async function boot(){
  const user=active();
@@ -242,8 +245,8 @@ window.nuriRenderAccountPanel=function(){
  const x=active();if(typeof modalHeader==='function')modalHeader('내 계정','TAEBIN LIFE · ACCOUNT');
  const body=$('appModalBody');if(!body)return;
  const email=x?.mode==='member'?(x.email||'회원 계정'):'게스트';
- const desc=x?.mode==='member'?'회원별 게임 기록을 기기에 저장하고, 인증 서버에 동기화해.':'게임 기록은 지금 사용하는 브라우저에만 저장돼.';
- const accountButtons=x?.mode==='member'?`<button class="nuri-auth-action" onclick="nuriAccountSyncNow()">클라우드에 지금 저장하기</button><button class="nuri-auth-action" onclick="nuriImportGuestSave()">게스트 저장을 이 계정으로 복사</button>`:'';
+ const desc=x?.mode==='member'?'태빈이 게임 기록을 계정별로 별도 저장하고 클라우드에 동기화해. 누리 키우기 기록과 분리돼.':'게임 기록은 지금 사용하는 브라우저에만 저장돼.';
+ const accountButtons=x?.mode==='member'?`<button class="nuri-auth-action" onclick="nuriAccountSyncNow()">클라우드에 지금 저장하기</button><button class="nuri-auth-action" onclick="nuriImportGuestSave()">게스트 저장을 이 계정으로 복사</button><button class="nuri-auth-action" onclick="openAppModal('ranking')">🏆 온라인 랭킹 보기</button>`:'';
  body.innerHTML=`<section class="nuri-account-panel"><b>${x?.mode==='member'?'회원 로그인':'게스트 플레이'}</b><small>${String(email).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]))}</small><p>${desc}</p><small id="nuriAccountCloudStatus">${lastStatus}</small>${accountButtons}<button class="nuri-auth-action danger" onclick="nuriAccountSignOut()">${x?.mode==='guest'?'게스트 플레이 종료':'로그아웃'}</button><button class="nuri-auth-action" onclick="openAppModal('menu')">메뉴로 돌아가기</button></section>`;
 };
 window.nuriAccountSignOut=()=>{signOut()};
