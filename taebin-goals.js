@@ -152,6 +152,16 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
   function ensure(){
     localDone();
     if(!Array.isArray(state.taebinGoalHistory))state.taebinGoalHistory=[];
+    // Older game goals used the same ID. Don't count their completions as newly added player goals.
+    if(!state.taebinCustomGoalsMigrated){
+      const ids=new Set(CUSTOM_BUCKETLIST.map(g=>g.id));
+      state.taebinGoalsDone=state.taebinGoalsDone.filter(id=>!ids.has(id));
+      state.taebinGoalHistory=state.taebinGoalHistory.filter(row=>!ids.has(row?.id));
+      state.taebinGoalRuns=state.taebinGoalRuns&&typeof state.taebinGoalRuns==='object'?state.taebinGoalRuns:{};
+      for(const id of ids)delete state.taebinGoalRuns[id];
+      state.taebinCustomGoalsMigrated=true;
+      state.taebinAllGoalsAchieved=false;
+    }
     if(!state.taebinGoalRuns||typeof state.taebinGoalRuns!=='object'||Array.isArray(state.taebinGoalRuns))state.taebinGoalRuns={};
     if(state.taebinGoalsDone.length===100&&!state.taebinAllGoalsAchieved){
       state.taebinAllGoalsAchieved=true;
@@ -396,6 +406,7 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     const prereq=requirements(g);
     const progressText='진행 '+progress+' / '+stageCount+'단계 · 난이도 '+LEVEL_NAMES[tier];
     const intro='<div class="taebin-quest-cover"><div class="taebin-quest-kicker">'+escapeHtml(g.icon+' '+g.category+' · 난이도 '+LEVEL_NAMES[tier])+'</div><h3>'+escapeHtml(g.name)+'</h3><p>'+escapeHtml(g.custom?g.story:'이 꿈은 버튼 한 번으로 이룰 수 없어. 준비와 선택, 게임 속 시간의 흐름이 필요해.')+'</p></div>';
+    const specialStat=(g.id==='t8_8'||g.id==='t8_9')&&typeof holdingsValue==='function'?'<div class="taebin-quest-wait">📈 현재 가상 주식 평가액: '+formatWon(holdingsValue())+' · 목표 '+(g.id==='t8_8'?'50억 원':'100억 원')+'</div>':'';
     const summary='<div class="taebin-quest-meta"><span>'+escapeHtml(progressText)+'</span><span>필요한 능력 · '+escapeHtml(STAT_NAMES[g.stat])+' '+req+' (현재 '+Math.floor(skillOf(g))+')</span><span>필요 예산 · '+formatWon(budget)+'</span></div><div class="taebin-goal-progress"><i style="width:'+(progress/stageCount*100)+'%"></i></div>';
     let content='';
     if(done){
@@ -418,7 +429,7 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
       const gated=miniNeeded(g,r)&&r.miniPassedStage!==r.stage;
       content='<div class="taebin-quest-scene"><small>📖 이야기 '+(r.stage+1)+' / '+stageCount+' · '+escapeHtml(stageName)+'</small><h3>'+escapeHtml(g.name)+' — '+escapeHtml(stageName)+'</h3><p>'+escapeHtml(sceneFor(g,r))+'</p></div>'+caveat+next+(wait?'':gated?miniHTML(g,r):'<div class="taebin-quest-choices">'+rows+'</div>')+'<p class="taebin-quest-tip">성공한 선택은 저장돼. 미니게임을 통과해야 다음 장면이 열리는 목표도 있어.</p>';
     }
-    el.innerHTML=intro+summary+content+'<div class="menu-actions"><button type="button" class="modal-action" onclick="taebinGoalBack()">← 100가지 목표 목록</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>';
+    el.innerHTML=intro+summary+specialStat+content+'<div class="menu-actions"><button type="button" class="modal-action" onclick="taebinGoalBack()">← 100가지 목표 목록</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>';
   }
   function renderModal(){
     ensure();activeQuest=null;
@@ -461,6 +472,25 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     if(miniNeeded(g,r)&&r.miniPassedStage!==r.stage){showToast('미니게임부터 통과해야 다음 장면으로 넘어갈 수 있어.');return;}
     if(r.lastActionDay===number(state.day,1)){showToast('오늘은 이미 도전했어. 게임에서 다음 날로 넘어가 줘.');return questPanel(id);}
     const length=goalSteps(g).length,budget=goalBudget(g),req=requiredSkill(g),phase=goalSteps(g)[r.stage];
+    // 주식 목표는 가상 투자 평가액을 달성했을 때만 실제로 완료할 수 있어.
+    const stockTarget=id==='t8_8'?5000000:id==='t8_9'?10000000:0;
+    const held=stockTarget&&typeof holdingsValue==='function'?holdingsValue():0;
+    if(stockTarget&&r.stage===length-1&&held<stockTarget){
+      const won=n=>Math.round(n*1000).toLocaleString('ko-KR')+'원';
+      const msg='가상 주식 평가액 '+won(held)+' / 목표 '+won(stockTarget)+'. 투자 목표 금액이 아직 부족해.';
+      r.notes.push(msg);r.notes=r.notes.slice(-4);
+      record('📈 주식 목표 진행 중 · '+g.name,'가상 주식 계좌의 평가액을 확인했어.','잔고 확인',msg);
+      r.lastActionDay=number(state.day,1);r.misses++;
+      saveAndDraw();questPanel(id);showToast('주식 평가액 조건을 충족해야 해.');return;
+    }
+    // 추첨은 플레이어가 조작할 수 없는 가상 확률 이벤트로 판정해.
+    if(id==='t6_8'&&r.stage===length-1&&Math.random()>=0.08){
+      const msg='가상 이벤트 추첨에서 이번에는 당첨되지 않았어. 다음 게임 날 다시 응모할 수 있어.';
+      r.notes.push(msg);r.notes=r.notes.slice(-4);
+      record('🎟️ 이벤트 결과 · '+g.name,'게임 속 가상 추첨을 진행했어.','이벤트 응모',msg);
+      r.lastActionDay=number(state.day,1);r.misses++;
+      saveAndDraw();questPanel(id);showToast('이번엔 미당첨. 다음 날 재도전할 수 있어.');return;
+    }
     const needsMoney=r.stage>=1&&!r.paid&&budget>0;
     if(needsMoney&&state.money<budget){showToast('준비 비용이 부족해. '+formatWon(budget)+'이 필요해.');return questPanel(id);}
     if(needsMoney){state.money=Math.max(0,Math.round((state.money-budget)*100)/100);r.paid=true;}
@@ -514,6 +544,15 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     questPanel(id);
     showToast(progress?(r.stage>=length?'🎉 '+g.name+' 목표 완수!':'📖 스토리 진행 '+r.stage+'/'+length):'실패했어. 다음 날 실력을 보완해 재도전할 수 있어.');
   }
+  // 인생의 끝에 한 번만 판정되는 특수 버킷리스트. 게임 속 노년 자연 마무리만 인정.
+  window.taebinGoalOnLifeEnd=function(reason){
+    ensure();
+    if(state.age<80||!String(reason).includes('자연스럽게')||completed('t9_9'))return;
+    state.taebinGoalsDone.push('t9_9');
+    state.taebinGoalHistory.push({id:'t9_9',age:state.age,day:state.day,automatic:true});
+    record('🌿 오래 살아온 인생의 마지막 장','한태빈은 긴 생을 돌아보며 남겨 둔 수첩을 펼쳤어.','삶의 마무리','태빈이의 100가지 목표 중 삶의 자연스러운 마무리 항목이 기록됐어.');
+    ensure();
+  };
   window.taebinGoalOpen=questPanel;
   window.taebinGoalDo=begin;
   window.taebinGoalChoose=choose;
