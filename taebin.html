@@ -970,6 +970,29 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 .taebin-goal-victory{padding:18px;border:1px solid #d5ba71;background:#544c2f85;border-radius:16px}
 @media(max-width:560px){.taebin-goal-cta{flex-wrap:wrap}.taebin-goal-cta button{width:100%}.taebin-goal-item{padding:9px;gap:7px}}
 </style>
+<style>
+/* 태빈이 인생 목표: 스토리 퀘스트 선택지 */
+.taebin-quest-cover{background:linear-gradient(125deg,#1e354b,#2d3156);border:1px solid #90bbdb77;border-radius:18px;padding:20px;margin:0 0 14px}
+.taebin-quest-cover h3{font-size:21px;color:#fff;margin:6px 0 8px}
+.taebin-quest-cover p{font-size:13px;color:#cfdfed;line-height:1.65;margin:0}
+.taebin-quest-kicker{color:#8ae3d9;font-weight:850;font-size:11px;letter-spacing:.07em}
+.taebin-quest-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.taebin-quest-meta span{padding:7px 10px;border:1px solid #739eb571;background:#293e57;color:#d8eef6;font-size:12px;border-radius:9px}
+.taebin-quest-scene{padding:18px;border:1px solid #829db58a;border-radius:14px;background:#202f47;color:#e4edf8;margin:15px 0}
+.taebin-quest-scene h3{color:#f4f8fc;margin:7px 0;font-size:17px}
+.taebin-quest-scene p{line-height:1.7;font-size:14px;margin:0;color:#dfebf5}
+.taebin-quest-scene small{color:#97dce3;font-weight:800}
+.taebin-quest-choices{display:grid;gap:10px;margin:12px 0 15px}
+.taebin-quest-option{width:100%;display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px 15px;border:1px solid #5f8dba80;border-radius:12px;background:#293a56;cursor:pointer;color:#f8fbff;font:inherit;transition:background .15s}
+.taebin-quest-option:hover:not(:disabled){background:#395475;border-color:#9de9e0}
+.taebin-quest-option small{font-size:12px;color:#cad7e7;line-height:1.5}
+.taebin-quest-option:disabled{opacity:.48;cursor:not-allowed}
+.taebin-quest-tip{font-size:12px;color:var(--muted);line-height:1.7}
+.taebin-quest-wait{background:#273c54;border:1px solid #bfab6688;color:#ffdf98;padding:12px 14px;border-radius:11px;font-size:13px;line-height:1.6}
+.taebin-quest-ending{border:1px solid #7adbb5;background:#1c5d4670;border-radius:16px;padding:18px}
+.taebin-quest-ending h3{margin:0 0 7px;color:#a0f6d3}.taebin-quest-ending p{color:#e3fae9}
+.taebin-quest-primary{width:100%;text-align:center}
+</style>
 </head>
 <body>
 <!-- PC 전용 타이틀 로딩 화면. 모바일에서는 CSS로 완전히 숨겨서 터치를 차단하지 않음. -->
@@ -1213,7 +1236,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 <script src="./taebin-game.js?v=1.0.27"></script>
 <script src="./taebin-social.js?v=1.0.22"></script>
 <script src="./taebin-prologue.js?v=1.0.15"></script>
-<script src="./taebin-goals.js?v=1.0.0"></script>
+<script src="./taebin-goals.js?v=1.1.0"></script>
 <script src="./light-ui.js?v=1.0.0"></script>
 <script src="./taebin-mobile.js?v=1.0.16" defer></script>
 <script id="nuriPcIntroRuntime">
