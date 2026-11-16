@@ -10,8 +10,8 @@ try {
  const str=child.execFileSync('git',['log','-1','--pretty=%s'],{encoding:'utf8',timeout:3500}).trim();
  if(str)subject=str.slice(0,160);
 }catch(e){/* git metadata unavailable in local builds */}
-const notes=['연애 화면 가독성 개선 · 인물 이름과 하린 설정 정리','개인 인생 랭킹과 현금 입출금 통장 추가','창업 8가지 · 직원 감원 기능 추가','가상 SNS 누리스타와 주변 인물 6명의 이야기 추가','가상 주식 6종 추가 · 상승 빨강, 하락 파랑, 보합 회색 표시','특별 이벤트 사진첩에 새 사진 7장 추가','시작 화면에 게임 소개와 플레이 방법 추가','모바일 글자·선택지·하단 메뉴와 체력 관리 화면 개선','하루 쉬기 체력 회복 +12','네 집안별 어린 시절부터 노년까지 이어지는 인생 스토리','이전 스토리 선택과 가족 지원 상태가 다음 이야기에 반영','네 집안 시작 자금 표시 · 재벌집 500,000원',subject];
-const manifest={version:'1.0.20',buildId,deployedAt:now,commit:commit||null,notes};
+const notes=['이어서 플레이할 때 선택지가 사라지는 오류 수정','연애 화면 가독성 개선 · 인물 이름과 하린 설정 정리','개인 인생 랭킹과 현금 입출금 통장 추가','창업 8가지 · 직원 감원 기능 추가','가상 SNS 누리스타와 주변 인물 6명의 이야기 추가','가상 주식 6종 추가 · 상승 빨강, 하락 파랑, 보합 회색 표시','특별 이벤트 사진첩에 새 사진 7장 추가','시작 화면에 게임 소개와 플레이 방법 추가','모바일 글자·선택지·하단 메뉴와 체력 관리 화면 개선','하루 쉬기 체력 회복 +12','네 집안별 어린 시절부터 노년까지 이어지는 인생 스토리','이전 스토리 선택과 가족 지원 상태가 다음 이야기에 반영','네 집안 시작 자금 표시 · 재벌집 500,000원',subject];
+const manifest={version:'1.0.21',buildId,deployedAt:now,commit:commit||null,notes};
 fs.writeFileSync('nuri-update.json',JSON.stringify(manifest,null,2)+'\n','utf8');
 const filename='index.html';
 const html=fs.readFileSync(filename,'utf8');

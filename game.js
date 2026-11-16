@@ -1842,7 +1842,7 @@ function renderStoryOverlay(){
 function chooseStoryOption(index){
  ensureStory();
  const chapter=state.pendingStory;
- if(!chapter||!chapter.options[index]||state.pendingTurningPoint)return;
+ if(!chapter?.options?.[index]||state.pendingTurningPoint)return;
  const option=chapter.options[index];
  const fx=actualEffect(growthEffect(option.effect,option.label,index));
  for(let i=0;i<fx.length;i+=2){
@@ -1963,7 +1963,7 @@ function renderTurningPoint(){
 }
 function chooseTurningPoint(index){
  const event=state.pendingTurningPoint;
- if(!event||!event.options[index])return;
+ if(!event?.options?.[index])return;
  const option=event.options[index];
  const balancedEffect=actualEffect(growthEffect(option.effect,option.label,index));
  recordCareerChoice(option);
@@ -2721,7 +2721,40 @@ function renderLifeReviewModal(){
 }
 
 let currentChoices=[];
+function savedChoiceOptions(event){
+ return Array.isArray(event?.options)?event.options.filter(option=>typeof option?.label==="string"&&option.label.trim()):[];
+}
+function restorePendingChoices(){
+ if(!state.alive)return;
+ const turningPoint=state.pendingTurningPoint;
+ if(turningPoint){
+  const options=savedChoiceOptions(turningPoint);
+  if(options.length)turningPoint.options=options;
+  else {
+   const event=turningPoint.age===state.age?turningPointEvents[state.age]:null;
+   state.pendingTurningPoint=event?{age:state.age,...event}:null;
+  }
+ }
+ const story=state.pendingStory;
+ if(story){
+  const options=savedChoiceOptions(story);
+  if(options.length)story.options=options;
+  else {
+   state.pendingStory=null;
+   if(!story.fromLifeArc&&!story.fromRomance&&story.age===state.age){
+    ensureStory();
+    const chapter=familyStoryChapter(state.age);
+    if(chapter&&!state.storyJournal.some(entry=>entry?.age===state.age&&entry.title===chapter.title)){
+     state.storySeen=state.storySeen.filter(age=>age!==state.age);
+     maybeStartStory(state.age);
+    }
+   }
+  }
+ }
+ showNextLifeArc();
+}
 function render(){
+ restorePendingChoices();
  ensureLifeHealth();
  let s=state.stats, age=state.age??0;
  // Older saved games used 5 choices/day; prevent an old gauge overflowing the new speed.
@@ -3934,7 +3967,7 @@ function worldRenderMain(){
 
 function save(){try{localStorage.setItem(window.nuriCurrentSaveKey(),JSON.stringify(state))}catch(e){}worldPersistLegacy(false);if(window.nuriCloudSchedule)window.nuriCloudSchedule();}
 function resetGame(force=false){ensurePlayerExtras();if(!force&&state.alive&&state.settings.confirmReset&&!confirm("누리의 이야기를 처음부터 다시 시작할까?"))return;try{localStorage.removeItem(window.nuriCurrentSaveKey())}catch(e){}closeAppModal();state={version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,items:{},settings:{...DEFAULT_SETTINGS},schoolPath:"",adultPath:"",day:1,event:0,family:null,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{intelligence:5,health:50,social:5,creativity:5,charm:5,happiness:50},money:100,log:[],seen:0,storySeen:[],storyJournal:[],storyFlags:{bond:0,flags:[]},pendingStory:null,latestStory:"",detourPoints:0,lastDetour:"",sceneTurn:0,lastOutcome:"",photoAlbum:{unlocked:[],seen:[],featured:null,history:[]}};document.getElementById("gameMain").style.display="none";document.getElementById("familyScreen").style.display="block";selectFamily("ordinary");save();if(window.nuriResetPrologueFlow)window.nuriResetPrologueFlow();toast("집안을 다시 선택해 줘!")}
-try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()));if(old&&old.stats){state={...state,...old,age:Number.isInteger(old.age)?old.age:([0,3,7,13,16,20][old.stage||0]),version:3,progress:Number.isInteger(old.progress)?Math.min(4,Math.max(0,old.progress)):0,yearDay:old.version>=2&&Number.isInteger(old.yearDay)?(old.version===2?Math.min(2,Math.floor(Math.max(0,old.yearDay)*3/7)):Math.min(2,Math.max(0,old.yearDay))):0,turningPoints:Array.isArray(old.turningPoints)?old.turningPoints:[],pendingTurningPoint:old.version===2?(old.pendingTurningPoint||null):null,comedyLine:old.comedyLine||"인생은 선택의 연속이라는데, 누리는 간식 선택부터 어렵다.",items:old.items||{},settings:{...DEFAULT_SETTINGS,...(old.settings||{})},day:Number.isInteger(old.day)?Math.max(1,old.day):1,schoolPath:old.schoolPath||"",adultPath:old.adultPath||"",alive:old.alive!==false,deathCause:old.deathCause||"",stats:{...state.stats,...old.stats,health:limitStat("health",old.stats.health),happiness:limitStat("happiness",old.stats.happiness)},log:migrateOldLog(old.log),storySeen:Array.isArray(old.storySeen)?old.storySeen:[],storyJournal:Array.isArray(old.storyJournal)?old.storyJournal:[],storyFlags:old.storyFlags||{bond:0,flags:[]},pendingStory:old.pendingStory||null,latestStory:old.latestStory||"",detourPoints:Number(old.detourPoints)||0,lastDetour:old.lastDetour||"",sceneTurn:Number(old.sceneTurn)||0,lastOutcome:old.lastOutcome||""};if(state.family&&families[state.family]){selectedFamily=state.family;document.getElementById("familyScreen").style.display="none";document.getElementById("gameMain").style.display="block"}else{document.getElementById("familyScreen").style.display="block";document.getElementById("gameMain").style.display="none"}}}catch(e){}
+try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()));if(old&&old.stats){state={...state,...old,age:Number.isInteger(old.age)?old.age:([0,3,7,13,16,20][old.stage||0]),version:3,progress:Number.isInteger(old.progress)?Math.min(4,Math.max(0,old.progress)):0,yearDay:old.version>=2&&Number.isInteger(old.yearDay)?(old.version===2?Math.min(2,Math.floor(Math.max(0,old.yearDay)*3/7)):Math.min(2,Math.max(0,old.yearDay))):0,turningPoints:Array.isArray(old.turningPoints)?old.turningPoints:[],pendingTurningPoint:old.pendingTurningPoint||null,comedyLine:old.comedyLine||"인생은 선택의 연속이라는데, 누리는 간식 선택부터 어렵다.",items:old.items||{},settings:{...DEFAULT_SETTINGS,...(old.settings||{})},day:Number.isInteger(old.day)?Math.max(1,old.day):1,schoolPath:old.schoolPath||"",adultPath:old.adultPath||"",alive:old.alive!==false,deathCause:old.deathCause||"",stats:{...state.stats,...old.stats,health:limitStat("health",old.stats.health),happiness:limitStat("happiness",old.stats.happiness)},log:migrateOldLog(old.log),storySeen:Array.isArray(old.storySeen)?old.storySeen:[],storyJournal:Array.isArray(old.storyJournal)?old.storyJournal:[],storyFlags:old.storyFlags||{bond:0,flags:[]},pendingStory:old.pendingStory||null,latestStory:old.latestStory||"",detourPoints:Number(old.detourPoints)||0,lastDetour:old.lastDetour||"",sceneTurn:Number(old.sceneTurn)||0,lastOutcome:old.lastOutcome||""};if(state.family&&families[state.family]){selectedFamily=state.family;document.getElementById("familyScreen").style.display="none";document.getElementById("gameMain").style.display="block"}else{document.getElementById("familyScreen").style.display="block";document.getElementById("gameMain").style.display="none"}}}catch(e){}
 // Migrate old 5-step saves by preserving the proportion of an unfinished day.
 if(state.family&&(()=>{try{return String(localStorage.getItem(window.nuriCurrentSaveKey())||"").includes('"gameSpeed"')}catch(e){return false}})()){
  state.progress=Math.min(growthRequired(state.age)-1,Math.max(0,Math.floor(Number(state.progress)||0)));
@@ -3945,7 +3978,6 @@ applySettings();
 ensureLifeHealth();
 ensureWorld();
 ensureLifeArc();showNextLifeArc();
-if(document.getElementById("gameMain").style.display!=="none"){if(!state.pendingStory)maybeStartStory(state.age);render();save();}
 
 /* ===== NURI LIFE: aging gallery and interconnected service / workplace arcs ===== */
 function agingStage(age){
@@ -4179,8 +4211,14 @@ function showNextLifeArc(){
  ensureLifeArc();
  if(!state.alive)return;
  if(state.pendingStory||state.pendingTurningPoint||!state.arcQueue.length)return;
- const next=state.arcQueue.shift();
- state.pendingStory={...next,fromLifeArc:true};
+ let next,options;
+ while(state.arcQueue.length){
+  next=state.arcQueue.shift();
+  options=savedChoiceOptions(next);
+  if(options.length)break;
+ }
+ if(!options?.length)return;
+ state.pendingStory={...next,options,fromLifeArc:true};
  state.latestStory='🎞️ '+next.age+'살 · '+next.title;
 }
 
@@ -4237,3 +4275,5 @@ function routeSceneBank(age){
  return null;
 }
 
+// Resume the saved game only after the route-specific scene tables are initialized.
+if(document.getElementById("gameMain").style.display!=="none"){if(!state.pendingStory)maybeStartStory(state.age);render();save();}
