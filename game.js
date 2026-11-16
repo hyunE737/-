@@ -179,7 +179,7 @@ function holdingsValue(){
  return NURI_STOCKS.reduce((acc,k)=>acc+state.holdings[k.id]*state.stocks[k.id],0);
 }
 function nuriNetWorth(){
- const p=worldWorthParts();return worldRound(p.cash+p.stocks+p.property+p.business-p.debt);
+ const p=worldWorthParts();return Math.round((p.cash+p.bank+p.stocks+p.property+p.business-p.debt)*1000)/1000;
 }
 function stockProfitRate(sym){
  const arr=state.stockChart[sym]||[];
@@ -250,7 +250,7 @@ function updateWealthHud(){
  const bar=document.getElementById('wealthFill');if(bar)bar.style.width=pct+'%';
  const progress=document.getElementById('wealthTrack');if(progress)progress.setAttribute('aria-valuenow',String(pct));
  const value=document.getElementById('wealthPercent');if(value)value.textContent=(pct<.01?pct.toFixed(4):pct<1?pct.toFixed(2):pct.toFixed(1))+'%';
- const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 주식 '+formatWon(p.stocks)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' − 대출 '+formatWon(p.debt);}
+ const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 통장 '+formatWon(p.bank)+' · 주식 '+formatWon(p.stocks)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' − 대출 '+formatWon(p.debt);}
  const portfolio=document.getElementById('stockPortfolioValue');if(portfolio)portfolio.textContent=formatWon(holdingsValue());
  const held=document.getElementById('stockHeldCount');if(held)held.textContent=NURI_STOCKS.filter(k=>state.holdings[k.id]>0).length+'개';
  const note=document.getElementById('stockMainNote');if(note)note.textContent=state.age<18?'18살이 되면 가상 주식 거래가 열려.':(state.goal100Achieved?'100억 목표를 달성했어! 계속 인생을 즐겨 봐.':stockMarketHeadline()||'가상 기업의 가격이 게임 하루마다 변해.');
@@ -323,7 +323,7 @@ function renderStockModal(){
 function renderWealthGoalModal(){
  modalHeader('100억 부자 달성','NURI LIFE · GOAL COMPLETE');
  document.getElementById('appModalBody').innerHTML=`
-  <div class="life-review-cover"><div class="life-review-eyebrow">GOAL ACHIEVED</div><h3>누리의 꿈이 이루어졌어!</h3><p>${state.age}살, 현금·주식·부동산·사업에서 빚을 뺀 순자산이 100억 원을 돌파했어. 게임은 끝나지 않아. 이제 남은 인생을 어떤 삶으로 채울지 선택해 봐.</p></div>
+  <div class="life-review-cover"><div class="life-review-eyebrow">GOAL ACHIEVED</div><h3>누리의 꿈이 이루어졌어!</h3><p>${state.age}살, 현금·통장·주식·부동산·사업에서 빚을 뺀 순자산이 100억 원을 돌파했어. 게임은 끝나지 않아. 이제 남은 인생을 어떤 삶으로 채울지 선택해 봐.</p></div>
   <div class="stock-overview"><div><small>현재 순자산</small><b>${formatWon(nuriNetWorth())}</b></div><div><small>달성 나이</small><b>${state.goal100Age}살</b></div></div>
   <div class="menu-actions"><button type="button" class="modal-action" onclick="closeAppModal()">인생 계속하기</button><button type="button" class="modal-action" onclick="openAppModal('stocks')">가상 주식시장 보기</button></div>`;
 }
@@ -607,7 +607,7 @@ const STORY_CHAPTERS={
   {label:"🎵 소리에 반응하며 세상 배우기",effect:["creativity",3,"happiness",-1],outcome:"첫 앨범에는 리듬에 맞춰 웃던 날이 남았어.",careerId:"art",flag:"curiosity"},
   {label:"🧩 장난감 구조에 호기심 갖기",effect:["intelligence",3,"health",-1],outcome:"첫 앨범에는 조심스럽게 장난감을 살피던 날이 남았어.",careerId:"technology",flag:"curiosity"},
   {label:"🤲 가족의 손을 꼭 잡기",effect:["social",3,"intelligence",-1],outcome:"첫 앨범에는 가족과 따뜻하게 시간을 보낸 날이 남았어.",careerId:"people",flag:"family"}]},
- 3:{title:"놀이터의 새로운 친구",text:()=>"비가 그친 놀이터에서 하린이라는 아이가 혼자 색분필로 길을 그리고 있어. 누리는 먼저 다가갈지, 조금 거리를 둘지 결정해야 해.",options:[
+ 3:{title:"놀이터의 새로운 친구",text:()=>"비가 그친 놀이터에서 하린이라는 여자아이가 혼자 색분필로 길을 그리고 있어. 누리는 먼저 다가갈지, 조금 거리를 둘지 결정해야 해.",options:[
   {label:"🤝 하린에게 같이 놀자고 말하기",effect:["social",4,"happiness",-2],outcome:"하린은 활짝 웃으며 누리에게 분필 한 개를 건넸어.",careerId:"people",bond:2},
   {label:"🎨 길 옆에 멋진 그림 더하기",effect:["creativity",4,"health",-1],outcome:"누리의 그림을 본 하린이 먼저 다가와 인사를 했어.",careerId:"art",bond:1},
   {label:"🧩 색분필로 규칙 있는 미로 만들기",effect:["intelligence",4,"happiness",-1],outcome:"하린은 누리의 미로를 한참 보더니 함께 풀어보자고 했어.",careerId:"research",bond:1}]},
@@ -883,7 +883,7 @@ const FAMILY_STORY_VARIANTS={
  "wealthy": {
   "3": {
    "title": "저택 담장 밖의 첫 친구",
-   "text": "정해진 산책 시간에 처음 동네 놀이터에 나왔어. 하린은 누리의 집안도 모르고 분필 하나를 내밀어. 수행하던 어른은 돌아갈 시간을 확인하지만, 누리는 조금 더 함께 놀고 싶어 해.",
+   "text": "정해진 산책 시간에 처음 동네 놀이터에 나왔어. 하린이라는 여자아이가 누리의 집안도 모르고 분필 하나를 내밀어. 수행하던 어른은 돌아갈 시간을 확인하지만, 누리는 조금 더 함께 놀고 싶어 해.",
    "choices": [
     [
      "하린에게 같이 놀자고 인사하기",
@@ -1101,7 +1101,7 @@ const FAMILY_STORY_VARIANTS={
  "supportive": {
   "3": {
    "title": "처음 고른 놀이터",
-   "text": "부모님은 오늘 누리가 가리킨 놀이터로 걸어왔어. 하린이 바닥에 분필 그림을 그리고 있어. 무엇을 좋아하는지 서둘러 정하지 않아도 된다는 말에 누리는 천천히 다가가.",
+   "text": "부모님은 오늘 누리가 가리킨 놀이터로 걸어왔어. 하린이라는 여자아이가 바닥에 분필 그림을 그리고 있어. 무엇을 좋아하는지 서둘러 정하지 않아도 된다는 말에 누리는 천천히 다가가.",
    "choices": [
     [
      "하린에게 어떤 놀이를 좋아하는지 묻기",
@@ -1319,7 +1319,7 @@ const FAMILY_STORY_VARIANTS={
  "ordinary": {
   "3": {
    "title": "우리 동네 놀이터의 분필 한 개",
-   "text": "장을 보고 돌아오는 길, 누리가 놀이터 앞에서 걸음을 멈췄어. 하린이라는 아이가 바닥에 길을 그리고 있어. 특별한 약속이 없는 오후, 누리에게 첫 친구를 만날 시간이 생겼어.",
+   "text": "장을 보고 돌아오는 길, 누리가 놀이터 앞에서 걸음을 멈췄어. 하린이라는 여자아이가 바닥에 길을 그리고 있어. 특별한 약속이 없는 오후, 누리에게 첫 친구를 만날 시간이 생겼어.",
    "choices": [
     [
      "하린에게 같이 놀자고 말하기",
@@ -1537,7 +1537,7 @@ const FAMILY_STORY_VARIANTS={
  "frugal": {
   "3": {
    "title": "반 토막 분필로 그린 세상",
-   "text": "동생 손을 잡은 부모님과 동네 놀이터에 왔어. 새 장난감 구경은 지나쳤지만, 하린이 남은 분필을 내밀어. 누리는 작은 조각으로도 바닥 가득 무언가를 그릴 수 있을 것 같아.",
+   "text": "동생 손을 잡은 부모님과 동네 놀이터에 왔어. 새 장난감 구경은 지나쳤지만, 하린이라는 여자아이가 남은 분필을 내밀어. 누리는 작은 조각으로도 바닥 가득 무언가를 그릴 수 있을 것 같아.",
    "choices": [
     [
      "하린과 분필을 나눠 같이 놀기",
@@ -2696,7 +2696,7 @@ function renderLifeReviewModal(){
   <div><small>기록된 이야기</small><b>${archive}장</b></div>
  </div>
   <div class="life-review-title">₩ 누리의 재산과 꿈</div>
-  <p class="life-review-sub">최종 순자산 ${formatWon(nuriNetWorth())} (현금·주식·부동산·사업 가치 − 대출 잔액). ${state.goal100Achieved?`${state.goal100Age}살에 100억 원 목표를 달성했어.`:'100억 원이라는 목표를 향해 도전했지만 이번 인생에서는 달성하지 못했어.'}</p>
+  <p class="life-review-sub">최종 순자산 ${formatWon(nuriNetWorth())} (현금·통장·주식·부동산·사업 가치 − 대출 잔액). ${state.goal100Achieved?`${state.goal100Age}살에 100억 원 목표를 달성했어.`:'100억 원이라는 목표를 향해 도전했지만 이번 인생에서는 달성하지 못했어.'}</p>
   ${worldReviewMarkup()}
   ${nuriAbsurdReview()}
   <div class="life-review-title">♡ 관계의 이야기</div><p class="life-review-sub">${lifeReviewEscape(romanceLifeSummary())}</p>
@@ -2962,9 +2962,10 @@ function openAppModal(view="menu"){
  else if(view==="lifeReview")renderLifeReviewModal();
  else if(view==="relationship")renderRomanceModal();
  else if(view==="social")nuriRenderSocial();
+ else if(view==="ranking")renderNuriRanking();
  else if(view==="stocks")renderStockModal();
  else if(view==="wealthGoal")renderWealthGoalModal();
- else if(['realestate','business','children','credit','careerWorld','friends','talents','achievements'].includes(view))worldRender(view);
+ else if(['bank','realestate','business','children','credit','careerWorld','friends','talents','achievements'].includes(view))worldRender(view);
  modal.classList.toggle("life-review-open",view==="lifeReview");
 }
 function closeAppModal(){
@@ -2988,13 +2989,15 @@ function renderMenuModal(){
    <button type="button" class="menu-tile" onclick="openAppModal('account')"><span class="tile-icon">●</span><span><b>내 계정</b><small>로그인 상태 · 저장 동기화 · 로그아웃</small></span></button>
    <button class="menu-tile" onclick="openAppModal('absurd')"><span class="tile-icon">ㅋㅋ</span><span><b>황당 사건록</b><small>지나온 병맛 사건과 결과 모아보기</small></span></button>
    <button class="menu-tile" onclick="openAppModal('realestate')"><span class="tile-icon">🏠</span><span><b>부동산</b><small>매입 · 매도 · 임대 수익</small></span></button>
-   <button class="menu-tile" onclick="openAppModal('business')"><span class="tile-icon">📈</span><span><b>창업·사업</b><small>창업 · 직원 채용 · 확장</small></span></button>
+   <button type="button" class="menu-tile" onclick="openAppModal('bank')"><span class="tile-icon">💳</span><span><b>은행 · 내 통장</b><small>현금 입금 · 출금 · 거래 내역</small></span></button>
+   <button class="menu-tile" onclick="openAppModal('business')"><span class="tile-icon">📈</span><span><b>창업·사업</b><small>8가지 업종 · 직원 채용·감원 · 확장</small></span></button>
    <button class="menu-tile" onclick="openAppModal('children')"><span class="tile-icon">👪</span><span><b>자녀·가족</b><small>자녀 성장 · 가족 관계</small></span></button>
    <button class="menu-tile" onclick="openAppModal('credit')"><span class="tile-icon">🏦</span><span><b>대출·신용</b><small>대출 · 이자 · 상환</small></span></button>
    <button class="menu-tile" onclick="openAppModal('careerWorld')"><span class="tile-icon">💼</span><span><b>월급·승진</b><small>연봉 · 실적 · 승진</small></span></button>
    <button class="menu-tile" onclick="openAppModal('friends')"><span class="tile-icon">🤝</span><span><b>주변 인물 · 친구와 라이벌</b><small>우정 · 경쟁 · 인물별 이야기</small></span></button>
    <button class="menu-tile" onclick="openAppModal('social')"><span class="tile-icon">📱</span><span><b>누리스타</b><small>게임 속 피드 · 팔로우 · 메시지</small></span></button>
    <button class="menu-tile" onclick="openAppModal('talents')"><span class="tile-icon">◈</span><span><b>재능·특기</b><small>타고난 재능 · 훈련</small></span></button>
+   <button type="button" class="menu-tile" onclick="openAppModal('ranking')"><span class="tile-icon">🏆</span><span><b>인생 랭킹</b><small>내 기록 · 순자산과 나이 비교</small></span></button>
    <button class="menu-tile" onclick="openAppModal('achievements')"><span class="tile-icon">★</span><span><b>업적·엔딩</b><small>목표 · 인생 유형 · 보상</small></span></button>
    <button class="menu-tile" onclick="openAppModal('relationship')"><span class="tile-icon">♡</span><span><b>연애 · 결혼</b><small>만남, 교제, 결혼생활, 이혼</small></span></button>
    <button class="menu-tile" onclick="openAppModal('stocks')"><span class="tile-icon">₩</span><span><b>주식 투자 · 100억 목표</b><small>가상 기업 매수·매도, 내 순자산 확인</small></span></button>
@@ -3099,7 +3102,40 @@ function migrateOldLog(lines){
 }
 
 /* ===== Relationship life system: adult meetings, dating, marriage, divorce ===== */
-const ROMANCE_PARTNER_NAMES=['하늘','서윤','도윤','연우','지민','민서'];
+const ROMANCE_PARTNER_NAMES={
+ female:['하은','예린','수아','유나','지은','민서'],
+ male:['지훈','태현','도윤','현우','건우','준혁']
+};
+const LEGACY_ROMANCE_NAMES=new Map([['하늘','하은'],['서윤','예린'],['도윤','수아'],['연우','유나'],['지민','지은']]);
+function romanceWith(name){
+ const last=name.charCodeAt(name.length-1);
+ return name+(last>=0xac00&&last<=0xd7a3&&(last-0xac00)%28?'과':'와');
+}
+function migrateRomanceNames(r){
+ if(r.namesVersion===1)return;
+ r.namesVersion=1;
+ if(r.partnerGender==='male')return;
+ const rename=n=>LEGACY_ROMANCE_NAMES.get(n)||n;
+ const renameText=t=>typeof t==='string'?t.replace(/(하늘|서윤|도윤|연우|지민)와(?=의|\s)/g,(_,n)=>romanceWith(rename(n))):t;
+ if(r.partner)r.partner=rename(r.partner);
+ r.exPartners=r.exPartners.map(rename);
+ for(const item of r.history)if(item&&typeof item==='object'){
+  const old=item.details;
+  item.details=renameText(old);
+  if(old!==item.details&&typeof state.latestStory==='string'&&state.latestStory.endsWith(' — '+old)){
+   state.latestStory=state.latestStory.slice(0,-old.length)+item.details;
+  }
+ }
+ if(Array.isArray(state.arcQueue))for(const chapter of state.arcQueue)if(chapter?.fromRomance)chapter.text=renameText(chapter.text);
+ if(state.pendingStory?.fromRomance)state.pendingStory.text=renameText(state.pendingStory.text);
+ if(Array.isArray(state.log))state.log=state.log.map(t=>typeof t==='string'&&t.startsWith('♡ ')?renameText(t):t);
+ if(r.partner)r.partnerGender='female';
+}
+function setRomancePreference(gender){
+ if(!Object.hasOwn(ROMANCE_PARTNER_NAMES,gender)||!romanceCan('meet'))return;
+ ensureRomance().meetPreference=gender;
+ save();renderRomanceModal();
+}
 function ensureRomance(){
  if(!state.romance||typeof state.romance!=='object')state.romance={};
  const r=state.romance;
@@ -3112,6 +3148,8 @@ function ensureRomance(){
  if(!Array.isArray(r.history))r.history=[];
  if(!Array.isArray(r.chapterAges))r.chapterAges=[];
  if(!Array.isArray(r.exPartners))r.exPartners=[];
+ migrateRomanceNames(r);
+ if(!Object.hasOwn(ROMANCE_PARTNER_NAMES,r.meetPreference))r.meetPreference='female';
  r.datingAge=Number.isFinite(Number(r.datingAge))?Number(r.datingAge):-1;
  r.marriageAge=Number.isFinite(Number(r.marriageAge))?Number(r.marriageAge):-1;
  return r;
@@ -3145,45 +3183,47 @@ function applyRomanceEvent(action,fromStory=false){
  if(!romanceCan(action))return false;
  const r=ensureRomance();
  if(action==='meet'){
-  const names=ROMANCE_PARTNER_NAMES.filter(n=>n!==r.exPartners.at(-1));
-  r.partner=names[(Math.floor(state.age)+Math.floor(state.totalChoices||0)+r.exPartners.length)%names.length]||ROMANCE_PARTNER_NAMES[0];
+  const names=ROMANCE_PARTNER_NAMES[r.meetPreference].filter(n=>n!==r.exPartners.at(-1));
+  const index=Math.max(0,Math.floor(state.age)+Math.floor(Number(state.totalChoices)||0)+r.exPartners.length)%names.length;
+  r.partner=names[index];
+  r.partnerGender=r.meetPreference;
   r.status='meeting';r.affection=25;r.trust=25;
-  romanceLog('새로운 만남',r.partner+'와 서로의 관심사를 이야기하기 시작했어.');
+  romanceLog('새로운 만남',romanceWith(r.partner)+' 서로의 관심사를 이야기하기 시작했어.');
  }else if(action==='talk'){
   r.affection=Math.min(100,r.affection+13);r.trust=Math.min(100,r.trust+14);
-  romanceLog('솔직한 대화',r.partner+'와 서로의 생각을 차분히 나누며 신뢰가 깊어졌어.');
+  romanceLog('솔직한 대화',romanceWith(r.partner)+' 서로의 생각을 차분히 나누며 신뢰가 깊어졌어.');
  }else if(action==='time'){
   r.affection=Math.min(100,r.affection+18);r.trust=Math.min(100,r.trust+8);
   state.money=Math.max(0,state.money-10);
   state.stats.happiness=limitStat('happiness',state.stats.happiness+3);
-  romanceLog('함께한 시간',r.partner+'와 휴일을 보내며 추억을 만들었어. 비용 10,000원.');
+  romanceLog('함께한 시간',romanceWith(r.partner)+' 휴일을 보내며 추억을 만들었어. 비용 10,000원.');
  }else if(action==='startDating'){
   r.status='dating';r.datingAge=state.age;
   state.stats.happiness=limitStat('happiness',state.stats.happiness+5);
-  romanceLog('교제 시작',r.partner+'와 서로의 마음을 확인하고 연인이 되었어.');
+  romanceLog('교제 시작',romanceWith(r.partner)+' 서로의 마음을 확인하고 연인이 되었어.');
  }else if(action==='marry'){
   r.status='married';r.marriageAge=state.age;state.money=Math.max(0,state.money-50);
   state.stats.happiness=limitStat('happiness',state.stats.happiness+7);
-  romanceLog('결혼',r.partner+'와 앞으로의 생활을 함께 만들어가기로 약속했어. 결혼 비용 50,000원.');
+  romanceLog('결혼',romanceWith(r.partner)+' 앞으로의 생활을 함께 만들어가기로 약속했어. 결혼 비용 50,000원.');
  }else if(action==='disagree'){
   r.affection=Math.max(0,r.affection-15);r.trust=Math.max(0,r.trust-20);
   state.stats.happiness=limitStat('happiness',state.stats.happiness-4);
-  romanceLog('의견 충돌',r.partner+'와 갈등이 생겼어. 서로 생각을 돌아볼 시간이 필요해.');
+  romanceLog('의견 충돌',romanceWith(r.partner)+' 갈등이 생겼어. 서로 생각을 돌아볼 시간이 필요해.');
  }else if(action==='repair'){
   r.affection=Math.min(100,r.affection+11);r.trust=Math.min(100,r.trust+22);
   state.stats.happiness=limitStat('happiness',state.stats.happiness+2);
-  romanceLog('갈등 해결',r.partner+'와 솔직히 대화하고 앞으로 지킬 약속을 정했어.');
+  romanceLog('갈등 해결',romanceWith(r.partner)+' 솔직히 대화하고 앞으로 지킬 약속을 정했어.');
  }else if(action==='breakup'){
   const partner=r.partner;
-  r.exPartners.push(partner);r.status='single';r.partner='';r.affection=0;r.trust=0;r.datingAge=-1;
+  r.exPartners.push(partner);r.status='single';r.partner='';r.partnerGender=null;r.affection=0;r.trust=0;r.datingAge=-1;
   state.stats.happiness=limitStat('happiness',state.stats.happiness-5);
-  romanceLog('이별',partner+'와 각자의 길을 가기로 했어. 관계를 돌아보며 새로운 일상을 시작했어.');
+  romanceLog('이별',romanceWith(partner)+' 각자의 길을 가기로 했어. 관계를 돌아보며 새로운 일상을 시작했어.');
  }else if(action==='divorce'){
   const partner=r.partner;
-  r.exPartners.push(partner);r.status='divorced';r.partner='';r.affection=0;r.trust=0;r.datingAge=-1;r.marriageAge=-1;
+  r.exPartners.push(partner);r.status='divorced';r.partner='';r.partnerGender=null;r.affection=0;r.trust=0;r.datingAge=-1;r.marriageAge=-1;
   state.money=Math.max(0,state.money-40);
   state.stats.happiness=limitStat('happiness',state.stats.happiness-8);
-  romanceLog('이혼',partner+'와 충분히 대화한 끝에 혼인 관계를 정리했어. 생활 정리 비용 40,000원.');
+  romanceLog('이혼',romanceWith(partner)+' 충분히 대화한 끝에 혼인 관계를 정리했어. 생활 정리 비용 40,000원.');
  }else if(action==='alone'){
   romanceLog('나만의 삶', '당장은 연애보다 친구, 일, 취미에 시간을 쓰기로 했어.');
  }
@@ -3230,7 +3270,7 @@ function renderRomanceModal(){
   document.getElementById('appModalBody').innerHTML='<p class="modal-hint">연애와 결혼 시스템은 누리가 18살이 된 후 열려. 지금은 친구 관계와 성장에 집중해 보자.</p><button class="modal-action" onclick="renderMenuModal()">메뉴로 돌아가기</button>';return;
  }
  const actions=[
-  ['meet','새로운 사람 만나기','새로운 인연을 알아가며 관계 시작'],
+  ['meet','새로운 사람 만나기',(r.meetPreference==='male'?'남성':'여성')+' 인물과 새로운 인연을 시작'],
   ['talk','서로의 이야기 듣기','호감도 +13 · 신뢰도 +14'],
   ['time','함께 시간 보내기','호감도 +18 · 신뢰도 +8 · 10,000원'],
   ['startDating','교제 시작하기','알아가는 사이 · 호감도 40 / 신뢰도 35 이상'],
@@ -3253,9 +3293,10 @@ function renderRomanceModal(){
  });
  const safe=t=>lifeReviewEscape(t);
  document.getElementById('appModalBody').innerHTML=`
-  <div class="romance-card"><small>현재 관계 · ${safe(romanceStatusLabel())}</small><h3>${r.partner?safe(r.partner)+'와의 이야기':'누리의 관계 이야기'}</h3><p class="romance-summary">${r.partner?'서로의 신뢰를 지키거나, 다른 삶의 방향을 선택할 수 있어.':'누리는 연애와 결혼을 선택할 수도, 혼자만의 삶을 이어갈 수도 있어.'}</p>
+  <div class="romance-card"><small>현재 관계 · ${safe(romanceStatusLabel())}${r.partner&&r.partnerGender?' · '+(r.partnerGender==='male'?'남성':'여성'):''}</small><h3>${r.partner?safe(romanceWith(r.partner))+'의 이야기':'누리의 관계 이야기'}</h3><p class="romance-summary">${r.partner?'서로의 신뢰를 지키거나, 다른 삶의 방향을 선택할 수 있어.':'누리는 연애와 결혼을 선택할 수도, 혼자만의 삶을 이어갈 수도 있어.'}</p>
   <div class="romance-meter"><div><label><span>호감도</span><b>${r.affection} / 100</b></label><div class="track"><span class="fill" style="width:${r.affection}%"></span></div></div><div><label><span>신뢰도</span><b>${r.trust} / 100</b></label><div class="track"><span class="fill trust-fill" style="width:${r.trust}%"></span></div></div></div></div>
   <p class="modal-hint">관계 행동도 성장 선택으로 계산돼. 매번 체력 -1, 다른 능력치 2개 증가. 결혼과 이혼은 인생 회고록에 기록돼.</p>
+  ${romanceCan('meet')?`<fieldset class="romance-preference"><legend>만날 인물</legend><div><button type="button" aria-pressed="${r.meetPreference==='female'}" onclick="setRomancePreference('female')">여성</button><button type="button" aria-pressed="${r.meetPreference==='male'}" onclick="setRomancePreference('male')">남성</button></div></fieldset>`:''}
   <div class="romance-actions">${visible.map(([id,title,help])=>`<button type="button" class="romance-action ${id==='divorce'||id==='breakup'?'danger':''}" onclick="romanceAction('${id}')" ${romanceCan(id)?'':'disabled'}><b>${safe(title)}</b><small>${safe(help)}</small></button>`).join('')}</div>
   <h3 style="margin:20px 0 10px;font-size:15px">관계의 기록</h3><div class="romance-history">${r.history.length?r.history.slice(-10).reverse().map(e=>`<div><b>${e.age}살 · ${safe(e.title)}</b><p>${safe(e.details)}</p></div>`).join(''):'<p class="modal-hint">아직 관계 기록이 없어. 누리만의 속도로 시작할 수 있어.</p>'}</div>
   <div class="menu-actions"><button class="modal-action" onclick="renderMenuModal()">← 메뉴로 돌아가기</button></div>`;
@@ -3265,7 +3306,7 @@ function romanceAnnualUpdate(){
  if(r.status==='dating'||r.status==='married'){
   r.affection=Math.max(0,r.affection-1);
   if(r.affection<25&&r.trust<25){
-    romanceLog('멀어진 관계',r.partner+'와의 소통이 줄어들고 있어. 대화로 회복할 수 있어.');
+    romanceLog('멀어진 관계',romanceWith(r.partner)+'의 소통이 줄어들고 있어. 대화로 회복할 수 있어.');
   }
  }
 }
@@ -3281,20 +3322,20 @@ function maybeStartRomanceChapter(age){
  const opts=[];
  let title,text;
  if(r.status==='married'){
-  title='함께 만들어가는 결혼생활';text=r.partner+'와 함께 지내며 일과 생활의 균형을 고민하게 됐어. 앞으로의 관계를 어떻게 만들어갈까?';
+  title='함께 만들어가는 결혼생활';text=romanceWith(r.partner)+' 함께 지내며 일과 생활의 균형을 고민하게 됐어. 앞으로의 관계를 어떻게 만들어갈까?';
   opts.push(romanceStoryOption('서로의 고민을 천천히 듣기','social','intelligence','서로의 생각을 나누며 관계를 돌봤어.','talk'));
   opts.push(romanceStoryOption('함께 보내는 휴일 계획하기','social','creativity','바쁜 일상 속에서 함께할 시간을 만들었어.','time'));
   opts.push(romanceStoryOption('갈등을 인정하고 대화하기','intelligence','charm','서로 다른 생각을 받아들이는 일이 필요했어.','repair'));
   opts.push(romanceStoryOption('각자의 길을 위해 이혼 결정하기','intelligence','social','오랜 고민 끝에 결혼생활을 정리하고 새로운 삶을 시작했어.','divorce'));
  }else if(r.status==='dating'){
-  title='앞으로의 관계를 고민하는 날';text=r.partner+'와 서로의 생활 방식에 대해 이야기했어. 작은 선택들이 관계의 방향을 바꾸고 있어.';
+  title='앞으로의 관계를 고민하는 날';text=romanceWith(r.partner)+' 서로의 생활 방식에 대해 이야기했어. 작은 선택들이 관계의 방향을 바꾸고 있어.';
   opts.push(romanceStoryOption('미래에 대해 솔직히 대화하기','social','intelligence','함께 바라는 미래에 대해 알게 됐어.','talk'));
   opts.push(romanceStoryOption('추억을 만들며 관계 돌보기','social','creativity','일상의 기억을 하나 더 쌓았어.','time'));
   if(romanceCan('marry'))opts.push(romanceStoryOption('결혼을 선택하기','social','charm','두 사람은 앞으로의 생활을 함께 만들어가기로 했어.','marry'));
   else opts.push(romanceStoryOption('각자의 목표를 존중하기','intelligence','creativity','서로에게 필요한 시간을 인정했어.','talk'));
   opts.push(romanceStoryOption('서로 다른 길로 헤어지기','intelligence','social','각자의 삶을 이어가기 위해 헤어졌어.','breakup'));
  }else if(r.status==='meeting'){
-  title='새 인연과의 중요한 대화';text=r.partner+'와 조금씩 알아가고 있어. 누리는 관계를 천천히 발전시킬 수 있어.';
+  title='새 인연과의 중요한 대화';text=romanceWith(r.partner)+' 조금씩 알아가고 있어. 누리는 관계를 천천히 발전시킬 수 있어.';
   opts.push(romanceStoryOption('관심사를 나누며 대화하기','social','intelligence','서로를 한층 더 이해하게 됐어.','talk'));
   opts.push(romanceStoryOption('함께 문화생활 즐기기','creativity','charm','함께 시간을 보내며 마음의 거리가 가까워졌어.','time'));
   if(romanceCan('startDating'))opts.push(romanceStoryOption('서로의 마음을 확인하고 교제하기','social','charm','서로 동의하며 교제를 시작했어.','startDating'));
@@ -3321,7 +3362,7 @@ function romanceLifeSummary(){
  if(divorces)details+=(marriages?',':' 누리는')+' '+divorces+'번 이혼을 경험했어.';
  else if(marriages)details+=' 서로의 관계를 함께 만들어갔어.';
  if(!marriages&&relations)details+=' 마음이 닿는 인연과 '+relations+'번 교제하며 관계에 대해 배웠어.';
- if(r.status==='married')details+=' 마지막에는 '+r.partner+'와 함께 생활했어.';
+ if(r.status==='married')details+=' 마지막에는 '+romanceWith(r.partner)+' 함께 생활했어.';
  if(!r.history.length)details+=' 연애나 결혼 없이 자신의 일상과 목표에 집중했어.';
  return details;
 }
@@ -3337,7 +3378,11 @@ const WORLD_BUSINESSES = [
  {id:'cafe',name:'동네 카페',cost:14000,desc:'맛과 서비스로 단골을 모으는 가게',talent:'social'},
  {id:'media',name:'영상 제작 스튜디오',cost:30000,desc:'촬영과 콘텐츠 제작으로 의뢰를 받는 사업',talent:'creativity'},
  {id:'game',name:'게임 개발사',cost:65000,desc:'작은 게임부터 만들어 성장하는 회사',talent:'intelligence'},
- {id:'tech',name:'기술 스타트업',cost:115000,desc:'기술과 경영 감각이 필요한 성장형 기업',talent:'business'}
+ {id:'tech',name:'기술 스타트업',cost:115000,desc:'기술과 경영 감각이 필요한 성장형 기업',talent:'business'},
+ {id:'snack',name:'동네 분식점',cost:8500,desc:'친근한 메뉴와 서비스로 동네 손님을 모으는 가게',talent:'social'},
+ {id:'design',name:'디자인 공방',cost:23000,desc:'맞춤 굿즈와 브랜드 디자인을 만드는 작은 스튜디오',talent:'creativity'},
+ {id:'academy',name:'공부방',cost:27000,desc:'배우는 사람에게 맞춤 수업과 학습 계획을 제공하는 곳',talent:'intelligence'},
+ {id:'logistics',name:'지역 배송 업체',cost:45500,desc:'동네 상점의 배송을 맡아 꾸준히 거래처를 늘리는 사업',talent:'business'}
 ];
 const WORLD_TALENTS = [
  {id:'intelligence',name:'분석·연구',desc:'공부·기술·연구에 도움',regex:/공부|연구|코딩|컴퓨터|분석|수학|시험|기술|계획|자료|투자|장학/},
@@ -3366,7 +3411,7 @@ const WORLD_ACHIEVEMENTS = [
  {id:'absurdMaster',name:'전설의 황당 인생',desc:'병맛 사건 10번 경험하기'}
 ];
 const WORLD_FRIENDS = [
- {id:'harin',name:'하린',trait:'어린 시절부터 이어진 소중한 친구'},
+ {id:'harin',name:'하린',gender:'female',trait:'어린 시절부터 함께한 여자아이'},
  {id:'eunwoo',name:'은우',trait:'배우고 도전하는 걸 좋아하는 친구'},
  {id:'junho',name:'준호',trait:'함께 일하며 성장하는 친구'},
  {id:'seoyun',name:'서윤',trait:'동네 사진 동아리 친구',minAge:10},
@@ -3379,6 +3424,8 @@ function ensureWorld(){
  const w=state.world;
  if(!Array.isArray(w.properties))w.properties=[];
  if(!Array.isArray(w.loans))w.loans=[];
+ if(!Number.isSafeInteger(w.bankWon)||w.bankWon<0)w.bankWon=0;
+ if(!Array.isArray(w.bankHistory))w.bankHistory=[];
  if(!Array.isArray(w.children))w.children=[];
  if(!Array.isArray(w.events))w.events=[];
  if(!Array.isArray(w.achievements))w.achievements=[];
@@ -3405,7 +3452,7 @@ function ensureWorld(){
 function worldRealEstateValue(){return ensureWorld().properties.reduce((sum,p)=>sum+Math.max(0,Number(p.value)||0),0);}
 function worldDebt(){return ensureWorld().loans.reduce((sum,p)=>sum+Math.max(0,Number(p.balance)||0),0);}
 function worldBusinessValue(){const b=ensureWorld().business;return b?Math.max(0,Number(b.value)||0):0;}
-function worldWorthParts(){return {cash:Math.max(0,Number(state.money)||0),stocks:holdingsValue(),property:worldRealEstateValue(),business:worldBusinessValue(),debt:worldDebt()};}
+function worldWorthParts(){return {cash:Math.max(0,Number(state.money)||0),bank:ensureWorld().bankWon/1000,stocks:holdingsValue(),property:worldRealEstateValue(),business:worldBusinessValue(),debt:worldDebt()};}
 function worldNote(msg,type='event'){
  const w=ensureWorld();
  const label=state.age+'살 · '+msg;
@@ -3433,8 +3480,7 @@ function recordWorldChoice(choice){
 }
 function worldCheckAchievements(){
  if(!state.family)return;
- const w=ensureWorld();const worth=worldWorthParts();
- const net=worth.cash+worth.stocks+worth.property+worth.business-worth.debt;
+ const w=ensureWorld(),net=nuriNetWorth();
  const checks={
   firstJob:state.workStatus==='employed',firstPay:!!w.everPaid,firstHome:w.properties.length>0,
   landlord:w.properties.length>=3,founder:!!w.everFounded,businessGrowth:!!w.everLevel3,
@@ -3489,13 +3535,15 @@ function worldAnnualUpdate(){
   // Operating a business can lead to profit or loss.
   if(w.business){
    const b=w.business;
-   const relevant=Number(w.talents[(WORLD_BUSINESSES.find(x=>x.id===b.id)||{}).talent]||0);
+   const definition=WORLD_BUSINESSES.find(x=>x.id===b.id);
+   const name=definition?.name||'사업';
+   const relevant=Number(w.talents[definition?.talent]||0);
    const chance=Math.random();
    const variance=chance<.20?-.23+Math.random()*.13:.08+Math.random()*.25;
    const margin=(variance + Math.min(.09,relevant*.0015)+Math.min(.05,b.staff*.012));
-   const netProfit=Math.round(b.value*margin)-Math.round(b.value*.025*b.staff);
-   if(netProfit>=0){state.money+=netProfit;worldNote(b.name+' 사업 수익 '+formatWon(netProfit),'business');}
-   else {const paid=Math.min(state.money,Math.abs(netProfit));state.money=worldRound(state.money-paid);b.value=Math.max(0,worldRound(b.value-(Math.abs(netProfit)-paid)));worldNote(b.name+' 적자 발생 '+formatWon(Math.abs(netProfit)),'business');}
+   const netProfit=Math.round(b.value*margin)-worldAnnualStaffCost(b);
+   if(netProfit>=0){state.money+=netProfit;worldNote(name+' 사업 수익 '+formatWon(netProfit),'business');}
+   else {const paid=Math.min(state.money,Math.abs(netProfit));state.money=worldRound(state.money-paid);b.value=Math.max(0,worldRound(b.value-(Math.abs(netProfit)-paid)));worldNote(name+' 적자 발생 '+formatWon(Math.abs(netProfit)),'business');}
    b.value=Math.max(0,worldRound(b.value*(1+(chance<.2?-.07:.04)+Math.min(.08,relevant*.001))));
    b.lastProfit=netProfit;
   }
@@ -3521,6 +3569,43 @@ function worldCommit(message,view){
  if(document.getElementById('appModal')?.classList.contains('open')&&activeModal===view)worldRender(view);
  if(message)toast(message);
 }
+
+function worldBankTransfer(direction,all=false){
+ if(!state.family||!worldCanAct()||!['deposit','withdraw'].includes(direction))return false;
+ const w=ensureWorld(),deposit=direction==='deposit';
+ const cash=Math.round((Number(state.money)||0)*1000);
+ const available=deposit?cash:w.bankWon;
+ const amount=all?available:Number(document.getElementById('nuriBankAmount')?.value);
+ if(!Number.isSafeInteger(amount)||amount<=0){toast('1원 이상의 금액을 입력해 줘.');return false;}
+ if(amount>available){toast(deposit?'보유 현금이 부족해.':'통장 잔액이 부족해.');return false;}
+ const nextCash=cash+(deposit?-amount:amount);
+ const nextBank=w.bankWon+(deposit?amount:-amount);
+ if(!Number.isSafeInteger(nextCash)||nextCash<0||!Number.isSafeInteger(nextBank)||nextBank<0)return false;
+ state.money=nextCash/1000;
+ w.bankWon=nextBank;
+ w.bankHistory.unshift({age:state.age,direction,amount});
+ w.bankHistory=w.bankHistory.slice(0,20);
+ worldCommit((deposit?'통장에 입금 ':'현금으로 출금 ')+formatWon(amount/1000),'bank');
+ return true;
+}
+function worldAnnualStaffCost(b){
+ return Math.round((Number(b.value)||0)*.025*(Number(b.staff)||0));
+}
+function worldDismissalCost(b){
+ return Math.max(500,Math.round((Number(b.value)||0)*.025*.25));
+}
+function worldDismissStaff(){
+ if(!worldCanAct(19))return false;
+ const b=ensureWorld().business;
+ if(!b||!Number.isInteger(b.staff)||b.staff<1)return false;
+ const fee=worldDismissalCost(b);
+ if(state.money<fee){toast('감원 비용을 낼 현금이 부족해.');return false;}
+ if(!confirm('직원 1명을 감원할까? '+formatWon(fee)+'이 한 번 지출되고, 다음 정산부터 인건비와 직원의 매출 기여가 함께 줄어들어.'))return false;
+ state.money=worldRound(state.money-fee);b.staff--;
+ worldCommit('직원 1명 감원 · 비용 '+formatWon(fee)+' · 남은 직원 '+b.staff+'명','business');
+ return true;
+}
+
 function worldBuyProperty(id){
  if(!worldCanAct(18))return;
  const w=ensureWorld();const item=WORLD_PROPERTIES.find(x=>x.id===id);if(!item)return;
@@ -3693,7 +3778,7 @@ function worldLifeSummary(){
 }
 function worldReviewMarkup(){
  const w=ensureWorld(),parts=worldWorthParts();
- const rows=[['현금',parts.cash],['주식',parts.stocks],['부동산',parts.property],['사업 가치',parts.business],['대출 잔액',-parts.debt]];
+ const rows=[['현금',parts.cash],['통장',parts.bank],['주식',parts.stocks],['부동산',parts.property],['사업 가치',parts.business],['대출 잔액',-parts.debt]];
  const last=w.events.filter(e=>e.type!=='achievement').slice(-16);
  return `<div class="life-review-title">인생의 결과 · ${worldSafe(worldEndingName())}</div>
  <p class="life-review-sub">${worldSafe(worldLifeSummary())}</p>
@@ -3723,20 +3808,66 @@ function worldPersistLegacy(finished=false){
  for(const id of w.achievements)if(!record.achievements.includes(id))record.achievements.push(id);
  if(finished){
   record.runs++;
-  record.endings.push({title:worldEndingName(),age:state.age,wealth:worldRound(nuriNetWorth())});
+  record.endings.push({title:worldEndingName(),age:state.age,wealth:nuriNetWorth()});
   record.endings=record.endings.slice(-30);
  }
  try{localStorage.setItem(window.nuriCurrentLegacyKey(),JSON.stringify(record));}catch(e){}
 }
 
+
+/* Rank the current game and the completed lives kept by this save. */
+function nuriRankRows(metric='wealth'){
+ const archive=worldLegacy(),endings=archive.endings;
+ const start=Math.max(0,archive.runs-endings.length);
+ const rows=endings.flatMap((end,index)=>{
+  if(!end||!Number.isFinite(Number(end.age))||!Number.isFinite(Number(end.wealth)))return [];
+  return [{title:String(end.title||'지난 인생'),age:Number(end.age),wealth:Number(end.wealth),run:start+index+1,current:false}];
+ });
+ if(state.family&&state.alive){
+  rows.push({title:families[state.family]?.name||'현재 인생',age:state.age,wealth:nuriNetWorth(),run:archive.runs+1,current:true});
+ }
+ const key=metric==='age'?'age':'wealth',secondary=key==='age'?'wealth':'age';
+ rows.sort((a,b)=>b[key]-a[key]||b[secondary]-a[secondary]||b.run-a.run);
+ rows.forEach((row,index)=>{row.rank=index&&row[key]===rows[index-1][key]?rows[index-1].rank:index+1;});
+ return rows;
+}
+function renderNuriRanking(metric='wealth'){
+ const byAge=metric==='age';
+ const rows=nuriRankRows(byAge?'age':'wealth');
+ const current=rows.find(row=>row.current);
+ const top=rows.slice(0,10);
+ const renderRank=row=>`<li class="rank-row ${row.current?'rank-current':''}" value="${row.rank}"><span class="rank-place">${row.rank}위</span><div><b>${worldSafe(row.title)}</b><small>${row.current?'현재 진행 중':row.run+'번째 인생 · 완주'} · ${byAge?formatWon(row.wealth):row.age+'살'}</small></div><strong>${byAge?row.age+'살':formatWon(row.wealth)}</strong></li>`;
+ modalHeader('인생 랭킹','누리 키우기 · 내 기록');
+ document.getElementById('appModalBody').innerHTML=`
+  <p class="modal-hint">현재 인생과 이 저장에 남아 있는 완주 기록을 비교해. ${byAge?'살아온 나이':'순자산(현금·통장·주식·부동산·사업에서 대출을 뺀 금액)'}이 같으면 공동 순위야.</p>
+  <div class="social-tabs" aria-label="랭킹 기준"><button type="button" aria-pressed="${!byAge}" onclick="renderNuriRanking('wealth')">순자산 순</button><button type="button" aria-pressed="${byAge}" onclick="renderNuriRanking('age')">나이 순</button></div>
+  ${current?`<p class="rank-status">현재 인생 <b>${current.rank}위</b> / ${rows.length}개 기록</p>`:''}
+  ${top.length?`<ol class="rank-list" aria-label="상위 10개 인생 기록">${top.map(renderRank).join('')}</ol>`:'<p class="rank-status">아직 비교할 인생 기록이 없어.</p>'}
+  ${current&&!top.includes(current)?`<div class="rank-overflow"><h3>현재 인생</h3><ol class="rank-list">${renderRank(current)}</ol></div>`:''}
+  <p class="modal-hint">개인 랭킹 · 다른 플레이어의 기록은 표시되지 않아.</p>
+  <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">← 메뉴로 돌아가기</button></div>`;
+ document.querySelector('.app-modal-card')?.scrollTo?.(0,0);
+}
+
 function worldRender(view){
  ensureWorld();
- const headings={realestate:['부동산','NURI LIFE · REAL ESTATE'],business:['창업·사업','NURI LIFE · BUSINESS'],children:['자녀·가족','NURI LIFE · FAMILY'],credit:['대출·신용','NURI LIFE · CREDIT'],careerWorld:['월급·승진','NURI LIFE · CAREER'],friends:['친구·라이벌','NURI LIFE · FRIENDS'],talents:['재능·특기','NURI LIFE · TALENTS'],achievements:['업적·엔딩','NURI LIFE · ACHIEVEMENTS']};
+ const headings={bank:['은행 · 내 통장','NURI LIFE · BANK'],realestate:['부동산','NURI LIFE · REAL ESTATE'],business:['창업·사업','NURI LIFE · BUSINESS'],children:['자녀·가족','NURI LIFE · FAMILY'],credit:['대출·신용','NURI LIFE · CREDIT'],careerWorld:['월급·승진','NURI LIFE · CAREER'],friends:['친구·라이벌','NURI LIFE · FRIENDS'],talents:['재능·특기','NURI LIFE · TALENTS'],achievements:['업적·엔딩','NURI LIFE · ACHIEVEMENTS']};
  if(!headings[view])return;
  modalHeader(...headings[view]);
  const w=state.world;const locked=state.alive?'':'disabled';
  const button=(txt,call,disabled)=>`<button type="button" class="world-button" onclick="${call}" ${(disabled||!state.alive)?'disabled':''}>${txt}</button>`;
  let html=`<div class="world-moneybar"><span>현금 <b>${formatWon(state.money)}</b></span><span>순자산 <b>${formatWon(nuriNetWorth())}</b></span></div>`;
+
+ if(view==='bank'){
+  const disabled=state.alive?'':'disabled';
+  const movable=Math.round(state.money*1000)>0;
+  html+=`<div class="world-feature"><div class="world-mini-grid"><div><small>지갑 속 현금</small><b>${formatWon(state.money)}</b></div><div><small>통장 잔액</small><b>${formatWon(w.bankWon/1000)}</b></div></div>
+  <p class="modal-hint">현금과 통장 사이를 수수료 없이 옮길 수 있어. 통장 잔액도 순자산에 포함돼. 상점이나 투자에 쓰려면 먼저 현금으로 출금해 줘.</p>
+  <div class="bank-form"><label for="nuriBankAmount">옮길 금액 (원)</label><input id="nuriBankAmount" type="number" inputmode="numeric" min="1" step="1" placeholder="예: 10000" ${disabled}>
+  <div class="social-actions">${button('통장으로 입금',"worldBankTransfer('deposit')",!movable)}${button('현금으로 출금',"worldBankTransfer('withdraw')",w.bankWon===0)}</div>
+  <div class="social-actions">${button('현금 전액 입금',"worldBankTransfer('deposit',true)",!movable)}${button('통장 전액 출금',"worldBankTransfer('withdraw',true)",w.bankWon===0)}</div></div></div>
+  <div class="stock-history"><h3>최근 통장 거래</h3><ul>${w.bankHistory.length?w.bankHistory.slice(0,10).map(t=>`<li>${worldSafe(t.age)}살 · ${t.direction==='deposit'?'입금':'출금'} · ${formatWon(t.amount/1000)}</li>`).join(''):'<li>아직 거래 내역이 없어.</li>'}</ul></div>`;
+ }
  if(view==='realestate'){
   html+='<p class="modal-hint">18살부터 매매 가능. 매년 가격이 변하고 임대수익에서 관리비가 차감돼. 이 게임만의 가상 부동산이야.</p><h3>매물</h3><div class="world-list">';
   for(const p of WORLD_PROPERTIES)html+=`<article class="world-item"><div><b>${p.name}</b><small>${p.desc}</small><small>매입 ${formatWon(p.price)} · 연 임대료 기준 ${formatWon(p.rent)}</small></div>${button('매입',`worldBuyProperty('${p.id}')`,state.age<18||state.money<p.price)}</article>`;
@@ -3745,11 +3876,11 @@ function worldRender(view){
   html+='</div>';
  }
  if(view==='business'){
-  html+='<p class="modal-hint">19살부터 창업 가능. 사업 수익은 매년 시장 상황과 재능에 따라 달라져. 적자가 날 수도 있어.</p>';
-  if(!w.business){html+='<div class="world-list">'+WORLD_BUSINESSES.map(b=>`<article class="world-item"><div><b>${b.name}</b><small>${b.desc}</small><small>필요 자본 ${formatWon(b.cost)}</small></div>${button('창업',`worldFoundBusiness('${b.id}')`,state.age<19||state.money<b.cost)}</article>`).join('')+'</div>';
+  html+='<p class="modal-hint">19살부터 창업 가능 · 8가지 업종 중 선택. 사업 수익은 매년 시장 상황과 재능에 따라 달라져. 적자가 날 수도 있어.</p>';
+  if(!w.business){html+='<div class="world-list">'+WORLD_BUSINESSES.slice().sort((a,b)=>a.cost-b.cost).map(b=>`<article class="world-item"><div><b>${b.name}</b><small>${b.desc}</small><small>필요 자본 ${formatWon(b.cost)}</small></div>${button('창업',`worldFoundBusiness('${b.id}')`,state.age<19||state.money<b.cost)}</article>`).join('')+'</div>';
   } else {
    const b=w.business;const name=WORLD_BUSINESSES.find(x=>x.id===b.id)?.name||b.id;
-   html+=`<div class="world-feature"><h3>${name}</h3><div class="world-mini-grid"><div><small>사업 레벨</small><b>${b.level}</b></div><div><small>직원</small><b>${b.staff}명</b></div><div><small>평가 가치</small><b>${formatWon(b.value)}</b></div><div><small>최근 연 실적</small><b>${b.lastProfit<0?'−':''}${formatWon(Math.abs(b.lastProfit))}</b></div></div><div class="world-actions">${button('사업 확장',`worldExpandBusiness()`,b.level>=8||state.money<Math.round(b.value*.3))}${button('직원 채용',`worldHireStaff()`,b.staff>=12||state.money<1500+b.staff*500)}${button('사업 매각',`worldSellBusiness()`)}</div></div>`;
+   html+=`<div class="world-feature"><h3>${name}</h3><div class="world-mini-grid"><div><small>사업 레벨</small><b>${b.level}</b></div><div><small>직원</small><b>${b.staff}명</b></div><div><small>평가 가치</small><b>${formatWon(b.value)}</b></div><div><small>최근 연 실적</small><b>${b.lastProfit<0?'−':''}${formatWon(Math.abs(b.lastProfit))}</b></div><div><small>예상 연 인건비</small><b>${formatWon(worldAnnualStaffCost(b))}</b></div></div><p class="modal-hint">${b.staff?'직원 1명을 줄이면 '+formatWon(worldDismissalCost(b))+'을 한 번 내. 다음 정산부터 인건비와 직원의 매출 기여가 줄어들어.':'채용하면 매출에 도움이 되지만 해마다 인건비가 들어.'}</p><div class="world-actions">${button('사업 확장',`worldExpandBusiness()`,b.level>=8||state.money<Math.round(b.value*.3))}${button('직원 채용',`worldHireStaff()`,b.staff>=12||state.money<1500+b.staff*500)}${button('직원 1명 감원','worldDismissStaff()',b.staff<1||state.money<worldDismissalCost(b))}${button('사업 매각',`worldSellBusiness()`)}</div></div>`;
   }
  }
  if(view==='children'){
@@ -3796,9 +3927,9 @@ function worldRender(view){
 function worldRenderMain(){
  const el=document.getElementById('worldMainSummary');if(!el||!state.family)return;
  const w=ensureWorld();const parts=worldWorthParts();
- el.innerHTML=`<div class="world-main-top"><div><small>내 인생의 경제·가족 시스템</small><h2>나의 삶 · 자산 관리</h2></div><span>순자산 ${formatWon(Math.max(0,parts.cash+parts.stocks+parts.property+parts.business-parts.debt))}</span></div>
- <div class="world-mini-grid"><div><small>부동산 가치</small><b>${formatWon(parts.property)}</b></div><div><small>사업 가치</small><b>${formatWon(parts.business)}</b></div><div><small>대출 잔액</small><b>${formatWon(parts.debt)}</b></div><div><small>업적</small><b>${w.achievements.length} / ${WORLD_ACHIEVEMENTS.length}</b></div></div>
- <div class="world-main-actions"><button type="button" onclick="openAppModal('realestate')">부동산</button><button type="button" onclick="openAppModal('business')">창업·사업</button><button type="button" onclick="openAppModal('careerWorld')">월급·승진</button><button type="button" onclick="openAppModal('achievements')">업적 보기</button></div>`;
+ el.innerHTML=`<div class="world-main-top"><div><small>내 인생의 경제·가족 시스템</small><h2>나의 삶 · 자산 관리</h2></div><span>순자산 ${formatWon(Math.max(0,nuriNetWorth()))}</span></div>
+ <div class="world-mini-grid"><div><small>통장 잔액</small><b>${formatWon(parts.bank)}</b></div><div><small>부동산 가치</small><b>${formatWon(parts.property)}</b></div><div><small>사업 가치</small><b>${formatWon(parts.business)}</b></div><div><small>대출 잔액</small><b>${formatWon(parts.debt)}</b></div><div><small>업적</small><b>${w.achievements.length} / ${WORLD_ACHIEVEMENTS.length}</b></div></div>
+ <div class="world-main-actions"><button type="button" onclick="openAppModal('bank')">은행</button><button type="button" onclick="openAppModal('realestate')">부동산</button><button type="button" onclick="openAppModal('business')">창업·사업</button><button type="button" onclick="openAppModal('careerWorld')">월급·승진</button><button type="button" onclick="openAppModal('achievements')">업적 보기</button></div>`;
 }
 
 function save(){try{localStorage.setItem(window.nuriCurrentSaveKey(),JSON.stringify(state))}catch(e){}worldPersistLegacy(false);if(window.nuriCloudSchedule)window.nuriCloudSchedule();}

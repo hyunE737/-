@@ -151,3 +151,36 @@ input::placeholder,textarea::placeholder{color:#63766f!important;opacity:1}
  opacity:1!important;
 }
 #gameMain .health-foot,#gameMain .risk-head,#gameMain .wealth-progress-foot{gap:8px}
+
+/* Relationship, personal ranking and bank controls on the light dialog surface. */
+#appModal .romance-card,#appModal .romance-meter label{color:#2f4e46!important}
+#appModal .romance-meter .track{background:#e0e6e1}
+#appModal .romance-action:not(:disabled){background:#fffdf8!important;border:1px solid #bdcfc3!important}
+#appModal .romance-action:not(:disabled):hover{background:#ecf4ed!important;border-color:#659680!important}
+#appModal .romance-action b,#appModal .romance-history b{color:#1d3c33!important;font-size:15px;line-height:1.5}
+#appModal .romance-action small,#appModal .romance-history p{color:#3e5c52!important;font-size:13px;line-height:1.65}
+#appModal .romance-action:disabled b,#appModal .romance-action:disabled small{color:#485d53!important}
+#appModal .romance-action.danger:not(:disabled){border-color:#d5aea8!important;background:#fff6f4!important}
+#appModal .romance-action.danger b{color:#7f352f!important}
+#appModal .romance-history>div{border-color:#cfddd3;background:#f4f7f0}
+.romance-preference{min-width:0;margin:14px 0;padding:10px 12px 12px;border:1px solid #c6d8ce;border-radius:14px}
+.romance-preference legend{padding:0 5px;color:#294c40;font-weight:800}
+.romance-preference>div{display:flex;flex-wrap:wrap;gap:8px}
+#appModal .romance-preference button{min-height:44px;padding:8px 16px;border:1px solid #bfd0c4;border-radius:11px;background:#edf3eb;color:#294b40;font:inherit;font-weight:750;cursor:pointer}
+#appModal .romance-preference button[aria-pressed="true"]{background:#245e51;color:#fff;border-color:#245e51}
+.rank-status{padding:12px 14px;background:#edf4eb;border:1px solid #ceddd2;border-radius:12px;color:#274b40}
+.rank-list{list-style:none;display:grid;gap:8px;padding:0;margin:12px 0}
+.rank-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:11px 12px;border:1px solid #d4e0d6;border-radius:14px;background:#fffdf8;color:#234238}
+.rank-row.rank-current{border-color:#9fbfae;background:#edf6eb}
+.rank-place{font-weight:850;min-width:36px}
+.rank-row small{display:block;color:#48645a;line-height:1.55}
+.rank-row strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.bank-form{display:grid;gap:8px;margin-top:12px}
+.bank-form label{font-weight:800}
+#appModal .bank-form input{min-height:46px;width:100%;padding:10px 12px;border:1px solid #b3c9bb;border-radius:11px;background:#fffdf8;font:inherit;font-size:16px}
+#appModal .bank-form .world-button{min-height:44px}
+@media(max-width:460px){
+ .rank-row{grid-template-columns:36px minmax(0,1fr);gap:4px 8px}
+ .rank-row strong{grid-column:2}
+ .bank-form .world-button{flex:1 1 128px}
+}
