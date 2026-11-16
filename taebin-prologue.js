@@ -50,13 +50,13 @@ function applyChoice(){
  state.prologueChoice=OPTIONS.indexOf(option);
  if(!Array.isArray(state.storyJournal))state.storyJournal=[];
  state.storyJournal.unshift({
-  age:'프롤로그',title:'다시 시작하는 인생',
-  intro:'한태빈이 횡단보도를 건너던 순간 트럭이 다가왔고, 시간이 멈춘 듯 새로운 시작의 기회가 열렸어.',
+  age:'프롤로그',title:'별 100개가 그려진 수첩',
+  intro:'오래된 서점에서 한태빈은 별 100개가 그려진 수첩을 발견했어. 네 가지 집안의 문이 열리자 새로운 인생을 선택했어.',
   choice:option.title,
-  outcome:'한태빈은 '+option.title+'로 시작 자금 '+formatWon(families[option.family].money)+'을 갖고 새로운 인생을 시작했어.'
+  outcome:'한태빈은 '+option.title+'로 시작 자금 '+formatWon(families[option.family].money)+'을 갖고, 수첩의 별 100개를 채울 인생을 시작했어.'
  });
  if(!Array.isArray(state.log))state.log=[];
- state.log.push('📖 프롤로그 · '+option.caption+' 선택. 태빈이가 다시 태어났어.');
+ state.log.push('📖 프롤로그 · '+option.caption+' 선택. 한태빈의 100가지 인생 목표가 시작됐어.');
 }
 function resetFlow(){
  if(document.getElementById('gameMain')?.style.display==='block')return;
