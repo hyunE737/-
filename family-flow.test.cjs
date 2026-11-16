@@ -40,7 +40,7 @@ for(const [index,[family,money]] of expected.entries()){
   run('maybeStartStory('+age+')');assert.equal(run('state.storySeen.filter(a=>a==='+age+').length'),1);
   run('chooseStoryOption(0)');assert.equal(run('state.pendingStory'),null);
  }
- run('state.age=7;maybeStartStory(7)');assert.equal(run('state.pendingStory.title'),run('STORY_CHAPTERS[7].title'));
+ run('state.age=7;maybeStartStory(7)');assert.equal(run('state.pendingStory.title'),run('FAMILY_STORY_VARIANTS[state.family][7].title'));
  run('state.age=12;Math.random=()=>0;state.settings.randomEvents=false');assert.equal(run('familyBackgroundEvent()'),false);
  run('state.settings.randomEvents=true');assert.equal(run('familyBackgroundEvent()'),true);assert.ok(run('state.latestEvent.length')>0);
  if(family==='supportive'){
@@ -56,3 +56,76 @@ assert.equal(titles.size,4);
 for(const [,money] of expected)assert.ok(html.includes('시작 자금 '+(money*1000).toLocaleString('ko-KR')+'원'));
 assert.ok(!html.includes('시작 자금 300,000원'));
 console.log('PASS syntax, four distinct openings and fallback family cards');
+
+// Every shared milestone has a distinct house narrative, while effects,
+// career points, friendship bonds and flags retain their existing definitions.
+const milestoneAges=[3,7,10,13,16,18,20,25,35,50,70,90];
+for(const age of milestoneAges){
+ const houseTitles=new Set(),houseChoices=new Set();
+ for(const [familyIndex,[family]] of expected.entries()){
+  for(let optionIndex=0;optionIndex<3;optionIndex++){
+   const {get,run}=setup();
+   get('nuriPrologueChoices').children[familyIndex].click();
+   run('chooseStoryOption(0);state.age='+age+';maybeStartStory('+age+')');
+   const chapter=JSON.parse(run('JSON.stringify(state.pendingStory)'));
+   houseTitles.add(chapter.title);houseChoices.add(chapter.options.map(o=>o.label).join('|'));
+   assert.equal(chapter.family,family);
+   assert.equal(chapter.options.length,3);
+   assert.equal(run('JSON.stringify(state.pendingStory.options.map(o=>({effect:o.effect,careerId:o.careerId,bond:o.bond,flag:o.flag})))'),
+                run('JSON.stringify(STORY_CHAPTERS['+age+'].options.map(o=>({effect:o.effect,careerId:o.careerId,bond:o.bond,flag:o.flag})))'));
+   const before=run('JSON.stringify(STORY_CHAPTERS['+age+'])');
+   run('chooseStoryOption('+optionIndex+')');
+   assert.equal(run('state.familyStoryMemory.choice'),chapter.options[optionIndex].label);
+   assert.equal(run('state.familyStoryMemory.outcome'),chapter.options[optionIndex].outcome);
+   assert.equal(run('state.storyJournal.at(-1).choice'),chapter.options[optionIndex].label);
+   assert.equal(run('state.storyJournal.at(-1).outcome'),chapter.options[optionIndex].outcome);
+   assert.equal(run('JSON.stringify(STORY_CHAPTERS['+age+'])'),before);
+   const nextAge=age+1;
+   run('state.age='+nextAge);
+   const next=run('familyStoryChapter('+nextAge+')');
+   if(next)assert.ok(next.text.includes(chapter.options[optionIndex].outcome));
+  }
+ }
+ assert.equal(houseTitles.size,4);assert.equal(houseChoices.size,4);
+}
+console.log('PASS 48 house-specific milestones / all 144 choices, shared effects, flags, journals and prior-choice callbacks');
+
+// Narrative follows the existing support actions, including independent paths.
+{
+ const {get,run,c}=setup();get('nuriPrologueChoices').children[1].click();run('chooseStoryOption(0)');
+ run('state.age=17;maybeStartStory(17);chooseStoryOption(2);state.age=18;maybeStartStory(18)');
+ assert.equal(run('state.familyDreamSupport'),false);
+ assert.match(run('state.pendingStory.text'),/프로젝트 비용 지원 없이/);
+ assert.ok(run('state.pendingStory.text').includes(run('state.familyStoryMemory.outcome')));
+ run('chooseStoryOption(0);state.age=28;maybeStartStory(28);chooseStoryOption(0);state.age=35;maybeStartStory(35)');
+ assert.equal(run('state.familyDreamSupport'),true);assert.match(run('state.pendingStory.text'),/프로젝트 지원을 받기로/);
+ run('state.pendingStory=null;state.storySeen=state.storySeen.filter(a=>a!==28);state.age=28;maybeStartStory(28);chooseStoryOption(2)');
+ assert.equal(run('state.familyDreamSupport'),false);
+ run('state.age=40;maybeStartStory(40)');assert.match(run('state.pendingStory.text'),/프로젝트 비용 지원 없이/);
+ // Exercise the real saved-game migration, rather than a new-game initializer.
+ run('save()');const stored=JSON.parse(c.localStorage.getItem('test'));
+ const begin=game.indexOf('try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()))');
+ const end=game.indexOf('// Migrate old 5-step saves',begin);
+ run('state.familyStoryMemory=null;state.money=0;'+game.slice(begin,end));
+ assert.equal(run('state.familyStoryMemory.choice'),stored.familyStoryMemory.choice);
+ assert.equal(run('state.money'),stored.money);
+ assert.equal(run('state.familyDreamSupport'),false);
+ run('state.pendingStory=null;state.age=50;maybeStartStory(50)');assert.match(run('state.pendingStory.text'),/프로젝트 비용 지원 없이/);
+}
+{
+ const {get,run}=setup();get('nuriPrologueChoices').children[3].click();run('chooseStoryOption(0)');
+ run('state.age=12;maybeStartStory(12)');const before=run('state.money');run('chooseStoryOption(0)');
+ assert.equal(run('state.money'),before+12);assert.equal(run('state.familyScholarships'),1);
+ run('state.age=13;maybeStartStory(13)');assert.match(run('state.pendingStory.text'),/활동비 지원/);
+}
+{
+ const {get,run}=setup();get('nuriPrologueChoices').children[0].click();run('chooseStoryOption(0)');
+ run('state.age=5;maybeStartStory(5);chooseStoryOption(0);state.age=12;maybeStartStory(12)');
+ assert.equal(run('state.familyTrust'),1);assert.match(run('state.pendingStory.text'),/가족과의 신뢰/);
+ // A legacy save without the new memory field still gets the correct branch.
+ run('delete state.familyStoryMemory;state.pendingStory=null;state.age=16;maybeStartStory(16)');
+ assert.equal(run('state.pendingStory.title'),'가업 설명회와 나의 진로표');
+ assert.ok(!run('state.pendingStory.text').includes('undefined'));
+ run('resetGame(true)');assert.equal(run('state.familyStoryMemory'),undefined);
+}
+console.log('PASS support withdrawal/resumption/independence, scholarship amounts, family trust, real save reload and legacy compatibility');
