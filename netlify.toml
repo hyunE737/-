@@ -1,6 +1,7 @@
 [build]
   command = "node build-update.cjs"
   publish = "."
+  functions = "netlify/functions"
 
 [[headers]]
   for = "/nuri-update.json"

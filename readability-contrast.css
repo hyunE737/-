@@ -184,3 +184,18 @@ input::placeholder,textarea::placeholder{color:#63766f!important;opacity:1}
  .rank-row strong{grid-column:2}
  .bank-form .world-button{flex:1 1 128px}
 }
+
+#appModal .setting-row b,#appModal .tempo-settings> b,#appModal .tempo-mode b{
+ color:#1d3c33!important;font-size:15px;line-height:1.5
+}
+#appModal .setting-row small,#appModal .tempo-mode small{
+ color:#3e5a51!important;font-size:13px;line-height:1.6
+}
+#appModal .setting-row{align-items:center}
+#appModal .setting-row .switch-btn{min-height:44px;min-width:54px;flex-shrink:0}
+#gameMain #nuriRankingButton{white-space:nowrap}
+#appModal .social-compose input[name=nickname]{max-width:100%}
+@media(max-width:420px){
+ #gameMain .top-actions #nuriRankingButton,
+ #gameMain .top-actions .menu-open-btn{padding-inline:8px!important}
+}

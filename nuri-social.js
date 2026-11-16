@@ -65,6 +65,54 @@ function nuriStoryInfo(person){
 function nuriPeopleSummary(){
  return '<p class="modal-hint">만남과 대화로 관계를 쌓으면 각 인물의 이야기가 열려. 선택에 따라 관계와 다음 장면의 대사가 달라져.</p>';
 }
+function nuriHarinRomanceScene(){
+ const social=nuriSocialState(),r=ensureRomance();
+ if(state.age<18||!state.family)return null;
+ if(!social.harinRomance&&nuriStoryRecords('harin').length>=2&&nuriStoryInfo(nuriPerson('harin')).score>=55&&romanceCan('meet')){
+  return {id:'letter',title:'분필 그림 옆의 편지',text:'하린은 오래된 놀이터 사진을 건네며 말했어. “우리 사이가 소중해서 조심스러운데, 요즘은 친구 이상의 마음이 들어. 넌 어때?”',choices:['나도 같은 마음이야. 연인으로 만나고 싶어','너를 아끼지만 친구로 지내고 싶어']};
+ }
+ if(social.harinRomance==='dating'&&r.partner==='하린'&&r.status==='dating'&&state.age>r.datingAge){
+  return {id:'weekend',title:'오래된 친구, 새로 맞추는 주말',text:'연인이 된 뒤 둘 다 바빠지자 만나기로 한 주말이 자꾸 미뤄졌어. 하린은 예전처럼 마음을 숨기지 말고 이야기해 보자고 해.',choices:['서운했던 마음부터 천천히 들어 주기','부담 없이 함께할 작은 약속 정하기']};
+ }
+ return null;
+}
+function nuriChooseHarinRomance(id,index){
+ const scene=nuriHarinRomanceScene();
+ if(!state.alive||!scene||scene.id!==id||![0,1].includes(index))return false;
+ const social=nuriSocialState(),r=ensureRomance();
+ let outcome;
+ if(id==='letter'){
+  if(index===0){
+   r.partner='하린';r.partnerGender='female';r.status='meeting';r.affection=45;r.trust=55;
+   romanceLog('하린과 서로의 마음을 전한 날','어릴 적 분필 그림을 보며 서로 같은 마음이었다고 이야기했어.');
+   applyRomanceEvent('startDating',true);
+   social.harinRomance='dating';
+   outcome='하린과 서로의 마음을 확인하고 연인이 되었어.';
+  }else{
+   social.harinRomance='friends';
+   nuriChangeRelation(nuriPerson('harin'),3);
+   outcome='하린은 누리의 마음을 존중했어. 둘은 친구로 계속 서로를 응원하기로 했어.';
+  }
+ }else{
+  r.affection=Math.min(100,r.affection+(index===0?5:10));
+  r.trust=Math.min(100,r.trust+(index===0?12:6));
+  social.harinRomance='together';
+  outcome=index===0?'서로 기다리던 시간을 솔직히 말하자 미루던 대화가 다시 이어졌어.':'매주 짧은 산책을 약속했어. 바쁜 일상에도 둘만의 시간이 생겼어.';
+ }
+ romanceLog(scene.title,outcome);
+ render();save();nuriRenderPerson('harin');toast(outcome);
+ return true;
+}
+function nuriHarinRomanceMarkup(){
+ const scene=nuriHarinRomanceScene();
+ const branch=nuriSocialState().harinRomance;
+ if(!scene){
+  if(branch==='friends')return '<p class="social-panel">하린과 소중한 친구로 지내기로 했어.</p>';
+  if(branch==='dating'&&ensureRomance().partner==='하린'&&ensureRomance().status==='dating')return '<p class="social-panel">하린과 교제 중이야. 다음 해에 둘의 이야기가 더 이어져.</p>';
+  return !branch&&state.age>=13?'<p class="modal-hint">18살 이후 · 하린 이야기 2장 · 친밀도 55 이상 · 교제 중인 상대가 없을 때 새로운 이야기가 열려.</p>':'';
+ }
+ return `<article class="social-panel"><h3>♡ ${scene.title}</h3><p>${scene.text}</p><div class="social-actions">${scene.choices.map((choice,index)=>`<button type="button" class="modal-action" onclick="nuriChooseHarinRomance('${scene.id}',${index})" ${!state.alive?'disabled':''}>${choice}</button>`).join('')}</div></article>`;
+}
 function nuriOpenPerson(id){activeModal='personStory';nuriRenderPerson(id);}
 function nuriRenderPerson(id){
  const person=nuriPerson(id);if(!person)return;
@@ -76,6 +124,7 @@ function nuriRenderPerson(id){
  document.getElementById('appModalBody').innerHTML=`
   <div class="social-panel"><h3>${person.icon} ${person.name} · ${person.role}</h3><p>${relation.label} ${score}/100 · 이야기 ${records.length}/${person.chapters.length}장</p></div>
   ${chapter?`<article class="social-panel"><h3>${ready?chapter[2]:'다음 이야기는 아직 잠겨 있어'}</h3>${ready?`<p>${callback?'<span class="social-callback">'+callback+'</span>':''}${chapter[3]}</p><div class="social-actions">${chapter[4].map((label,index)=>`<button type="button" class="modal-action" onclick="nuriChoosePersonStory('${id}',${index},${records.length})" ${!state.alive?'disabled':''}>${label}</button>`).join('')}</div>`:`<p>${chapter[0]}살 이상 · ${relation.label} ${chapter[1]} 이상</p>`}</article>`:'<p class="social-panel">이 인물의 이야기를 모두 만났어. 이후에도 만나거나 메시지를 주고받을 수 있어.</p>'}
+  ${id==='harin'?nuriHarinRomanceMarkup():''}
   ${records.slice().reverse().map(entry=>`<article class="social-panel social-record"><small>${worldSafe(entry.age)}살 · 선택 기록</small><h3>${worldSafe(entry.title)}</h3><p><b>${worldSafe(entry.choice)}</b> · ${worldSafe(entry.outcome)}</p></article>`).join('')}
   <div class="social-actions"><button type="button" class="modal-action" onclick="openAppModal('friends')">주변 인물로</button><button type="button" class="modal-action" onclick="openAppModal('social')">누리스타 보기</button></div>`;
  document.querySelector('.app-modal-card')?.scrollTo?.(0,0);

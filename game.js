@@ -179,7 +179,7 @@ function holdingsValue(){
  return NURI_STOCKS.reduce((acc,k)=>acc+state.holdings[k.id]*state.stocks[k.id],0);
 }
 function nuriNetWorth(){
- const p=worldWorthParts();return Math.round((p.cash+p.bank+p.stocks+p.property+p.business-p.debt)*1000)/1000;
+ const p=worldWorthParts();return Math.round((p.cash+p.bank+p.stocks+p.crypto+p.property+p.business+p.vehicles-p.debt)*1000)/1000;
 }
 function stockProfitRate(sym){
  const arr=state.stockChart[sym]||[];
@@ -192,12 +192,13 @@ function stockTrend(value){
 function stockMarketHeadline(){
  return String(state.marketNews||'').split(' · ')[0];
 }
-function stockSpark(sym,trend){
- const series=(state.stockChart[sym]||[]).slice(-12);
- if(series.length<2)return '<div class="stock-note" style="margin:4px 0;padding:8px">첫 거래일 이후 주가 그래프가 나타나.</div>';
+function stockSpark(sym,trend){return marketSpark(state.stockChart[sym]||[],trend,'주가');}
+function marketSpark(history,trend,label){
+ const series=history.filter(value=>Number.isFinite(value)).slice(-12);
+ if(series.length<2)return '<div class="stock-note" style="margin:4px 0;padding:8px">가격이 바뀐 뒤 그래프가 나타나.</div>';
  const min=Math.min(...series),max=Math.max(...series),span=Math.max(.1,max-min);
  const path=series.map((v,i)=>[3+(i/(series.length-1))*294,43-((v-min)/span)*36].map(n=>n.toFixed(1)).join(',')).join(' ');
- return `<svg class="stock-spark ${trend.className}" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" aria-label="최근 주가 흐름 · 전일 대비 ${trend.label}"><polyline points="${path}" fill="none" stroke="currentColor" stroke-width="2.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ return `<svg class="stock-spark ${trend.className}" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" aria-label="최근 ${label} 흐름 · 전일 대비 ${trend.label}"><polyline points="${path}" fill="none" stroke="currentColor" stroke-width="2.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function updateStockMarket(){
  if(!state.alive||state.age<18)return;
@@ -250,7 +251,7 @@ function updateWealthHud(){
  const bar=document.getElementById('wealthFill');if(bar)bar.style.width=pct+'%';
  const progress=document.getElementById('wealthTrack');if(progress)progress.setAttribute('aria-valuenow',String(pct));
  const value=document.getElementById('wealthPercent');if(value)value.textContent=(pct<.01?pct.toFixed(4):pct<1?pct.toFixed(2):pct.toFixed(1))+'%';
- const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 통장 '+formatWon(p.bank)+' · 주식 '+formatWon(p.stocks)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' − 대출 '+formatWon(p.debt);}
+ const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 통장 '+formatWon(p.bank)+' · 주식 '+formatWon(p.stocks)+' · 비트코인 '+formatWon(p.crypto)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' · 탈것 '+formatWon(p.vehicles)+' − 대출 '+formatWon(p.debt);}
  const portfolio=document.getElementById('stockPortfolioValue');if(portfolio)portfolio.textContent=formatWon(holdingsValue());
  const held=document.getElementById('stockHeldCount');if(held)held.textContent=NURI_STOCKS.filter(k=>state.holdings[k.id]>0).length+'개';
  const note=document.getElementById('stockMainNote');if(note)note.textContent=state.age<18?'18살이 되면 가상 주식 거래가 열려.':(state.goal100Achieved?'100억 목표를 달성했어! 계속 인생을 즐겨 봐.':stockMarketHeadline()||'가상 기업의 가격이 게임 하루마다 변해.');
@@ -316,6 +317,7 @@ function renderStockModal(){
   <div class="stock-overview"><div><small>현금</small><b>${formatWon(state.money)}</b></div><div><small>주식 평가액</small><b>${formatWon(holdingsValue())}</b></div><div><small>현재 순자산</small><b>${formatWon(total)}</b></div><div><small>100억까지</small><b>${formatWon(Math.max(0,NURI_GOAL_UNITS-total))}</b></div><div><small>매도해서 얻은 실현손익</small><b>${state.stockRealizedProfit>=0?'+':''}${formatWon(state.stockRealizedProfit)}</b></div></div>
   <p class="stock-note"><b>🗞️ 오늘의 시장 뉴스</b> ${worldSafe(stockMarketHeadline())||'아직 첫 거래일이야.'}<br/><b>거래 수수료</b> 매수·매도 각각 0.15% · 수수료 포함 평균 매입가 적용<br/>${locked?'18살이 되면 주식 거래를 시작할 수 있어. 성장하면서 원하는 진로를 먼저 찾아 봐.':(!state.alive?'누리의 인생이 끝나 주식 거래가 종료됐어.':'주가는 하루마다 뉴스와 무작위 시장 상황에 따라 오르거나 내려. 수익과 손실은 보장되지 않아.')}<br/>가상 종목과 임의의 가격 변동으로 만든 게임 시스템이야. 실제 주식 투자 정보는 아니며 손실도 발생할 수 있어.</p>
   <p class="stock-legend"><b>전체 ${NURI_STOCKS.length}종목</b><span class="stock-up">▲ 상승</span><span class="stock-down">▼ 하락</span><span class="stock-flat">– 보합</span></p>
+  <div class="social-actions"><button type="button" class="modal-action" onclick="openAppModal('crypto')">비트코인 시장</button></div>
   <div class="stock-market-grid">${details}</div>
   <div class="stock-history"><h3>거래 기록</h3><ul>${state.stockLedger.length?state.stockLedger.slice(0,10).map(x=>`<li>${String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</li>`).join(''):'<li>아직 거래 기록이 없어.</li>'}</ul></div>
   <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">메뉴로 돌아가기</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>`;
@@ -323,7 +325,7 @@ function renderStockModal(){
 function renderWealthGoalModal(){
  modalHeader('100억 부자 달성','NURI LIFE · GOAL COMPLETE');
  document.getElementById('appModalBody').innerHTML=`
-  <div class="life-review-cover"><div class="life-review-eyebrow">GOAL ACHIEVED</div><h3>누리의 꿈이 이루어졌어!</h3><p>${state.age}살, 현금·통장·주식·부동산·사업에서 빚을 뺀 순자산이 100억 원을 돌파했어. 게임은 끝나지 않아. 이제 남은 인생을 어떤 삶으로 채울지 선택해 봐.</p></div>
+  <div class="life-review-cover"><div class="life-review-eyebrow">GOAL ACHIEVED</div><h3>누리의 꿈이 이루어졌어!</h3><p>${state.age}살, 현금·통장·주식·비트코인·부동산·사업·탈것에서 빚을 뺀 순자산이 100억 원을 돌파했어. 게임은 끝나지 않아. 이제 남은 인생을 어떤 삶으로 채울지 선택해 봐.</p></div>
   <div class="stock-overview"><div><small>현재 순자산</small><b>${formatWon(nuriNetWorth())}</b></div><div><small>달성 나이</small><b>${state.goal100Age}살</b></div></div>
   <div class="menu-actions"><button type="button" class="modal-action" onclick="closeAppModal()">인생 계속하기</button><button type="button" class="modal-action" onclick="openAppModal('stocks')">가상 주식시장 보기</button></div>`;
 }
@@ -577,6 +579,7 @@ function advanceOneDay(){
  state.yearDay=(Number(state.yearDay)||0)+1;
  state.progress=0;
  updateStockMarket();
+ nuriUpdateCrypto();
  randomDailyEvent();
  fatigueDailyEvent();
  updateHealthRiskDaily();
@@ -2696,7 +2699,7 @@ function renderLifeReviewModal(){
   <div><small>기록된 이야기</small><b>${archive}장</b></div>
  </div>
   <div class="life-review-title">₩ 누리의 재산과 꿈</div>
-  <p class="life-review-sub">최종 순자산 ${formatWon(nuriNetWorth())} (현금·통장·주식·부동산·사업 가치 − 대출 잔액). ${state.goal100Achieved?`${state.goal100Age}살에 100억 원 목표를 달성했어.`:'100억 원이라는 목표를 향해 도전했지만 이번 인생에서는 달성하지 못했어.'}</p>
+  <p class="life-review-sub">최종 순자산 ${formatWon(nuriNetWorth())} (현금·통장·주식·비트코인·부동산·사업·탈것 가치 − 대출 잔액). ${state.goal100Achieved?`${state.goal100Age}살에 100억 원 목표를 달성했어.`:'100억 원이라는 목표를 향해 도전했지만 이번 인생에서는 달성하지 못했어.'}</p>
   ${worldReviewMarkup()}
   ${nuriAbsurdReview()}
   <div class="life-review-title">♡ 관계의 이야기</div><p class="life-review-sub">${lifeReviewEscape(romanceLifeSummary())}</p>
@@ -2995,8 +2998,11 @@ function openAppModal(view="menu"){
  else if(view==="lifeReview")renderLifeReviewModal();
  else if(view==="relationship")renderRomanceModal();
  else if(view==="social")nuriRenderSocial();
- else if(view==="ranking")renderNuriRanking();
+ else if(view==="ranking")renderNuriPublicRanking();
  else if(view==="stocks")renderStockModal();
+ else if(view==="crypto")renderNuriCrypto();
+ else if(view==="certificates")renderNuriCertificates();
+ else if(view==="vehicles")renderNuriVehicles();
  else if(view==="wealthGoal")renderWealthGoalModal();
  else if(['bank','realestate','business','children','credit','careerWorld','friends','talents','achievements'].includes(view))worldRender(view);
  modal.classList.toggle("life-review-open",view==="lifeReview");
@@ -3030,10 +3036,12 @@ function renderMenuModal(){
    <button class="menu-tile" onclick="openAppModal('friends')"><span class="tile-icon">🤝</span><span><b>주변 인물 · 친구와 라이벌</b><small>우정 · 경쟁 · 인물별 이야기</small></span></button>
    <button class="menu-tile" onclick="openAppModal('social')"><span class="tile-icon">📱</span><span><b>누리스타</b><small>게임 속 피드 · 팔로우 · 메시지</small></span></button>
    <button class="menu-tile" onclick="openAppModal('talents')"><span class="tile-icon">◈</span><span><b>재능·특기</b><small>타고난 재능 · 훈련</small></span></button>
-   <button type="button" class="menu-tile" onclick="openAppModal('ranking')"><span class="tile-icon">🏆</span><span><b>인생 랭킹</b><small>내 기록 · 순자산과 나이 비교</small></span></button>
    <button class="menu-tile" onclick="openAppModal('achievements')"><span class="tile-icon">★</span><span><b>업적·엔딩</b><small>목표 · 인생 유형 · 보상</small></span></button>
    <button class="menu-tile" onclick="openAppModal('relationship')"><span class="tile-icon">♡</span><span><b>연애 · 결혼</b><small>만남, 교제, 결혼생활, 이혼</small></span></button>
    <button class="menu-tile" onclick="openAppModal('stocks')"><span class="tile-icon">₩</span><span><b>주식 투자 · 100억 목표</b><small>가상 기업 매수·매도, 내 순자산 확인</small></span></button>
+   <button type="button" class="menu-tile" onclick="openAppModal('crypto')"><span class="tile-icon">₿</span><span><b>비트코인</b><small>게임 시세 · 소수점 단위 매수·매도</small></span></button>
+   <button type="button" class="menu-tile" onclick="openAppModal('certificates')"><span class="tile-icon">🏅</span><span><b>자격증</b><small>공부 · 시험 · 취득하면 연봉 보너스</small></span></button>
+   <button type="button" class="menu-tile" onclick="openAppModal('vehicles')"><span class="tile-icon">🚲</span><span><b>탈것 · 내 차고</b><small>자전거·차량 구매, 이용 및 판매</small></span></button>
    <button class="menu-tile" onclick="openAppModal('inventory')"><span class="tile-icon">🎒</span><span><b>아이템 창</b><small>아이템 구매와 사용</small></span></button>
    <button class="menu-tile" onclick="openAppModal('photoAlbum')"><span class="tile-icon">📸</span><span><b>특별 이벤트 사진첩</b><small>플레이 중 해금하는 캐릭터 기념컷</small></span></button><button class="menu-tile" onclick="openAppModal('growth')"><span class="tile-icon">🧬</span><span><b>성장 앨범</b><small>아기부터 노년까지 실제 모습 비교</small></span></button><button class="menu-tile" onclick="openAppModal('story')"><span class="tile-icon">📖</span><span><b>스토리 앨범</b><small>나이에 따라 이어지는 누리의 이야기</small></span></button>
    ${!state.alive?'<button class="menu-tile" onclick="openAppModal(&quot;lifeReview&quot;)"><span class="tile-icon">📜</span><span><b>인생 회고록</b><small>누리가 걸어온 길 다시 보기</small></span></button>':''}
@@ -3459,6 +3467,11 @@ function ensureWorld(){
  if(!Array.isArray(w.loans))w.loans=[];
  if(!Number.isSafeInteger(w.bankWon)||w.bankWon<0)w.bankWon=0;
  if(!Array.isArray(w.bankHistory))w.bankHistory=[];
+ if(!Array.isArray(w.vehicles))w.vehicles=[];
+ if(typeof w.activeVehicle!=='string')w.activeVehicle='';
+ if(!w.certificates||typeof w.certificates!=='object'||Array.isArray(w.certificates))w.certificates={};
+ if(!Number.isSafeInteger(w.lastCertStudyDay))w.lastCertStudyDay=-1;
+ if(w.certExam&&!NURI_CERTS.find(c=>c.id===w.certExam.id&&c.questions[w.certExam.question]))w.certExam=null;
  if(!Array.isArray(w.children))w.children=[];
  if(!Array.isArray(w.events))w.events=[];
  if(!Array.isArray(w.achievements))w.achievements=[];
@@ -3485,7 +3498,7 @@ function ensureWorld(){
 function worldRealEstateValue(){return ensureWorld().properties.reduce((sum,p)=>sum+Math.max(0,Number(p.value)||0),0);}
 function worldDebt(){return ensureWorld().loans.reduce((sum,p)=>sum+Math.max(0,Number(p.balance)||0),0);}
 function worldBusinessValue(){const b=ensureWorld().business;return b?Math.max(0,Number(b.value)||0):0;}
-function worldWorthParts(){return {cash:Math.max(0,Number(state.money)||0),bank:ensureWorld().bankWon/1000,stocks:holdingsValue(),property:worldRealEstateValue(),business:worldBusinessValue(),debt:worldDebt()};}
+function worldWorthParts(){return {cash:Math.max(0,Number(state.money)||0),bank:ensureWorld().bankWon/1000,stocks:holdingsValue(),crypto:nuriCryptoValue(),property:worldRealEstateValue(),business:worldBusinessValue(),vehicles:nuriVehicleWorth(),debt:worldDebt()};}
 function worldNote(msg,type='event'){
  const w=ensureWorld();
  const label=state.age+'살 · '+msg;
@@ -3499,7 +3512,7 @@ function worldFictionalIncome(){
  if(state.workStatus!=='employed'||state.age<19||state.age>69)return 0;
  const level=Math.max(0,Number(state.jobLevel)||0);
  const score=Number(w.talents.intelligence)||0;
- return Math.round((30000+level*10000)*(1+Math.min(.25,score/600)));
+ return Math.round((30000+level*10000)*(1+Math.min(.25,score/600)+nuriCertCount(w)*.02));
 }
 function recordWorldChoice(choice){
  const w=ensureWorld();
@@ -3535,6 +3548,7 @@ function worldAnnualUpdate(){
  // One financial settlement per game year (3 game-days), never per render.
  if(w.lastAnnualAge===state.age)return;
  w.lastAnnualAge=state.age;
+ nuriVehicleAnnual(w);
  if(state.age>=19){
   const salary=worldFictionalIncome();
   if(salary>0){
@@ -3811,7 +3825,7 @@ function worldLifeSummary(){
 }
 function worldReviewMarkup(){
  const w=ensureWorld(),parts=worldWorthParts();
- const rows=[['현금',parts.cash],['통장',parts.bank],['주식',parts.stocks],['부동산',parts.property],['사업 가치',parts.business],['대출 잔액',-parts.debt]];
+ const rows=[['현금',parts.cash],['통장',parts.bank],['주식',parts.stocks],['비트코인',parts.crypto],['부동산',parts.property],['사업 가치',parts.business],['탈것',parts.vehicles],['대출 잔액',-parts.debt]];
  const last=w.events.filter(e=>e.type!=='achievement').slice(-16);
  return `<div class="life-review-title">인생의 결과 · ${worldSafe(worldEndingName())}</div>
  <p class="life-review-sub">${worldSafe(worldLifeSummary())}</p>
@@ -3820,6 +3834,232 @@ function worldReviewMarkup(){
  <div class="world-history">${last.length?last.map(e=>`<div><strong>${e.age}살</strong><span>${worldSafe(e.title)}</span></div>`).join(''):'<p>아직 추가 기록이 없어.</p>'}</div>
  <div class="life-review-title">수집한 업적 · ${w.achievements.length}/${WORLD_ACHIEVEMENTS.length}</div>
  <p class="life-review-sub">${w.achievements.map(id=>WORLD_ACHIEVEMENTS.find(a=>a.id===id)?.name||id).join(' · ')||'이번 인생에서 모은 업적은 없어.'}</p>`;
+}
+
+
+/* Optional qualifications and a fictional bitcoin market. */
+const NURI_CERTS=[
+ {id:'office',name:'문서 활용',age:16,study:2,fee:8,icon:'📝',questions:[
+  ['표의 제목 행을 제외하고 가나다순으로 정렬하려면?',['데이터 행을 선택한다','제목만 바꾼다','모든 셀을 지운다'],0],
+  ['같은 서식을 여러 문단에 씌우려면?',['글자 하나씩 다시 입력한다','문단 스타일을 적용한다','다른 문서로 옮긴다'],1]]},
+ {id:'design',name:'디자인 제작',age:16,study:3,fee:12,icon:'🎨',questions:[
+  ['밝은 배경에서 글자를 또렷하게 보이려면?',['밝은 노랑을 쓴다','어두운 색으로 대비를 높인다','투명도를 높인다'],1],
+  ['중요한 제목을 먼저 발견하게 하려면?',['모든 글자 크기를 같게 한다','제목을 그림 뒤에 둔다','제목의 크기와 여백을 구분한다'],2]]},
+ {id:'coding',name:'코딩 기초',age:16,study:3,fee:16,icon:'💻',questions:[
+  ['같은 작업을 열 번 실행하려면 무엇이 어울릴까?',['반복문','글자 색 변경','파일 이름 삭제'],0],
+  ['입력이 빈 경우까지 점검하는 이유는?',['실행 속도를 무조건 높이려고','예상하지 못한 입력에서도 동작하는지 보려고','코드 길이를 늘리려고'],1]]},
+ {id:'service',name:'고객 응대',age:17,study:2,fee:10,icon:'🤝',questions:[
+  ['고객의 요청이 모호할 때 먼저 할 일은?',['요청을 확인하는 질문을 한다','바로 결론을 말한다','아무 답도 하지 않는다'],0],
+  ['해결에 시간이 걸린다면 어떻게 안내할까?',['확인 없이 금방 된다고 말한다','설명 없이 기다리게 한다','확인할 내용과 다음 안내 시간을 알려 준다'],2]]},
+ {id:'accounting',name:'회계 기초',age:18,study:4,fee:22,icon:'🧾',questions:[
+  ['가게의 매출이 80,000원이고 비용이 50,000원이면 남은 금액은?',['130,000원','30,000원','50,000원'],1],
+  ['지출을 나중에도 확인할 수 있게 하려면?',['영수증과 지출 기록을 함께 보관한다','금액을 모두 같게 적는다','큰 금액만 기억한다'],0]]},
+ {id:'delivery',name:'물류 관리',age:18,study:4,fee:24,icon:'📦',questions:[
+  ['유통기한이 서로 다른 상품의 출고 순서는?',['상자가 큰 것부터','진열된 위치순','유통기한이 빠른 것부터'],2],
+  ['보관 중 파손된 물건이 발견되면?',['정상 재고와 구분해 기록한다','정상 상품에 섞는다','기록 없이 수량만 줄인다'],0]]}
+];
+function nuriCertRecord(w,id){return w.certificates[id]??={study:0,attempts:0,lastExamDay:-1,earnedAt:null};}
+function nuriCertCount(w=ensureWorld()){
+ return NURI_CERTS.filter(c=>Number.isInteger(w.certificates[c.id]?.earnedAt)).length;
+}
+function nuriStudyCert(id){
+ const cert=NURI_CERTS.find(c=>c.id===id);
+ if(!cert||!state.family||!worldCanAct(cert.age))return false;
+ const w=ensureWorld(),rec=nuriCertRecord(w,id);
+ if(Number.isInteger(rec.earnedAt)||rec.study>=cert.study||w.certExam)return false;
+ if(w.lastCertStudyDay===state.day){toast('오늘은 이미 공부했어. 다음 날 다시 공부해 줘.');return false;}
+ if(state.stats.health<=10){toast('먼저 쉬어서 체력을 회복해 줘.');return false;}
+ rec.study++;w.lastCertStudyDay=state.day;state.stats.health=limitStat('health',state.stats.health-1);
+ render();save();if(activeModal==='certificates')renderNuriCertificates();toast(cert.name+' 공부 '+rec.study+'/'+cert.study);
+ return true;
+}
+function nuriTakeCertExam(id){
+ const cert=NURI_CERTS.find(c=>c.id===id);
+ if(!cert||!state.family||!worldCanAct(cert.age))return false;
+ const w=ensureWorld(),rec=nuriCertRecord(w,id);
+ if(w.certExam||rec.study<cert.study||rec.lastExamDay===state.day||Number.isInteger(rec.earnedAt))return false;
+ if(state.money<cert.fee){toast('응시료를 낼 현금이 부족해.');return false;}
+ state.money=Math.round((state.money-cert.fee)*1000)/1000;
+ w.certExam={id,question:rec.attempts%cert.questions.length};
+ rec.attempts++;rec.lastExamDay=state.day;
+ render();save();if(activeModal==='certificates')renderNuriCertificates();
+ return true;
+}
+function nuriAnswerCert(index){
+ if(!state.alive||!Number.isInteger(index))return false;
+ const w=ensureWorld(),exam=w.certExam;
+ const cert=NURI_CERTS.find(c=>c.id===exam?.id),question=cert?.questions[exam?.question];
+ if(!question||index<0||index>=question[1].length)return false;
+ const rec=nuriCertRecord(w,cert.id);
+ w.certExam=null;
+ const passed=index===question[2];
+ if(passed){
+  rec.earnedAt=state.age;
+  worldNote('🏅 '+cert.name+' 자격증 취득','certificate');
+ }
+ const result=passed?cert.name+' 시험에 합격했어!':cert.name+' 시험 불합격. 공부 기록은 유지돼. 다음 날 다시 응시할 수 있어.';
+ render();save();if(activeModal==='certificates')renderNuriCertificates(result);toast(result);
+ return passed;
+}
+function renderNuriCertificates(result=''){
+ const w=ensureWorld(),count=nuriCertCount(w),exam=w.certExam;
+ const current=NURI_CERTS.find(c=>c.id===exam?.id),question=current?.questions[exam?.question];
+ modalHeader('자격증','누리 키우기 · CERTIFICATES');
+ const stop=state.alive?'':'disabled';
+ const list=NURI_CERTS.map(c=>{
+  const r=nuriCertRecord(w,c.id);
+  const earned=Number.isInteger(r.earnedAt),locked=state.age<c.age;
+  return `<article class="world-item"><div><b>${c.icon} ${c.name}</b><small>${earned?r.earnedAt+'살에 취득':c.age+'살부터 · 공부 '+r.study+'/'+c.study+'회 · 응시료 '+formatWon(c.fee)}</small></div>
+   ${earned?'<strong>취득 완료</strong>':`<div class="world-actions"><button type="button" class="world-button" onclick="nuriStudyCert('${c.id}')" ${locked||r.study>=c.study||w.lastCertStudyDay===state.day?'disabled':stop}>공부하기</button><button type="button" class="world-button" onclick="nuriTakeCertExam('${c.id}')" ${locked||r.study<c.study||r.lastExamDay===state.day||state.money<c.fee?'disabled':stop}>시험 응시</button></div>`}</article>`;
+ }).join('');
+ document.getElementById('appModalBody').innerHTML=`
+  <p class="modal-hint">게임 전용 자격증이야. 하루 한 번 공부할 수 있고 체력 1을 써. 필요한 공부를 마치고 시험 문제를 맞히면 취득해.</p>
+  <div class="world-feature"><b>취득 ${count}/${NURI_CERTS.length}개 · 재직 중 기본 연봉 +${count*2}%</b></div>
+  ${result?`<p class="rank-status" role="status">${worldSafe(result)}</p>`:''}
+  ${question?`<section class="social-panel"><h3>${current.name} 모의 시험</h3><p>${question[0]}</p><div class="social-actions">${question[1].map((answer,i)=>`<button type="button" class="modal-action" onclick="nuriAnswerCert(${i})" ${stop}>${answer}</button>`).join('')}</div></section>`:`<div class="world-list">${list}</div>`}
+  <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">← 메뉴로 돌아가기</button></div>`;
+}
+
+const NURI_BTC_INITIAL=100000000, NURI_BTC_UNIT=100000000n, NURI_BTC_MAX_WON=5000000000;
+function nuriCryptoState(w=ensureWorld()){
+ if(!w.crypto||typeof w.crypto!=='object'||Array.isArray(w.crypto))w.crypto={};
+ const b=w.crypto;
+ if(!Number.isSafeInteger(b.price)||b.price<10000||b.price>NURI_BTC_MAX_WON)b.price=NURI_BTC_INITIAL;
+ if(!Number.isSafeInteger(b.sats)||b.sats<0)b.sats=0;
+ if(!Array.isArray(b.chart)||!b.chart.length)b.chart=[b.price];
+ if(!Array.isArray(b.history))b.history=[];
+ return b;
+}
+function nuriCryptoValue(){
+ const b=nuriCryptoState();
+ return Number(BigInt(b.sats)*BigInt(b.price)/NURI_BTC_UNIT)/1000;
+}
+function nuriUpdateCrypto(){
+ if(!state.alive||state.age<18)return;
+ const b=nuriCryptoState();
+ b.price=Math.max(10000,Math.min(NURI_BTC_MAX_WON,Math.round(b.price*(1+(Math.random()-.5)*.15))));
+ b.chart.push(b.price);b.chart=b.chart.slice(-30);
+}
+function nuriParseBtc(value){
+ const input=String(value??'').trim();
+ if(!/^(?:\d{1,8}(?:\.\d{0,8})?|\.\d{1,8})$/.test(input))return null;
+ const [whole='',fraction='']=input.split('.');
+ const sats=Number(BigInt(whole||'0')*NURI_BTC_UNIT+BigInt(fraction.padEnd(8,'0')));
+ return Number.isSafeInteger(sats)&&sats>0?sats:null;
+}
+function nuriFormatBtc(sats){return (sats/Number(NURI_BTC_UNIT)).toLocaleString('en',{maximumFractionDigits:8})+' BTC';}
+function nuriMaxBtc(b,cash){
+ if(!Number.isSafeInteger(cash)||cash<1)return 0;
+ const affordable=BigInt(cash)*1000n*NURI_BTC_UNIT/(BigInt(b.price)*1002n);
+ return Math.min(Number(affordable),Number.MAX_SAFE_INTEGER-b.sats);
+}
+function nuriTradeCrypto(side,all=false){
+ if(!state.family||!worldCanAct(18)||!['buy','sell'].includes(side))return false;
+ const b=nuriCryptoState(),buy=side==='buy',cash=Math.round(state.money*1000);
+ if(!Number.isSafeInteger(cash)||cash<0)return false;
+ const qty=all?(buy?nuriMaxBtc(b,cash):b.sats):nuriParseBtc(document.getElementById('nuriBtcQty')?.value);
+ if(!Number.isSafeInteger(qty)||qty<=0){toast('0.00000001 BTC 이상의 수량을 입력해 줘.');return false;}
+ if(!buy&&qty>b.sats){toast('보유한 비트코인보다 많이 팔 수 없어.');return false;}
+ const amount=BigInt(b.price)*BigInt(qty)*(buy?1002n:998n);
+ const divisor=NURI_BTC_UNIT*1000n;
+ const won=Number(buy?(amount+divisor-1n)/divisor:amount/divisor);
+ const nextCash=cash+(buy?-won:won),nextSats=b.sats+(buy?qty:-qty);
+ if(won<1){toast('거래 금액이 1원보다 작아. 수량을 늘려 줘.');return false;}
+ if(!Number.isSafeInteger(won)||!Number.isSafeInteger(nextCash)||!Number.isSafeInteger(nextSats)||nextCash<0){toast('보유 현금이나 거래 한도를 확인해 줘.');return false;}
+ b.sats=nextSats;state.money=nextCash/1000;
+ const entry=(buy?'매수 ':'매도 ')+nuriFormatBtc(qty)+' · '+formatWon(won/1000)+' (수수료 반영)';
+ b.history.unshift({age:state.age,entry});b.history=b.history.slice(0,24);
+ worldNote('비트코인 '+entry,'crypto');render();save();if(activeModal==='crypto')renderNuriCrypto();toast('비트코인 '+(buy?'매수':'매도')+' 완료');
+ return true;
+}
+function renderNuriCrypto(){
+ const b=nuriCryptoState(),cash=Math.round(state.money*1000);
+ const previous=b.chart.length>1?b.chart.at(-2):b.price;
+ const rate=previous>0?Number(((b.price/previous-1)*100).toFixed(2)):0,trend=stockTrend(rate);
+ const locked=!state.alive||state.age<18;
+ modalHeader('비트코인','누리 키우기 · 가상 거래');
+ document.getElementById('appModalBody').innerHTML=`
+  <p class="modal-hint">18살부터 거래할 수 있어. 시세는 게임 속 하루마다 바뀌어. 매수·매도 수수료는 각각 0.2%야. 실제 시세나 거래소와 연결되지 않아.</p>
+  <div class="world-feature"><div class="world-mini-grid">
+   <div><small>1 BTC 시세</small><b class="${trend.className}">${formatWon(b.price/1000)}</b><small class="${trend.className}">${trend.mark} ${trend.label} ${Math.abs(rate).toFixed(2)}%</small></div>
+   <div><small>보유량</small><b>${nuriFormatBtc(b.sats)}</b></div>
+   <div><small>비트코인 평가액</small><b>${formatWon(nuriCryptoValue())}</b></div>
+   <div><small>거래에 쓸 현금</small><b>${formatWon(state.money)}</b></div>
+  </div>${marketSpark(b.chart,trend,'BTC 시세')}
+   <div class="bank-form"><label for="nuriBtcQty">거래 수량 (BTC)</label><input id="nuriBtcQty" type="text" inputmode="decimal" maxlength="17" placeholder="예: 0.0001" ${locked?'disabled':''}>
+   <div class="social-actions"><button type="button" class="modal-action" onclick="nuriTradeCrypto('buy')" ${locked||nuriMaxBtc(b,cash)===0?'disabled':''}>매수</button><button type="button" class="modal-action" onclick="nuriTradeCrypto('sell')" ${locked||b.sats===0?'disabled':''}>매도</button></div>
+   <div class="social-actions"><button type="button" class="modal-action" onclick="nuriTradeCrypto('buy',true)" ${locked||nuriMaxBtc(b,cash)===0?'disabled':''}>최대 매수</button><button type="button" class="modal-action" onclick="nuriTradeCrypto('sell',true)" ${locked||b.sats===0?'disabled':''}>전량 매도</button></div></div>
+  </div>
+  <div class="stock-history"><h3>최근 거래</h3><ul>${b.history.length?b.history.slice(0,8).map(h=>`<li>${worldSafe(h.age)}살 · ${worldSafe(h.entry)}</li>`).join(''):'<li>아직 거래 기록이 없어.</li>'}</ul></div>
+  <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('stocks')">주식 시장</button><button type="button" class="modal-action" onclick="openAppModal('menu')">← 메뉴로 돌아가기</button></div>`;
+}
+
+
+/* Fictional vehicles: values and ownership are separate from spendable cash. */
+const NURI_VEHICLES=[
+ {id:'bike',name:'동네 자전거',icon:'🚲',age:7,price:60,upkeep:2,depreciation:.05,stat:'health',gain:2},
+ {id:'kick',name:'접이식 킥보드',icon:'🛴',age:10,price:95,upkeep:3,depreciation:.06,stat:'happiness',gain:1},
+ {id:'ebike',name:'전기 자전거',icon:'🚲',age:16,price:650,upkeep:18,depreciation:.08,stat:'health',gain:1},
+ {id:'scooter',name:'클래식 스쿠터',icon:'🛵',age:18,price:1800,upkeep:60,depreciation:.09,stat:'happiness',gain:1},
+ {id:'compact',name:'중고 경차',icon:'🚙',age:19,price:5200,upkeep:160,depreciation:.08,stat:'happiness',gain:2},
+ {id:'sedan',name:'중형 세단',icon:'🚗',age:20,price:22000,upkeep:450,depreciation:.11,stat:'happiness',gain:2},
+ {id:'suv',name:'여행용 SUV',icon:'🚘',age:23,price:39000,upkeep:750,depreciation:.11,stat:'happiness',gain:3}
+];
+function nuriVehicleWorth(w=ensureWorld()){
+ return w.vehicles.reduce((sum,vehicle)=>sum+Math.max(0,Number(vehicle?.value)||0),0);
+}
+function nuriVehicleAction(action,id){
+ const spec=NURI_VEHICLES.find(v=>v.id===id);
+ if(!spec||!state.family||!worldCanAct(spec.age))return false;
+ const w=ensureWorld(),index=w.vehicles.findIndex(v=>v.id===id);
+ let message;
+ if(action==='buy'){
+  if(index>=0){toast('이미 소유한 탈것이야.');return false;}
+  if(w.vehicles.length>=4){toast('차고에는 탈것을 최대 4대까지 둘 수 있어.');return false;}
+  if(state.money<spec.price){toast('보유 현금이 부족해.');return false;}
+  state.money=Math.round((state.money-spec.price)*1000)/1000;
+  w.vehicles.push({id,value:spec.price,boughtAt:state.age});
+  if(!w.activeVehicle)w.activeVehicle=id;
+  message=spec.name+' 구입 · '+formatWon(spec.price);
+ }else if(action==='sell'&&index>=0){
+  const price=Math.floor(w.vehicles[index].value*.95);
+  if(!confirm(spec.name+'을 '+formatWon(price)+'에 판매할까?'))return false;
+  w.vehicles.splice(index,1);
+  if(w.activeVehicle===id)w.activeVehicle='';
+  state.money=Math.round((state.money+price)*1000)/1000;
+  message=spec.name+' 판매 · '+formatWon(price);
+ }else if(action==='use'&&index>=0){
+  w.activeVehicle=w.activeVehicle===id?'':id;
+  message=w.activeVehicle?spec.name+'을 타고 다니기로 했어.':spec.name+'을 차고에 보관했어.';
+ }else return false;
+ worldNote(message,'vehicle');
+ render();save();if(activeModal==='vehicles')renderNuriVehicles();toast(message);
+ return true;
+}
+function nuriVehicleAnnual(w){
+ for(const vehicle of w.vehicles){
+  const spec=NURI_VEHICLES.find(v=>v.id===vehicle.id);
+  if(!spec)continue;
+  vehicle.value=Math.max(Math.round(spec.price*.2),worldRound(vehicle.value*(1-spec.depreciation)));
+  if(w.activeVehicle!==vehicle.id)continue;
+  if(state.money<spec.upkeep){w.activeVehicle='';worldNote(spec.name+' 유지비가 부족해 차고에 보관했어.','vehicle');continue;}
+  state.money=Math.round((state.money-spec.upkeep)*1000)/1000;
+  state.stats[spec.stat]=limitStat(spec.stat,state.stats[spec.stat]+spec.gain);
+  worldNote(spec.name+' 연간 유지비 '+formatWon(spec.upkeep)+' · '+labels[spec.stat]+' +'+spec.gain,'vehicle');
+ }
+}
+function renderNuriVehicles(){
+ const w=ensureWorld(),stop=state.alive?'':'disabled';
+ modalHeader('탈것 · 내 차고','누리 키우기 · GARAGE');
+ const cards=NURI_VEHICLES.map(spec=>{
+  const own=w.vehicles.find(v=>v.id===spec.id),using=w.activeVehicle===spec.id;
+  const locked=state.age<spec.age;
+  return `<article class="world-item"><div><b>${spec.icon} ${spec.name}${using?' · 이용 중':''}</b><small>${own?'현재 가치 '+formatWon(own.value):spec.age+'살부터 · 구매 '+formatWon(spec.price)}</small><small>이용 중 연 유지비 ${formatWon(spec.upkeep)} · ${labels[spec.stat]} +${spec.gain}</small></div><div class="world-actions">${own?`<button type="button" class="world-button" onclick="nuriVehicleAction('use','${spec.id}')" ${stop}>${using?'차고에 보관':'타고 다니기'}</button><button type="button" class="world-button" onclick="nuriVehicleAction('sell','${spec.id}')" ${stop}>${formatWon(Math.floor(own.value*.95))}에 판매</button>`:`<button type="button" class="world-button" onclick="nuriVehicleAction('buy','${spec.id}')" ${locked||w.vehicles.length>=4||state.money<spec.price?'disabled':stop}>${locked?spec.age+'살부터':'구매하기'}</button>`}</div></article>`;
+ }).join('');
+ document.getElementById('appModalBody').innerHTML=`
+  <div class="world-moneybar"><span>현금 <b>${formatWon(state.money)}</b></span><span>탈것 평가액 <b>${formatWon(nuriVehicleWorth(w))}</b></span><span>차고 ${w.vehicles.length}/4대</span></div>
+  <p class="modal-hint">한 대를 골라 타고 다닐 수 있어. 보유한 탈것의 가치는 해마다 내려가고, 유지비와 효과는 타고 다니는 탈것에만 적용돼.</p>
+  <div class="world-list">${cards}</div><div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">← 메뉴로 돌아가기</button></div>`;
 }
 
 /* Meta collection survives a restart on the same browser/device. */
@@ -3864,6 +4104,78 @@ function nuriRankRows(metric='wealth'){
  rows.forEach((row,index)=>{row.rank=index&&row[key]===rows[index-1][key]?rows[index-1].rank:index+1;});
  return rows;
 }
+
+/* Public leaderboard does not share account identifiers or game saves. */
+const NURI_RANK_PATH='/.netlify/functions/ranking';
+function nuriRankRegistration(){
+ try{return JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()+':rank'))||{};}
+ catch{return {};}
+}
+function nuriRankStore(record){
+ try{localStorage.setItem(window.nuriCurrentSaveKey()+':rank',JSON.stringify(record));return true;}
+ catch{return false;}
+}
+function renderNuriPublicRanking(metric='wealth',message=''){
+ const byAge=metric==='age',by=byAge?'age':'wealth';
+ const registration=nuriRankRegistration();
+ const localScore={age:state.age,wealth:Math.round(nuriNetWorth()*1000)};
+ modalHeader('인생 랭킹','누리 키우기 · LEADERBOARD');
+ document.getElementById('appModalBody').innerHTML=`
+  <div class="social-tabs" aria-label="랭킹 종류"><button type="button" aria-pressed="true" onclick="renderNuriPublicRanking()">전체 플레이어</button><button type="button" aria-pressed="false" onclick="renderNuriRanking()">내 인생 기록</button></div>
+  <div class="social-tabs" aria-label="정렬 기준"><button type="button" aria-pressed="${!byAge}" onclick="renderNuriPublicRanking('wealth')">순자산 순</button><button type="button" aria-pressed="${byAge}" onclick="renderNuriPublicRanking('age')">나이 순</button></div>
+  <p class="modal-hint">플레이어가 직접 등록한 게임 기록이야. 상위 50개를 보여 줘.</p>
+  <div id="nuriPublicRankRows" aria-live="polite"><p class="rank-status">랭킹을 불러오는 중이야…</p></div>
+  ${state.family?`<form class="world-feature social-compose" onsubmit="return nuriPublishRanking(event,'${by}')"><h3>내 기록 등록</h3><label>공개 닉네임<input name="nickname" value="${nuriChoiceEscape(registration.nickname||'')}" minlength="2" maxlength="16" placeholder="게임 닉네임" required></label>
+   <p class="modal-hint">등록하면 닉네임, ${localScore.age}살, 순자산 ${formatWon(localScore.wealth/1000)}이 공개돼. 이름 대신 게임 닉네임을 사용해 줘.</p>
+   <div class="social-actions"><button type="submit" class="modal-action">${registration.nickname?'기록 갱신':'공개 랭킹에 올리기'}</button>${registration.nickname?`<button type="button" class="modal-action" onclick="nuriRemoveRanking('${by}')">내 공개 기록 지우기</button>`:''}</div></form>`:''}
+  <p id="nuriPublicRankMessage" class="modal-hint" role="status">${worldSafe(message)}</p>
+  <div class="menu-actions"><button type="button" class="modal-action" onclick="closeAppModal()">게임으로 돌아가기</button></div>`;
+ const target=document.getElementById('nuriPublicRankRows');
+ fetch(NURI_RANK_PATH+'?by='+by,{cache:'no-store'})
+  .then(async res=>{if(!res.ok)throw Error();return res.json();})
+  .then(data=>{
+   if(!target.isConnected)return;
+   const rows=Array.isArray(data.entries)?data.entries:[];
+   target.innerHTML=rows.length?`<ol class="rank-list">${rows.map(row=>`<li class="rank-row"><span class="rank-place">${worldSafe(row.rank)}위</span><div><b>${worldSafe(row.nickname)}</b><small>${byAge?formatWon(row.wealth/1000):worldSafe(row.age)+'살'}</small></div><strong>${byAge?worldSafe(row.age)+'살':formatWon(row.wealth/1000)}</strong></li>`).join('')}</ol>`:'<p class="rank-status">아직 등록된 기록이 없어. 첫 기록을 남겨 봐!</p>';
+  })
+  .catch(()=>{if(target.isConnected)target.innerHTML='<p class="rank-status">공개 랭킹을 불러오지 못했어. 잠시 후 다시 열어 봐.</p>';});
+ document.querySelector('.app-modal-card')?.scrollTo?.(0,0);
+}
+function nuriPublishRanking(event,metric){
+ event.preventDefault();
+ const form=event.currentTarget;
+ const button=form.querySelector('button[type=submit]');
+ const feedback=document.getElementById('nuriPublicRankMessage');
+ const nickname=String(new FormData(form).get('nickname')||'').normalize('NFC').trim();
+ if(!state.family||!/^[\p{L}\p{N} _-]{2,16}$/u.test(nickname)||/^\d{6,}$/.test(nickname)){
+  feedback.textContent='글자나 숫자로 된 2~16자 게임 닉네임을 입력해 줘.';return false;
+ }
+ let record=nuriRankRegistration();
+ if(!/^[a-f0-9]{64}$/.test(record.token||'')){
+  record={token:Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('')};
+ }
+ if(!nuriRankStore(record)){feedback.textContent='브라우저 저장이 필요해. 저장을 허용하고 다시 시도해 줘.';return false;}
+ button.disabled=true;feedback.textContent='기록을 등록하는 중이야…';
+ fetch(NURI_RANK_PATH,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+record.token},
+  body:JSON.stringify({nickname,age:state.age,wealth:Math.round(nuriNetWorth()*1000)})})
+  .then(async res=>{const data=await res.json();if(!res.ok)throw Error(data.error);})
+  .then(()=>{
+   nuriRankStore({...record,nickname});
+   if(form.isConnected)renderNuriPublicRanking(metric,'공개 랭킹에 기록을 등록했어.');
+  })
+  .catch(error=>{if(form.isConnected){feedback.textContent=error.message||'등록에 실패했어. 다시 시도해 줘.';button.disabled=false;}});
+ return false;
+}
+function nuriRemoveRanking(metric){
+ const record=nuriRankRegistration();
+ const feedback=document.getElementById('nuriPublicRankMessage');
+ if(!record.token||!confirm('공개 랭킹에서 내 기록을 지울까? 게임 저장은 그대로 남아.'))return;
+ fetch(NURI_RANK_PATH,{method:'DELETE',headers:{Authorization:'Bearer '+record.token}})
+  .then(async res=>{const data=await res.json();if(!res.ok)throw Error(data.error);})
+  .then(()=>{nuriRankStore({token:record.token});if(feedback.isConnected)renderNuriPublicRanking(metric,'공개 기록을 지웠어.');})
+  .catch(error=>{if(feedback.isConnected)feedback.textContent=error.message||'공개 기록을 지우지 못했어. 다시 시도해 줘.';});
+}
+
 function renderNuriRanking(metric='wealth'){
  const byAge=metric==='age';
  const rows=nuriRankRows(byAge?'age':'wealth');
@@ -3872,12 +4184,13 @@ function renderNuriRanking(metric='wealth'){
  const renderRank=row=>`<li class="rank-row ${row.current?'rank-current':''}" value="${row.rank}"><span class="rank-place">${row.rank}위</span><div><b>${worldSafe(row.title)}</b><small>${row.current?'현재 진행 중':row.run+'번째 인생 · 완주'} · ${byAge?formatWon(row.wealth):row.age+'살'}</small></div><strong>${byAge?row.age+'살':formatWon(row.wealth)}</strong></li>`;
  modalHeader('인생 랭킹','누리 키우기 · 내 기록');
  document.getElementById('appModalBody').innerHTML=`
-  <p class="modal-hint">현재 인생과 이 저장에 남아 있는 완주 기록을 비교해. ${byAge?'살아온 나이':'순자산(현금·통장·주식·부동산·사업에서 대출을 뺀 금액)'}이 같으면 공동 순위야.</p>
+  <div class="social-tabs" aria-label="랭킹 종류"><button type="button" aria-pressed="false" onclick="renderNuriPublicRanking()">전체 플레이어</button><button type="button" aria-pressed="true" onclick="renderNuriRanking()">내 인생 기록</button></div>
+  <p class="modal-hint">현재 인생과 이 저장에 남아 있는 완주 기록을 비교해. ${byAge?'살아온 나이':'순자산(현금·통장·주식·비트코인·부동산·사업·탈것에서 대출을 뺀 금액)'}이 같으면 공동 순위야.</p>
   <div class="social-tabs" aria-label="랭킹 기준"><button type="button" aria-pressed="${!byAge}" onclick="renderNuriRanking('wealth')">순자산 순</button><button type="button" aria-pressed="${byAge}" onclick="renderNuriRanking('age')">나이 순</button></div>
   ${current?`<p class="rank-status">현재 인생 <b>${current.rank}위</b> / ${rows.length}개 기록</p>`:''}
   ${top.length?`<ol class="rank-list" aria-label="상위 10개 인생 기록">${top.map(renderRank).join('')}</ol>`:'<p class="rank-status">아직 비교할 인생 기록이 없어.</p>'}
   ${current&&!top.includes(current)?`<div class="rank-overflow"><h3>현재 인생</h3><ol class="rank-list">${renderRank(current)}</ol></div>`:''}
-  <p class="modal-hint">개인 랭킹 · 다른 플레이어의 기록은 표시되지 않아.</p>
+  <p class="modal-hint">개인 기록은 공개 랭킹에 등록하기 전까지 이 화면에만 보여.</p>
   <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">← 메뉴로 돌아가기</button></div>`;
  document.querySelector('.app-modal-card')?.scrollTo?.(0,0);
 }
