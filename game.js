@@ -71,7 +71,16 @@ const NURI_STOCKS=[
  {id:'mirae',name:'미래로봇',sector:'신기술 · 고변동형',start:34,drift:.19,vol:.125,about:'큰 폭으로 오르거나 급락할 수 있는 가상의 기업이야.'},
  {id:'haneul',name:'하늘에너지',sector:'에너지 · 변동형',start:19,drift:.09,vol:.080,about:'업계 뉴스에 따라 주가가 자주 움직여.'},
 ];
-const SPECIAL_EVENT_PHOTOS=[{"id": "photo1", "title": "첫 등교 기념", "desc": "친구를 만나는 등굣길을 기념했어.", "hint": "7살 이후 가끔 찾아오는 기념 촬영 이벤트에서 획득.", "src": "assets/nuri-b9023b7c01e1444d.webp"}, {"id": "photo2", "title": "슈퍼히어로 기분", "desc": "평범한 날에도 영웅 같은 기분이 들었어.", "hint": "13살 이후 병맛 이벤트에서 획득.", "src": "assets/nuri-d8bb5e18ecea3c0f.webp"}, {"id": "photo3", "title": "햇살 받는 오후", "desc": "밝은 햇살 아래 기분 좋은 하루를 보냈어.", "hint": "10살 이후 산책/셀카 이벤트에서 획득.", "src": "assets/nuri-93765d5a458889c6.webp"}, {"id": "photo4", "title": "카메라 장난 대작전", "desc": "익숙한 사진도 장난스러운 이야기로 남아.", "hint": "13살 이후 장난기 높은 이벤트에서 획득.", "src": "assets/nuri-f9059d33539f4408.webp"}, {"id": "photo5", "title": "느긋한 밤", "desc": "오랫동안 기억할 편안한 시간이었어.", "hint": "16살 이후 휴식/행복 이벤트에서 획득.", "src": "assets/nuri-0e83e4b3b01b6c4b.webp"}, {"id": "photo6", "title": "도시 탐험", "desc": "낯선 거리를 돌아다니며 새로운 풍경을 만났어.", "hint": "15살 이후 외출 이벤트에서 획득.", "src": "assets/nuri-5b1034624cefbf89.webp"}, {"id": "photo7", "title": "자신감 장착", "desc": "오늘 누리는 스스로를 응원했어.", "hint": "14살 이후 자신감 이벤트에서 획득.", "src": "assets/nuri-be6e77e7ae52000f.webp"}, {"id": "photo8", "title": "새로운 스타일", "desc": "새로운 모습으로 또 다른 도전을 시작했어.", "hint": "17살 이후 코미디 이벤트에서 획득.", "src": "assets/nuri-57a191206ddb6661.webp"}, {"id": "photo9", "title": "기분 좋은 날", "desc": "가장 많이 웃었던 순간을 간직했어.", "hint": "15살 이후 친구 이벤트에서 획득.", "src": "assets/nuri-5e44553e4c1e99f7.webp"}];
+const SPECIAL_EVENT_PHOTOS=[{"id": "photo1", "title": "첫 등교 기념", "desc": "친구를 만나는 등굣길을 기념했어.", "hint": "7살 이후 가끔 찾아오는 기념 촬영 이벤트에서 획득.", "src": "assets/nuri-b9023b7c01e1444d.webp"}, {"id": "photo2", "title": "슈퍼히어로 기분", "desc": "평범한 날에도 영웅 같은 기분이 들었어.", "hint": "13살 이후 병맛 이벤트에서 획득.", "src": "assets/nuri-d8bb5e18ecea3c0f.webp"}, {"id": "photo3", "title": "햇살 받는 오후", "desc": "밝은 햇살 아래 기분 좋은 하루를 보냈어.", "hint": "10살 이후 산책/셀카 이벤트에서 획득.", "src": "assets/nuri-93765d5a458889c6.webp"}, {"id": "photo4", "title": "카메라 장난 대작전", "desc": "익숙한 사진도 장난스러운 이야기로 남아.", "hint": "13살 이후 장난기 높은 이벤트에서 획득.", "src": "assets/nuri-f9059d33539f4408.webp"}, {"id": "photo5", "title": "느긋한 밤", "desc": "오랫동안 기억할 편안한 시간이었어.", "hint": "16살 이후 휴식/행복 이벤트에서 획득.", "src": "assets/nuri-0e83e4b3b01b6c4b.webp"}, {"id": "photo6", "title": "도시 탐험", "desc": "낯선 거리를 돌아다니며 새로운 풍경을 만났어.", "hint": "15살 이후 외출 이벤트에서 획득.", "src": "assets/nuri-5b1034624cefbf89.webp"}, {"id": "photo7", "title": "자신감 장착", "desc": "오늘 누리는 스스로를 응원했어.", "hint": "14살 이후 자신감 이벤트에서 획득.", "src": "assets/nuri-be6e77e7ae52000f.webp"}, {"id": "photo8", "title": "새로운 스타일", "desc": "새로운 모습으로 또 다른 도전을 시작했어.", "hint": "17살 이후 코미디 이벤트에서 획득.", "src": "assets/nuri-57a191206ddb6661.webp"}, {"id": "photo9", "title": "기분 좋은 날", "desc": "가장 많이 웃었던 순간을 간직했어.", "hint": "15살 이후 친구 이벤트에서 획득.", "src": "assets/nuri-5e44553e4c1e99f7.webp"},
+ {"id":"photo10","title":"스튜디오 기념사진","desc":"카메라 앞에서 차분히 포즈를 취한 날.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/studio-portrait.jpg","hideLockedPreview":true},
+ {"id":"photo11","title":"장난기 가득한 순간","desc":"식사하다가 카메라를 발견한 순간이 사진으로 남았어.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/candid-moment.jpg","hideLockedPreview":true},
+ {"id":"photo12","title":"정원에서 찍은 셀카","desc":"꽃이 핀 정원을 걷다가 잠깐 멈춰 한 장 남겼어.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/garden-selfie.jpg","hideLockedPreview":true},
+ {"id":"photo13","title":"버스 타고 가는 길","desc":"버스 창가에서 찍은 일상 한 장.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/bus-ride.jpg","hideLockedPreview":true},
+ {"id":"photo14","title":"히어로로 변신한 날","desc":"히어로 의상을 입고 카메라 앞에서 재미있는 표정을 지어 봤어.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/costume-day.jpg","hideLockedPreview":true},
+ {"id":"photo15","title":"단정한 교복 사진","desc":"교복을 입고 단정하게 찍은 기념사진.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/school-portrait.jpg","hideLockedPreview":true},
+ {"id":"photo16","title":"조용히 쉬어 가는 순간","desc":"눈을 감고 잠깐 쉬어 가던 평범한 순간도 사진첩에 남았어.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/quiet-break.jpg","hideLockedPreview":true}
+];
+const LOCKED_PHOTO_SRC=SPECIAL_EVENT_PHOTOS[0].src;
 function ensurePhotoAlbum(){
  if(!state.photoAlbum||typeof state.photoAlbum!=='object')state.photoAlbum={unlocked:[],seen:[],featured:null,history:[]};
  if(!Array.isArray(state.photoAlbum.unlocked))state.photoAlbum.unlocked=[];
@@ -126,15 +135,15 @@ function renderSpecialPhotoAlbum(selectedId=''){
  const progress=Math.round(unlocked/SPECIAL_EVENT_PHOTOS.length*100);
  const big=unlockedSet.has(featured.id)
    ? `<div class="photo-big-preview"><img src="${featured.src}" alt="${featured.title}"><div><small>획득 완료</small><h3>${featured.title}</h3><p>${featured.desc}</p><p class="modal-hint">${featured.hint}</p></div></div>`
-   : `<div class="photo-big-preview"><img src="${featured.src}" alt="잠금 사진" style="filter:grayscale(1) blur(10px) brightness(.35)"><div><small>아직 잠김</small><h3>???</h3><p>플레이를 계속하면 언젠가 획득할 수 있어.</p><p class="modal-hint">힌트: ${featured.hint}</p></div></div>`;
+   : `<div class="photo-big-preview"><img src="${featured.hideLockedPreview?LOCKED_PHOTO_SRC:featured.src}" alt="잠금 사진" style="filter:grayscale(1) blur(10px) brightness(.35)"><div><small>아직 잠김</small><h3>???</h3><p>플레이를 계속하면 언젠가 획득할 수 있어.</p><p class="modal-hint">힌트: ${featured.hint}</p></div></div>`;
  const entries=SPECIAL_EVENT_PHOTOS.map((p,idx)=>{
    const on=unlockedSet.has(p.id);
-   return `<button class="special-photo-card ${on?'':'locked'}" onclick="renderSpecialPhotoAlbum('${p.id}')"><img src="${p.src}" alt="${on?p.title:'잠긴 사진'}"><small>${on?'획득 완료':'잠김'}</small><h3>${on?p.title:'특별 이벤트 사진 '+(idx+1)}</h3><p>${on?p.desc:'플레이 중 특정 이벤트를 만나면 해금돼.'}</p></button>`;
+   return `<button type="button" class="special-photo-card ${on?'':'locked'}" onclick="renderSpecialPhotoAlbum('${p.id}')"><img loading="lazy" src="${!on&&p.hideLockedPreview?LOCKED_PHOTO_SRC:p.src}" alt="${on?p.title:'잠긴 사진'}"><small>${on?'획득 완료':'잠김'}</small><h3>${on?p.title:'특별 이벤트 사진 '+(idx+1)}</h3><p>${on?p.desc:'플레이 중 특정 이벤트를 만나면 해금돼.'}</p></button>`;
  }).join('');
  const history=state.photoAlbum.history.length?state.photoAlbum.history.slice(0,6).map(h=>`<li>${h.age}살 · ${h.title} <small>(${h.reason})</small></li>`).join(''):'<li>아직 해금한 특별 사진이 없어.</li>';
  document.getElementById('appModalBody').innerHTML=`
    <div class="photo-album-top">
-    <div class="photo-unlock-banner"><b>사진 수집 진행도 ${unlocked}/${SPECIAL_EVENT_PHOTOS.length}</b><div class="photo-progress-bar"><span style="width:${progress}%"></span></div><p class="modal-hint">게임을 플레이하며 병맛 사건, 셀카 이벤트, 친구 이벤트를 만나면 누리의 게임 캐릭터 기념컷이 해금돼.</p></div>
+    <div class="photo-unlock-banner"><b>사진 수집 진행도 ${unlocked}/${SPECIAL_EVENT_PHOTOS.length}</b><div class="photo-progress-bar" role="progressbar" aria-label="사진 수집" aria-valuemin="0" aria-valuemax="${SPECIAL_EVENT_PHOTOS.length}" aria-valuenow="${unlocked}"><span style="width:${progress}%"></span></div><p class="modal-hint">‘오늘의 선택’을 이어 가며 누리를 키워 봐. 성장하다 기념 촬영, 셀카, 친구 이벤트 등을 만나면 사진이 해금될 수 있어. 사진 카드를 눌러 해금 힌트나 큰 사진을 볼 수 있어.</p></div>
     ${big}
    </div>
    <div class="special-photo-grid">${entries}</div>
