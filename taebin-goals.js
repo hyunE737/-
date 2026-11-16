@@ -219,6 +219,163 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     const previous=Array.isArray(run.notes)&&run.notes.length?(' 지난 장면: '+run.notes.at(-1)):'';
     return '한태빈의 버킷리스트 《'+g.name+'》 · '+title+'. '+CATEGORY_SCENES[g.category][phase]+previous;
   }
+
+  /* 인생 목표에 포함된 실제 미니게임 4종: 기억력, 순서, 계산, 숨은 표시 찾기 */
+  const MINI_SYMBOLS=['🌟','🎵','🌈','🍀','🎨','🧩'];
+  const MINI_KIND={가족:'memory',우정:'memory',나눔:'memory',창작:'order',탐험:'order',기록:'order',배움:'math',자립:'math',건강:'spot',도전:'spot'};
+  const MINI_ORDER={
+    창작:['아이디어 구상','계획서와 대본 작성','준비물·팀 구성','초안 제작','오류 수정·편집','최종 발표'],
+    탐험:['안전한 장소 탐색','일정과 교통편 확인','예산·준비물 점검','현장 방문','경험 기록','돌아와 정리'],
+    기록:['자료 모으기','내용 분류하기','초안 만들기','사실 확인','편집과 검토','최종 기록 남기기']
+  };
+  function miniNeeded(g,r) {
+    const len=goalSteps(g).length, tier=goalTier(g);
+    return r.stage===len-1 || (tier>=3 && r.stage===Math.floor(len/2));
+  }
+  function miniSeed(g,r,extra=0){
+    const str=g.id+':'+r.stage+':'+r.attempts+':'+extra;
+    let h=2166136261;
+    for(let i=0;i<str.length;i++)h=Math.imul(h^str.charCodeAt(i),16777619);
+    return h>>>0;
+  }
+  function miniRand(seed){
+    let x=seed>>>0;
+    return function(max){x=(Math.imul(x,1664525)+1013904223)>>>0;return x%max;};
+  }
+  function shuffle(values,rand) {
+    const a=values.slice();
+    for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  }
+  function miniBuild(g,r){
+    const type=MINI_KIND[g.category]||'memory',tier=goalTier(g),rand=miniRand(miniSeed(g,r));
+    const m={stage:r.stage,type,phase:'play',step:0,wrong:0,round:0,passed:false};
+    if(type==='memory'){
+      m.phase='preview';
+      const len=2+tier;
+      m.solution=Array.from({length:len},()=>rand(MINI_SYMBOLS.length));
+    }
+    if(type==='order'){
+      const order=MINI_ORDER[g.category]||MINI_ORDER.창작;
+      const len=Math.min(6,3+Math.ceil(tier/2));
+      m.solution=order.slice(0,len);
+      // fixed shuffle, ensure not already sorted
+      m.options=shuffle(m.solution,rand);
+      if(m.options.every((v,i)=>v===m.solution[i]))m.options.reverse();
+    }
+    if(type==='math'){
+      m.questions=[];
+      const rounds=1+Math.ceil(tier/2);
+      for(let i=0;i<rounds;i++){
+        const budget=70+rand(7)*10+tier*10,materials=10+rand(6)*5,travel=5+rand(5)*5;
+        const right=budget-materials-travel;
+        const gap=5+rand(3)*5;
+        const wrong=[right+gap,Math.max(0,right-gap)];
+        if(wrong[0]===wrong[1])wrong[1]+=5;
+        m.questions.push({budget,materials,travel,correct:right,choices:shuffle([right,...wrong],rand)});
+      }
+    }
+    if(type==='spot'){
+      m.rounds=1+Math.ceil(tier/2);
+      m.targets=[];
+      const size=12+tier*4;
+      for(let i=0;i<m.rounds;i++)m.targets.push(miniRand(miniSeed(g,r,i+91))(size));
+      m.cells=size;
+    }
+    return m;
+  }
+  function miniMaxWrong(g){return goalTier(g)<=2?3:goalTier(g)<=4?2:1;}
+  function miniStart(id){
+    const g=GOALS.find(x=>x.id===id),r=runFor(id);
+    if(!g||!r||completed(id)||!miniNeeded(g,r)||r.lastActionDay===number(state.day,1)||!state.alive)return;
+    if(!r.mini||r.mini.stage!==r.stage)r.mini=miniBuild(g,r);
+    if(typeof save==='function')save();
+    questPanel(id);
+  }
+  function miniReady(id){
+    const r=runFor(id);
+    if(!r?.mini||r.mini.type!=='memory'||r.mini.phase!=='preview')return;
+    r.mini.phase='play';
+    if(typeof save==='function')save();
+    questPanel(id);
+  }
+  function miniFail(g,r){
+    const m=r.mini;
+    r.misses=(r.misses||0)+1;r.attempts=(r.attempts||0)+1;
+    r.lastActionDay=number(state.day,1);
+    r.mini=null;
+    r.miniPassedStage=null;
+    if(!Array.isArray(r.notes))r.notes=[];
+    r.notes.push('미니게임에 실패했어. 게임 속 다음 날 다시 준비해 도전할 수 있어.');
+    r.notes=r.notes.slice(-4);
+    record('🎮 미니게임 실패 · '+g.name, '이번에는 어려운 장면에 막혔어.', '다시 준비하기', '실패 경험을 기록했어. 다음 날 재도전할 수 있어.');
+    saveAndDraw();
+    questPanel(g.id);
+    showToast('미니게임 실패! 게임 속 다음 날 다시 도전해 봐.');
+  }
+  function miniWin(g,r){
+    r.mini=null;
+    r.miniPassedStage=r.stage;
+    record('🎮 미니게임 성공 · '+g.name,'한태빈이 직접 문제를 해결했어.', '미니게임 통과','다음 이야기로 나아갈 준비가 됐어.');
+    if(typeof save==='function')save();
+    choose(g.id,0);
+  }
+  function miniPick(id,value){
+    const g=GOALS.find(x=>x.id===id),r=runFor(id),m=r?.mini;
+    if(!g||!r||!m||completed(id)||r.lastActionDay===number(state.day,1)||!state.alive||!miniNeeded(g,r)||m.stage!==r.stage)return;
+    const tier=goalTier(g);
+    if(m.type==='memory'){
+      if(m.phase!=='play'||!Number.isInteger(value)||value<0||value>=MINI_SYMBOLS.length)return;
+      if(value===m.solution[m.step])m.step++;
+      else{m.wrong++;m.step=0;}
+      if(m.step>=m.solution.length)return miniWin(g,r);
+    }else if(m.type==='order'){
+      if(!Number.isInteger(value)||value<0||value>=m.options.length)return;
+      if(m.options[value]===m.solution[m.step])m.step++;
+      else{m.wrong++;m.step=0;}
+      if(m.step>=m.solution.length)return miniWin(g,r);
+    }else if(m.type==='math'){
+      const q=m.questions[m.round];
+      if(!q||!q.choices.includes(value))return;
+      if(value===q.correct)m.round++;
+      else m.wrong++;
+      if(m.round>=m.questions.length)return miniWin(g,r);
+    }else if(m.type==='spot'){
+      if(!Number.isInteger(value)||value<0||value>=m.cells)return;
+      if(value===m.targets[m.round])m.round++;
+      else m.wrong++;
+      if(m.round>=m.rounds)return miniWin(g,r);
+    }
+    if(m.wrong>=miniMaxWrong(g))return miniFail(g,r);
+    if(typeof save==='function')save();
+    questPanel(id);
+  }
+  function miniHTML(g,r){
+    const m=r.mini,tier=goalTier(g);
+    if(!m||m.stage!==r.stage)return '<div class="taebin-mini-intro"><h3>🎮 이번 장면은 미니게임!</h3><p>버튼만 누르면 성공하는 게 아니야. 직접 문제를 풀어야 다음 이야기로 넘어갈 수 있어.</p><button type="button" class="taebin-mini-primary" onclick="taebinMiniStart(\''+g.id+'\')">미니게임 시작하기</button></div>';
+    const header='<div class="taebin-mini-head"><b>🎮 '+{memory:'순서 기억하기',order:'작업 순서 맞추기',math:'계산 퍼즐',spot:'숨은 표시 찾기'}[m.type]+'</b><span>실수 '+m.wrong+' / '+miniMaxWrong(g)+'</span></div>';
+    let body='';
+    if(m.type==='memory'){
+      if(m.phase==='preview'){
+        body='<p>다음 그림 순서를 외워봐. 준비가 되면 그림이 숨겨져.</p><div class="taebin-mini-preview">'+m.solution.map(i=>'<span>'+MINI_SYMBOLS[i]+'</span>').join('')+'</div><button type="button" class="taebin-mini-primary" onclick="taebinMiniReady(\''+g.id+'\')">기억했어! 그림 숨기기</button>';
+      }else{
+        body='<p>기억한 그림을 <strong>같은 순서</strong>로 눌러줘.</p><p>맞힌 길이 '+m.step+' / '+m.solution.length+'</p><div class="taebin-mini-grid">'+MINI_SYMBOLS.map((v,i)=>'<button type="button" onclick="taebinMiniPick(\''+g.id+'\','+i+')">'+v+'</button>').join('')+'</div>';
+      }
+    }else if(m.type==='order'){
+      body='<p>목표 《'+escapeHtml(g.name)+'》의 진행 과정을 알맞은 순서로 눌러줘.</p><p>맞힌 단계 '+m.step+' / '+m.solution.length+'</p><div class="taebin-mini-rows">'+m.options.map((v,i)=>'<button type="button" '+(m.solution.slice(0,m.step).includes(v)?'disabled':'')+' onclick="taebinMiniPick(\''+g.id+'\','+i+')">'+escapeHtml(v)+'</button>').join('')+'</div>';
+    }else if(m.type==='math'){
+      const q=m.questions[m.round];
+      body='<p>퍼즐 '+(m.round+1)+' / '+m.questions.length+' · 예산 '+q.budget+'천 원 중 준비물 '+q.materials+'천 원, 이동비 '+q.travel+'천 원을 썼어. <strong>남는 돈은 몇 천 원일까?</strong></p><div class="taebin-mini-rows">'+q.choices.map(c=>'<button type="button" onclick="taebinMiniPick(\''+g.id+'\','+c+')">'+c+'천 원</button>').join('')+'</div>';
+    }else if(m.type==='spot'){
+      const target=m.targets[m.round];
+      body='<p>관찰 미션 '+(m.round+1)+' / '+m.rounds+' · 여러 별 가운데 <strong>🌟 하나</strong>를 찾아 눌러!</p><div class="taebin-mini-grid taebin-mini-spot">'+Array.from({length:m.cells},(_,i)=>'<button type="button" aria-label="'+(i+1)+'번 표시" onclick="taebinMiniPick(\''+g.id+'\','+i+')">'+(i===target?'🌟':'⭐')+'</button>').join('')+'</div>';
+    }
+    return '<div class="taebin-mini-game">'+header+body+'<small>난이도 '+LEVEL_NAMES[tier]+' · 중간에 나가도 저장된 진행 단계는 유지돼.</small></div>';
+  }
+  window.taebinMiniStart=miniStart;
+  window.taebinMiniReady=miniReady;
+  window.taebinMiniPick=miniPick;
+
   function questPanel(id){
     const g=GOALS.find(item=>item.id===id);
     if(!g)return renderModal();
@@ -253,7 +410,8 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
       }).join('');
       const next=wait?'<p class="taebin-quest-wait">🕒 오늘은 이 목표에 이미 도전했어. <strong>일상 선택으로 다음 날까지 진행한 뒤</strong> 다시 도전할 수 있어.</p>':'';
       const caveat=(r.stage===stageCount-1&&Math.floor(skillOf(g))+Math.max(0,r.plan||0)*2<req)?'<p class="taebin-quest-wait">📚 최종 단계가 어려워. 다른 생활 활동으로 능력치를 올리고 충분히 준비해 봐.</p>':'';
-      content='<div class="taebin-quest-scene"><small>📖 이야기 '+(r.stage+1)+' / '+stageCount+' · '+escapeHtml(stageName)+'</small><h3>'+escapeHtml(g.name)+' — '+escapeHtml(stageName)+'</h3><p>'+escapeHtml(sceneFor(g,r))+'</p></div>'+caveat+next+'<div class="taebin-quest-choices">'+rows+'</div><p class="taebin-quest-tip">성공한 선택은 저장돼. 무리하면 단계가 지연될 수 있고, 예산이 부족하면 준비를 이어갈 수 없어.</p>';
+      const gated=miniNeeded(g,r)&&r.miniPassedStage!==r.stage;
+      content='<div class="taebin-quest-scene"><small>📖 이야기 '+(r.stage+1)+' / '+stageCount+' · '+escapeHtml(stageName)+'</small><h3>'+escapeHtml(g.name)+' — '+escapeHtml(stageName)+'</h3><p>'+escapeHtml(sceneFor(g,r))+'</p></div>'+caveat+next+(wait?'':gated?miniHTML(g,r):'<div class="taebin-quest-choices">'+rows+'</div>')+'<p class="taebin-quest-tip">성공한 선택은 저장돼. 미니게임을 통과해야 다음 장면이 열리는 목표도 있어.</p>';
     }
     el.innerHTML=intro+summary+content+'<div class="menu-actions"><button type="button" class="modal-action" onclick="taebinGoalBack()">← 100가지 목표 목록</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>';
   }
@@ -295,6 +453,7 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
   function choose(id,index){
     const g=GOALS.find(item=>item.id===id),r=runFor(id);
     if(!g||!r||completed(id)||!state.alive||![0,1,2].includes(index))return;
+    if(miniNeeded(g,r)&&r.miniPassedStage!==r.stage){showToast('미니게임부터 통과해야 다음 장면으로 넘어갈 수 있어.');return;}
     if(r.lastActionDay===number(state.day,1)){showToast('오늘은 이미 도전했어. 게임에서 다음 날로 넘어가 줘.');return questPanel(id);}
     const length=goalSteps(g).length,budget=goalBudget(g),req=requiredSkill(g),phase=goalSteps(g)[r.stage];
     const needsMoney=r.stage>=1&&!r.paid&&budget>0;
@@ -327,11 +486,13 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
       }else{
         progress=true;
         r.stage++;
+        r.miniPassedStage=null;
         outcome=success+' '+(r.stage>=length?'마지막 장면이 완성됐어!':'다음 장면을 준비할 수 있게 됐어.');
       }
       state.stats[g.stat]=Math.min(100,Math.max(0,skillOf(g))+1);
       if(index===1)state.stats.social=Math.min(100,number(state.stats.social,0)+1);
     }
+    if(!progress&&miniNeeded(g,r)){r.miniPassedStage=null;r.mini=null;}
     r.notes.push(outcome);
     r.notes=r.notes.slice(-4);
     record(title,intro,label,outcome);
