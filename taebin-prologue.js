@@ -51,9 +51,9 @@ function applyChoice(){
  if(!Array.isArray(state.storyJournal))state.storyJournal=[];
  state.storyJournal.unshift({
   age:'프롤로그',title:'다시 시작하는 인생',
-  intro:'태빈이가 횡단보도를 건너던 순간 트럭이 다가왔고, 시간이 멈춘 듯 새로운 시작의 기회가 열렸어.',
+  intro:'한태빈이 횡단보도를 건너던 순간 트럭이 다가왔고, 시간이 멈춘 듯 새로운 시작의 기회가 열렸어.',
   choice:option.title,
-  outcome:'태빈이는 '+option.title+'로 시작 자금 '+formatWon(families[option.family].money)+'을 갖고 새로운 인생을 시작했어.'
+  outcome:'한태빈은 '+option.title+'로 시작 자금 '+formatWon(families[option.family].money)+'을 갖고 새로운 인생을 시작했어.'
  });
  if(!Array.isArray(state.log))state.log=[];
  state.log.push('📖 프롤로그 · '+option.caption+' 선택. 태빈이가 다시 태어났어.');
