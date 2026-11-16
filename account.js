@@ -27,7 +27,7 @@ const baseUrl=String(cfg.supabaseUrl||'').trim().replace(/\/+$/,'');
 const apiKey=String(cfg.supabaseAnonKey||'').trim();
 const enabled=/^https:\/\/[\w.-]+\.supabase\.co$/i.test(baseUrl) && apiKey.length>20;
 function safeGet(key){try{return localStorage.getItem(key)}catch(e){return null}}
-function safeSet(key,value){try{localStorage.setItem(key,value)}catch(e){}}
+function safeSet(key,value){try{localStorage.setItem(key,value);return true}catch(e){return false}}
 function safeRemove(key){try{localStorage.removeItem(key)}catch(e){}}
 function readJson(key){try{return JSON.parse(safeGet(key)||'null')}catch(e){return null}}
 function active(){const x=readJson(ACTIVE_KEY);return x&&['guest','member'].includes(x.mode)?x:null}
@@ -39,7 +39,18 @@ window.nuriCurrentLegacyKey=()=>legacyKey(active());
 window.nuriCloudStatus=()=>lastStatus;
 function message(text,good=false){const el=$('nuriAuthMessage');if(el){el.textContent=text;el.style.color=good?'#7cf4d3':'#ffd3a3'}}
 function gate(on){const el=$('nuriAccountGate');if(el)el.hidden=!on}
-function setBusy(on){busy=on;const el=$('nuriAuthSubmit');if(el){el.disabled=on;el.textContent=on?'처리 중…':(tab==='signup'?'회원가입':'로그인')}const guest=$('nuriGuestLogin');if(guest)guest.disabled=on}
+function setBusy(on){
+ busy=on;
+ const submit=$('nuriAuthSubmit');
+ if(submit){
+   submit.disabled=on;
+   submit.textContent=on?'처리 중…':(tab==='signup'?'회원가입':'로그인');
+ }
+ for(const id of ['nuriGuestLogin','nuriTabLogin','nuriTabSignup']){
+   const control=$(id);
+   if(control)control.disabled=on;
+ }
+}
 function setTab(next){tab=next;const signup=next==='signup';$('nuriTabLogin').classList.toggle('selected',!signup);$('nuriTabSignup').classList.toggle('selected',signup);$('nuriTabLogin').setAttribute('aria-selected',String(!signup));$('nuriTabSignup').setAttribute('aria-selected',String(signup));$('nuriAuthRepeatWrap').hidden=!signup;$('nuriAuthPassword').autocomplete=signup?'new-password':'current-password';if($('nuriForgotPassword'))$('nuriForgotPassword').hidden=signup;$('nuriAuthSubmit').textContent=signup?'회원가입':'로그인';message(enabled?'': '회원 계정은 관리자가 인증 서버를 연결해야 사용할 수 있어. 지금은 게스트 플레이가 가능해.',!enabled&&false)}
 function humanError(err){const txt=String(err&&err.message||err||'연결 오류');return KOREAN[txt]||(/Failed to fetch|NetworkError|fetch failed/i.test(txt)?'인터넷 연결 또는 인증 서버 설정을 확인해 줘.':txt)}
 async function request(endpoint,{method='GET',body=null,accessToken=null,prefer=null}={}){
@@ -48,12 +59,27 @@ async function request(endpoint,{method='GET',body=null,accessToken=null,prefer=
   if(body!==null)headers['Content-Type']='application/json';
   if(accessToken)headers['Authorization']='Bearer '+accessToken;
   if(prefer)headers['Prefer']=prefer;
-  const resp=await fetch(baseUrl+endpoint,{method,headers,body:body!==null?JSON.stringify(body):undefined,cache:'no-store'});
-  const raw=await resp.text();let data=null;
-  if(raw){try{data=JSON.parse(raw)}catch(e){data=raw}}
-  if(!resp.ok){throw new Error((data&&((data.msg)||(data.message)||(data.error_description)||(data.error)))||'서버 오류 '+resp.status)}
-  return data;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),10000);
+  try{
+    const resp=await fetch(baseUrl+endpoint,{method,headers,body:body!==null?JSON.stringify(body):undefined,cache:'no-store',signal:controller.signal});
+    const raw=await resp.text();
+    let data=null;
+    if(raw){try{data=JSON.parse(raw)}catch(e){data=raw}}
+    if(!resp.ok){
+      const error=new Error((data&&((data.msg)||(data.message)||(data.error_description)||(data.error)))||'서버 오류 '+resp.status);
+      error.status=resp.status;
+      throw error;
+    }
+    return data;
+  }catch(e){
+    if(controller.signal.aborted)throw new Error('인증 서버의 응답이 늦어지고 있어. 잠시 뒤 다시 시도해 줘.');
+    throw e;
+  }finally{
+    clearTimeout(timeout);
+  }
 }
+
 async function validToken(){
   let t=token();if(!t||!t.access_token||!t.refresh_token)throw new Error('로그인이 필요해.');
   if(Date.now()/1000 >= Number(t.expires_at||0)-90){
@@ -67,7 +93,8 @@ async function authenticatedUser(){
   const t=await validToken();
   try{return await request('/auth/v1/user',{accessToken:t.access_token})}
   catch(e){
-    // Try a refresh once if cached token was revoked or expired early.
+    if(e.status!==401)throw e;
+    // Try a refresh once if the access token was rejected.
     const refreshed=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:t.refresh_token}});
     const next={access_token:refreshed.access_token,refresh_token:refreshed.refresh_token,expires_at:Math.floor(Date.now()/1000)+(refreshed.expires_in||3600),user:refreshed.user};
     safeSet(SESSION_KEY,JSON.stringify(next));
@@ -109,14 +136,28 @@ async function flush(){
  if(uploadRunning)return;
  uploadPromise=cloudUpload();await uploadPromise;
 }
+function showGame(){
+ if(typeof window.nuriLoadSavedGame!=='function')throw new Error('게임 파일을 불러오지 못했어. 새로고침 후 다시 시도해 줘.');
+ window.nuriLoadSavedGame();
+ authVerified=true;
+ gate(false);
+}
+async function openMemberGame(user){
+ lastStatus='클라우드 연결됨';
+ await syncBeforeEnter(user);
+ showGame();
+ if(safeGet(dirtyKey(user.id)))window.nuriCloudSchedule();
+}
 async function enterMember(accessData){
  if(!accessData?.access_token||!accessData?.refresh_token||!accessData?.user?.id)throw new Error('로그인 토큰을 받지 못했어.');
  const t={access_token:accessData.access_token,refresh_token:accessData.refresh_token,expires_at:Math.floor(Date.now()/1000)+(accessData.expires_in||3600),user:accessData.user};
- safeSet(SESSION_KEY,JSON.stringify(t));
  const user={mode:'member',id:accessData.user.id,email:accessData.user.email||''};
- safeSet(ACTIVE_KEY,JSON.stringify(user));
- await syncBeforeEnter(user);
- location.reload();
+ if(!safeSet(SESSION_KEY,JSON.stringify(t))||!safeSet(ACTIVE_KEY,JSON.stringify(user))){
+   safeRemove(SESSION_KEY);
+   safeRemove(ACTIVE_KEY);
+   throw new Error('브라우저에서 로그인 상태를 저장할 수 없어. 이 사이트의 데이터 저장을 허용한 뒤 다시 시도해 줘.');
+ }
+ await openMemberGame(user);
 }
 async function syncBeforeEnter(user){
  try{
@@ -134,28 +175,39 @@ async function syncBeforeEnter(user){
  }catch(e){lastStatus='클라우드 연결 불가 · 이 기기 데이터 사용';console.warn('[NURI] cloud download:',humanError(e));}
 }
 async function boot(){
- const x=active();
- if(x?.mode==='guest'){authVerified=true;gate(false);lastStatus='게스트 · 이 기기에 저장됨';return;}
- if(x?.mode==='member'&&enabled){
-    message('이전 인생을 확인하는 중…',true);
-    try{
-      const verified=await authenticatedUser();
-      if(verified?.id!==x.id)throw new Error('계정 정보가 일치하지 않아. 다시 로그인해 줘.');
-      await syncBeforeEnter(x);
-      authVerified=true;gate(false);
-      if(safeGet(dirtyKey(x.id)))window.nuriCloudSchedule();
-      // Fresh cloud payload may have arrived after the game script read local save.
-      const loaded=localObject(saveKey(x));
-      if(loaded?.stats && typeof state!=='undefined' && state && JSON.stringify(state.stats)!==JSON.stringify(loaded.stats))location.reload();
-      lastStatus=lastStatus==='게스트 · 이 기기에 저장됨'?'클라우드 연결됨':lastStatus;
-      return;
-    }catch(e){message('로그인이 만료되었거나 연결되지 않았어. 다시 로그인해 줘. ('+humanError(e)+')');safeRemove(ACTIVE_KEY);safeRemove(SESSION_KEY)}
+ const user=active();
+ if(user?.mode==='guest'){
+   lastStatus='게스트 · 이 기기에 저장됨';
+   try{showGame()}catch(e){message(humanError(e))}
+   return;
+ }
+ if(user?.mode==='member'&&enabled){
+   setBusy(true);
+   message('이전 인생을 확인하는 중…',true);
+   try{
+     const verified=await authenticatedUser();
+     if(verified?.id!==user.id)throw new Error('계정 정보가 일치하지 않아. 다시 로그인해 줘.');
+     await openMemberGame(user);
+   }catch(e){
+     message(humanError(e));
+   }finally{
+     setBusy(false);
+   }
+   return;
  }
  gate(true);
  if(!enabled)message('회원 계정은 관리자 인증 서버 설정 후 이용할 수 있어. 게스트로 바로 시작할 수 있어.');
- else if(!x)message('로그인하거나 게스트로 시작해 줘.',true);
+ else message('로그인하거나 게스트로 시작해 줘.',true);
 }
-function setGuest(){safeSet(ACTIVE_KEY,JSON.stringify({mode:'guest'}));authVerified=true;location.reload()}
+function setGuest(){
+ if(!safeSet(ACTIVE_KEY,JSON.stringify({mode:'guest'}))){
+   message('브라우저에서 게임을 저장할 수 없어. 이 사이트의 데이터 저장을 허용한 뒤 다시 시도해 줘.');
+   return;
+ }
+ safeRemove(SESSION_KEY);
+ lastStatus='게스트 · 이 기기에 저장됨';
+ try{showGame()}catch(e){message(humanError(e))}
+}
 async function submit(evt){evt.preventDefault();if(busy)return;const email=$('nuriAuthEmail').value.trim();const pass=$('nuriAuthPassword').value;
  if(!enabled){message('회원 계정은 인증 서버 설정이 필요해. 관리자에게 Supabase 연동을 요청하거나 게스트로 플레이해 줘.');return;}
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){message('올바른 이메일을 입력해 줘.');return;}

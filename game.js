@@ -46,7 +46,8 @@ const families={
  supportive:{name:"꿈을 응원해주는 집 외동아들",money:100,stats:{intelligence:5,health:10,social:12,creativity:9,charm:7,happiness:66},preview:"시작 100,000원 · 꿈을 전폭 지원 · 꿈을 포기하면 지원도 중단"}
 };
 let selectedFamily="ordinary";
-let state={version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,comedyLine:"인생은 선택의 연속이라는데, 누리는 간식 선택부터 어렵다.",items:{},settings:{largeText:false,reduceMotion:false,confirmReset:true},schoolPath:"",adultPath:"",day:1,event:0,family:null,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{intelligence:5,health:50,social:5,creativity:5,charm:5,happiness:50},money:100,log:[],seen:0};
+const freshNuriState=()=>({version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,comedyLine:"인생은 선택의 연속이라는데, 누리는 간식 선택부터 어렵다.",items:{},settings:{largeText:false,reduceMotion:false,confirmReset:true},schoolPath:"",adultPath:"",day:1,event:0,family:null,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{intelligence:5,health:50,social:5,creativity:5,charm:5,happiness:50},money:100,log:[],seen:0});
+let state=freshNuriState();
 let shopMode="ability";
 const upgrades={
  ability:[["책상 업그레이드","공부 효율이 좋아져 지능 +5",70,"intelligence",5],["운동용품 구매","건강한 생활로 체력 +5",65,"health",5],["취미 키트","새로운 아이디어로 창의력 +5",60,"creativity",5],["대화 연습","사람들과 더 편하게, 인간관계 +5",70,"social",5],["스타일 관리","자신감이 생겨 매력 +5",80,"charm",5]],
@@ -4280,18 +4281,6 @@ function worldRenderMain(){
 
 function save(){try{localStorage.setItem(window.nuriCurrentSaveKey(),JSON.stringify(state))}catch(e){}worldPersistLegacy(false);if(window.nuriCloudSchedule)window.nuriCloudSchedule();}
 function resetGame(force=false){ensurePlayerExtras();if(!force&&state.alive&&state.settings.confirmReset&&!confirm("누리의 이야기를 처음부터 다시 시작할까?"))return;try{localStorage.removeItem(window.nuriCurrentSaveKey())}catch(e){}closeAppModal();state={version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,items:{},settings:{...DEFAULT_SETTINGS},schoolPath:"",adultPath:"",day:1,event:0,family:null,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{intelligence:5,health:50,social:5,creativity:5,charm:5,happiness:50},money:100,log:[],seen:0,storySeen:[],storyJournal:[],storyFlags:{bond:0,flags:[]},pendingStory:null,latestStory:"",detourPoints:0,lastDetour:"",sceneTurn:0,lastOutcome:"",photoAlbum:{unlocked:[],seen:[],featured:null,history:[]}};document.getElementById("gameMain").style.display="none";document.getElementById("familyScreen").style.display="block";selectFamily("ordinary");save();if(window.nuriResetPrologueFlow)window.nuriResetPrologueFlow();toast("집안을 다시 선택해 줘!")}
-try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()));if(old&&old.stats){state={...state,...old,age:Number.isInteger(old.age)?old.age:([0,3,7,13,16,20][old.stage||0]),version:3,progress:Number.isInteger(old.progress)?Math.min(4,Math.max(0,old.progress)):0,yearDay:old.version>=2&&Number.isInteger(old.yearDay)?(old.version===2?Math.min(2,Math.floor(Math.max(0,old.yearDay)*3/7)):Math.min(2,Math.max(0,old.yearDay))):0,turningPoints:Array.isArray(old.turningPoints)?old.turningPoints:[],pendingTurningPoint:old.pendingTurningPoint||null,comedyLine:old.comedyLine||"인생은 선택의 연속이라는데, 누리는 간식 선택부터 어렵다.",items:old.items||{},settings:{...DEFAULT_SETTINGS,...(old.settings||{})},day:Number.isInteger(old.day)?Math.max(1,old.day):1,schoolPath:old.schoolPath||"",adultPath:old.adultPath||"",alive:old.alive!==false,deathCause:old.deathCause||"",stats:{...state.stats,...old.stats,health:limitStat("health",old.stats.health),happiness:limitStat("happiness",old.stats.happiness)},log:migrateOldLog(old.log),storySeen:Array.isArray(old.storySeen)?old.storySeen:[],storyJournal:Array.isArray(old.storyJournal)?old.storyJournal:[],storyFlags:old.storyFlags||{bond:0,flags:[]},pendingStory:old.pendingStory||null,latestStory:old.latestStory||"",detourPoints:Number(old.detourPoints)||0,lastDetour:old.lastDetour||"",sceneTurn:Number(old.sceneTurn)||0,lastOutcome:old.lastOutcome||""};if(state.family&&families[state.family]){selectedFamily=state.family;document.getElementById("familyScreen").style.display="none";document.getElementById("gameMain").style.display="block"}else{document.getElementById("familyScreen").style.display="block";document.getElementById("gameMain").style.display="none"}}}catch(e){}
-// Migrate old 5-step saves by preserving the proportion of an unfinished day.
-if(state.family&&(()=>{try{return String(localStorage.getItem(window.nuriCurrentSaveKey())||"").includes('"gameSpeed"')}catch(e){return false}})()){
- state.progress=Math.min(growthRequired(state.age)-1,Math.max(0,Math.floor(Number(state.progress)||0)));
-}else if(state.family){
- state.progress=Math.min(growthRequired(state.age)-1,Math.floor(Math.max(0,Number(state.progress)||0)/5*growthRequired(state.age)));
-}
-applySettings();
-ensureLifeHealth();
-ensureWorld();
-ensureLifeArc();showNextLifeArc();
-
 /* ===== NURI LIFE: aging gallery and interconnected service / workplace arcs ===== */
 function agingStage(age){
  if(age<3)return "갓난아기";
@@ -4588,5 +4577,64 @@ function routeSceneBank(age){
  return null;
 }
 
-// Resume the saved game only after the route-specific scene tables are initialized.
-if(document.getElementById("gameMain").style.display!=="none"){if(!state.pendingStory)maybeStartStory(state.age);render();save();}
+// Restore after authentication and cloud download have selected the account's save.
+function nuriLoadSavedGame(){
+ state=freshNuriState();
+ worldLegacyCache=null;
+ selectedFamily="ordinary";
+ let old;
+ try{old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()));}catch(e){}
+ if(old?.stats){
+  state={
+   ...state,...old,
+   age:Number.isInteger(old.age)?old.age:([0,3,7,13,16,20][old.stage||0]),
+   version:3,
+   progress:Number.isInteger(old.progress)?Math.min(4,Math.max(0,old.progress)):0,
+   yearDay:old.version>=2&&Number.isInteger(old.yearDay)
+    ?Math.min(2,old.version===2?Math.floor(Math.max(0,old.yearDay)*3/7):Math.max(0,old.yearDay))
+    :0,
+   turningPoints:Array.isArray(old.turningPoints)?old.turningPoints:[],
+   pendingTurningPoint:old.pendingTurningPoint||null,
+   comedyLine:old.comedyLine||state.comedyLine,
+   items:old.items||{},
+   settings:{...DEFAULT_SETTINGS,...(old.settings||{})},
+   day:Number.isInteger(old.day)?Math.max(1,old.day):1,
+   schoolPath:old.schoolPath||"",
+   adultPath:old.adultPath||"",
+   alive:old.alive!==false,
+   deathCause:old.deathCause||"",
+   stats:{...state.stats,...old.stats,health:limitStat("health",old.stats.health),happiness:limitStat("happiness",old.stats.happiness)},
+   log:migrateOldLog(old.log),
+   storySeen:Array.isArray(old.storySeen)?old.storySeen:[],
+   storyJournal:Array.isArray(old.storyJournal)?old.storyJournal:[],
+   storyFlags:old.storyFlags||{bond:0,flags:[]},
+   pendingStory:old.pendingStory||null,
+   latestStory:old.latestStory||"",
+   detourPoints:Number(old.detourPoints)||0,
+   lastDetour:old.lastDetour||"",
+   sceneTurn:Number(old.sceneTurn)||0,
+   lastOutcome:old.lastOutcome||""
+  };
+ }
+ const hasLife=Object.hasOwn(families,state.family);
+ if(hasLife){
+  selectedFamily=state.family;
+  // Keep the proportion of an unfinished day in older 5-step saves.
+  const steps=growthRequired(state.age);
+  const progress=Math.max(0,Number(state.progress)||0);
+  state.progress=Math.min(steps-1,Math.floor(old.settings?.gameSpeed===undefined?progress*steps/5:progress));
+ }
+ document.getElementById("familyScreen").style.display=hasLife?"none":"block";
+ document.getElementById("gameMain").style.display=hasLife?"block":"none";
+ applySettings();
+ ensureLifeHealth();
+ ensureWorld();
+ ensureLifeArc();showNextLifeArc();
+ if(hasLife){
+  if(!state.pendingStory)maybeStartStory(state.age);
+  render();
+  save();
+ }
+}
+// The account layer starts the game once a player has been selected.
+if(!window.nuriCloudSchedule)nuriLoadSavedGame();

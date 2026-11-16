@@ -6,12 +6,10 @@ function setup(){
  const node=()=>({hidden:false,style:{display:'none'},children:[],classList:{add(){},remove(){},toggle(){}},append(...x){this.children.push(...x)},replaceChildren(){this.children=[]},addEventListener(e,fn){this[e]=fn},focus(){},querySelector(s){return s==='#nuriPrologueChoices'?get('nuriPrologueChoices'):get('nuriPrologueChoices').children[0]}});
  function get(id){if(!nodes.has(id))nodes.set(id,node());return nodes.get(id)}
  const storage=new Map();
- const c=vm.createContext({console,Math:Object.create(Math),document:{readyState:'complete',body:node(),getElementById:get,createElement:node,querySelectorAll(){return []}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},setTimeout(){},clearTimeout(){},MutationObserver:class{observe(){}},alert(){throw Error('unexpected alert')},confirm:()=>true});
+ const c=vm.createContext({console,Math:Object.create(Math),document:{readyState:'complete',body:node(),documentElement:node(),getElementById:get,createElement:node,querySelectorAll(){return []}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},setTimeout(){},clearTimeout(){},MutationObserver:class{observe(){}},alert(){throw Error('unexpected alert')},confirm:()=>true});
  c.window=c;c.nuriCurrentSaveKey=()=>'test';
- // Skip only the page bootstrap; exercise actual gameplay functions below.
- const begin=game.indexOf('try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()))');
- const end=game.indexOf('/* ===== NURI LIFE:',begin);
- vm.runInContext(game.slice(0,begin)+game.slice(end),c);
+ c.nuriCloudSchedule=()=>{};
+ vm.runInContext(game,c);
  vm.runInContext('render=()=>{};save=()=>{localStorage.setItem("test",JSON.stringify(state))};toast=()=>{};closeAppModal=()=>{};',c);
  get('nuriAccountGate').hidden=true;get('familyScreen').style.display='block';get('nuriPrologue').hidden=false;
  vm.runInContext(pro,c);
@@ -104,9 +102,7 @@ console.log('PASS 48 house-specific milestones / all 144 choices, shared effects
  run('state.age=40;maybeStartStory(40)');assert.match(run('state.pendingStory.text'),/프로젝트 비용 지원 없이/);
  // Exercise the real saved-game migration, rather than a new-game initializer.
  run('save()');const stored=JSON.parse(c.localStorage.getItem('test'));
- const begin=game.indexOf('try{let old=JSON.parse(localStorage.getItem(window.nuriCurrentSaveKey()))');
- const end=game.indexOf('// Migrate old 5-step saves',begin);
- run('state.familyStoryMemory=null;state.money=0;'+game.slice(begin,end));
+ run('state.familyStoryMemory=null;state.money=0;nuriLoadSavedGame()');
  assert.equal(run('state.familyStoryMemory.choice'),stored.familyStoryMemory.choice);
  assert.equal(run('state.money'),stored.money);
  assert.equal(run('state.familyDreamSupport'),false);
