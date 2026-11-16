@@ -58,7 +58,7 @@ const upgrades={
  life:[["아늑한 방 꾸미기","행복 +10",90,"happiness",10],["용돈 모으기","돈 +30,000원",100,"money",30],["휴식 아이템","체력 +8, 행복 +5",75,"combo",13]]
 };
 function selectFamily(key){selectedFamily=key;document.querySelectorAll(".family-option").forEach(b=>b.classList.toggle("selected",b.dataset.family===key));document.getElementById("familyPreview").textContent=families[key].preview}
-function startGame(){let f=families[selectedFamily];state={version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,comedyLine:"인생은 선택의 연속이라는데, 태빈이는 간식 선택부터 어렵다.",items:{},settings:{...DEFAULT_SETTINGS},schoolPath:"",adultPath:"",day:1,event:0,family:selectedFamily,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{...f.stats,health:Math.max(85,f.stats.health)},money:f.money,log:["한태빈은 "+f.name+"에서 태어났어."],seen:0,storySeen:[],storyJournal:[],storyFlags:{bond:0,flags:[]},pendingStory:null,latestStory:"",detourPoints:0,lastDetour:"",sceneTurn:0,lastOutcome:"",familyDreamAbandoned:false,familyDreamSupport:selectedFamily==="supportive",familyScholarships:0,familyTalentProgress:0,familyTrust:0,photoAlbum:{unlocked:[],seen:[],featured:null,history:[]}};ensureWorld();ensurePhotoAlbum();maybeStartStory(0);if(window.nuriApplyPrologueChoice)window.nuriApplyPrologueChoice();document.getElementById("familyScreen").style.display="none";document.getElementById("gameMain").style.display="block";render();save()}
+function startGame(){let f=families[selectedFamily];state={version:3,stage:0,age:0,progress:0,yearDay:0,turningPoints:[],pendingTurningPoint:null,comedyLine:"인생은 선택의 연속이라는데, 태빈이는 간식 선택부터 어렵다.",items:{},settings:{...DEFAULT_SETTINGS},schoolPath:"",adultPath:"",day:1,event:0,family:selectedFamily,taebinGoalsDone:[],taebinGoalHistory:[],taebinAllGoalsAchieved:false,alive:true,deathCause:"",healthRisk:5,illnessSeverity:0,totalChoices:0,stats:{...f.stats,health:Math.max(85,f.stats.health)},money:f.money,log:["한태빈은 "+f.name+"에서 태어났어."],seen:0,storySeen:[],storyJournal:[],storyFlags:{bond:0,flags:[]},pendingStory:null,latestStory:"",detourPoints:0,lastDetour:"",sceneTurn:0,lastOutcome:"",familyDreamAbandoned:false,familyDreamSupport:selectedFamily==="supportive",familyScholarships:0,familyTalentProgress:0,familyTrust:0,photoAlbum:{unlocked:[],seen:[],featured:null,history:[]}};ensureWorld();ensurePhotoAlbum();maybeStartStory(0);if(window.nuriApplyPrologueChoice)window.nuriApplyPrologueChoice();document.getElementById("familyScreen").style.display="none";document.getElementById("gameMain").style.display="block";render();save()}
 function clamp(v){return Math.max(0,Math.round((Number(v)||0)*10)/10)}
 function limitStat(key,value){
  const result=clamp(value);
@@ -69,7 +69,6 @@ function formatWon(units){return Math.round((Number(units)||0)*1000).toLocaleStr
 
 /* ===== NURI fictional share market: internal currency unit = ₩1,000 ===== */
 const NURI_STOCK_FEE=.0015; // 거래당 0.15% 가상 수수료
-const NURI_GOAL_UNITS=10000000; // 100억 원 = 10,000,000 x 1,000원
 const NURI_STOCKS=[
  {id:'hanbit',name:'한빛전자',sector:'기술',profile:'성장형',start:22,drift:.125,vol:.070,about:'기술 개발에 따라 기회와 변동성이 있어.'},
  {id:'pureun',name:'푸른생활',sector:'생활',profile:'안정형',start:14,drift:.045,vol:.027,about:'오르내림이 비교적 작지만 수익도 완만해.'},
@@ -235,32 +234,17 @@ function updateStockMarket(){
  state.marketNews=event.name;
  checkWealthGoal();
 }
-function checkWealthGoal(){
- if(!state.family||state.goal100Achieved)return false;
- if(nuriNetWorth()<NURI_GOAL_UNITS)return false;
- state.goal100Achieved=true;
- state.goal100Age=state.age;
- const entry=`${state.age}살 · 태빈이의 순자산이 100억 원을 넘어 꿈을 이루었어!`;
- state.log.push(entry);
- state.stockLedger.unshift(entry);
- state.stockGoalPopup=true;
- return true;
-}
+// 태빈이 키우기의 주요 목표는 돈이 아닌 인생의 100가지 목표를 달성하는 것입니다.
+function checkWealthGoal(){ return false; }
 function updateWealthHud(){
  if(!state.family)return;
  ensureStockState();
  const wealth=nuriNetWorth();
- const pct=Math.max(0,Math.min(100,wealth/NURI_GOAL_UNITS*100));
- const total=document.getElementById('wealthTotal');
- if(total)total.textContent=formatWon(wealth);
- const bar=document.getElementById('wealthFill');if(bar)bar.style.width=pct+'%';
- const progress=document.getElementById('wealthTrack');if(progress)progress.setAttribute('aria-valuenow',String(pct));
- const value=document.getElementById('wealthPercent');if(value)value.textContent=(pct<.01?pct.toFixed(4):pct<1?pct.toFixed(2):pct.toFixed(1))+'%';
- const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 통장 '+formatWon(p.bank)+' · 주식 '+formatWon(p.stocks)+' · 비트코인 '+formatWon(p.crypto)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' · 탈것 '+formatWon(p.vehicles)+' − 대출 '+formatWon(p.debt);}
+ const detail=document.getElementById('stockMainNote');
+ if(detail)detail.textContent=state.age<18?'18살부터 가상 주식 거래를 경험할 수 있어.':stockMarketHeadline()||'가상 기업의 가격은 매일 달라져.';
  const portfolio=document.getElementById('stockPortfolioValue');if(portfolio)portfolio.textContent=formatWon(holdingsValue());
  const held=document.getElementById('stockHeldCount');if(held)held.textContent=NURI_STOCKS.filter(k=>state.holdings[k.id]>0).length+'개';
- const note=document.getElementById('stockMainNote');if(note)note.textContent=state.age<18?'18살이 되면 가상 주식 거래가 열려.':(state.goal100Achieved?'100억 목표를 달성했어! 계속 인생을 즐겨 봐.':stockMarketHeadline()||'가상 기업의 가격이 게임 하루마다 변해.');
- const hud=document.getElementById('cashHud');if(hud)hud.textContent=state.goal100Achieved?'100억 달성!':'순자산 '+formatWon(wealth);
+ if(typeof window.taebinGoalTick==='function')window.taebinGoalTick();
 }
 function buyOrSellStock(id,side,all=false){
  if(!state.alive)return toast('인생이 끝난 뒤에는 거래할 수 없어.');
@@ -319,7 +303,7 @@ function renderStockModal(){
    </section>`;
  }).join('');
  document.getElementById('appModalBody').innerHTML=`
-  <div class="stock-overview"><div><small>현금</small><b>${formatWon(state.money)}</b></div><div><small>주식 평가액</small><b>${formatWon(holdingsValue())}</b></div><div><small>현재 순자산</small><b>${formatWon(total)}</b></div><div><small>100억까지</small><b>${formatWon(Math.max(0,NURI_GOAL_UNITS-total))}</b></div><div><small>매도해서 얻은 실현손익</small><b>${state.stockRealizedProfit>=0?'+':''}${formatWon(state.stockRealizedProfit)}</b></div></div>
+  <div class="stock-overview"><div><small>현금</small><b>${formatWon(state.money)}</b></div><div><small>주식 평가액</small><b>${formatWon(holdingsValue())}</b></div><div><small>현재 순자산</small><b>${formatWon(total)}</b></div><div><small>인생의 목표</small><b>${typeof window.taebinGoalCount==="function"?window.taebinGoalCount():0}/100개 달성</b></div><div><small>매도해서 얻은 실현손익</small><b>${state.stockRealizedProfit>=0?'+':''}${formatWon(state.stockRealizedProfit)}</b></div></div>
   <p class="stock-note"><b>🗞️ 오늘의 시장 뉴스</b> ${worldSafe(stockMarketHeadline())||'아직 첫 거래일이야.'}<br/><b>거래 수수료</b> 매수·매도 각각 0.15% · 수수료 포함 평균 매입가 적용<br/>${locked?'18살이 되면 주식 거래를 시작할 수 있어. 성장하면서 원하는 진로를 먼저 찾아 봐.':(!state.alive?'태빈이의 인생이 끝나 주식 거래가 종료됐어.':'주가는 하루마다 뉴스와 무작위 시장 상황에 따라 오르거나 내려. 수익과 손실은 보장되지 않아.')}<br/>가상 종목과 임의의 가격 변동으로 만든 게임 시스템이야. 실제 주식 투자 정보는 아니며 손실도 발생할 수 있어.</p>
   <p class="stock-legend"><b>전체 ${NURI_STOCKS.length}종목</b><span class="stock-up">▲ 상승</span><span class="stock-down">▼ 하락</span><span class="stock-flat">– 보합</span></p>
   <div class="social-actions"><button type="button" class="modal-action" onclick="openAppModal('crypto')">비트코인 시장</button></div>
@@ -328,11 +312,8 @@ function renderStockModal(){
   <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">메뉴로 돌아가기</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>`;
 }
 function renderWealthGoalModal(){
- modalHeader('100억 부자 달성','TAEBIN LIFE · GOAL COMPLETE');
- document.getElementById('appModalBody').innerHTML=`
-  <div class="life-review-cover"><div class="life-review-eyebrow">GOAL ACHIEVED</div><h3>태빈이의 꿈이 이루어졌어!</h3><p>${state.age}살, 현금·통장·주식·비트코인·부동산·사업·탈것에서 빚을 뺀 순자산이 100억 원을 돌파했어. 게임은 끝나지 않아. 이제 남은 인생을 어떤 삶으로 채울지 선택해 봐.</p></div>
-  <div class="stock-overview"><div><small>현재 순자산</small><b>${formatWon(nuriNetWorth())}</b></div><div><small>달성 나이</small><b>${state.goal100Age}살</b></div></div>
-  <div class="menu-actions"><button type="button" class="modal-action" onclick="closeAppModal()">인생 계속하기</button><button type="button" class="modal-action" onclick="openAppModal('stocks')">가상 주식시장 보기</button></div>`;
+ if(typeof window.renderTaebinGoalModal==='function')window.renderTaebinGoalModal();
+ else renderMenuModal();
 }
 
 function stageForAge(age){
@@ -2494,7 +2475,7 @@ const NURI_ABSURD_BANK={
    ["의자 소개 영상을 점심시간에 만들기","creativity","charm","동료들이 다 같이 웃으며 봤어.",2,2],
    ["동료에게 다음 회의 일정을 알려 주기","social","intelligence","모두가 제시간에 회의에 참석했어.",0,1],
    ["의자가 책임자라며 업무를 전부 떠넘기기","charm","social","회의 분위기가 싸늘해져 사과했어.",0,-3]]],
-  ["팀장님이 발표 자료 제목을 '100억 프로젝트' 대신 '100억 프로젝터'로 적어 왔어.",[
+  ["팀장님이 발표 자료 제목을 '꿈 백 개 프로젝트' 대신 '꿈 백 개 프로젝터'로 적어 왔어.",[
    ["제목을 바로잡고 발표 이어가기","intelligence","social","실수를 바로잡고 설명을 이어 갔어.",0,1],
    ["프로젝터를 마스코트로 디자인하기","creativity","charm","발표 장면에 웃음이 더해졌어.",0,2],
    ["팀장님과 발표 흐름 다시 맞추기","social","intelligence","팀워크가 좋아졌어.",0,1],
@@ -2555,9 +2536,9 @@ const NURI_ABSURD_BANK={
    ["배송업체에 포장 개선 의견 남기기","social","intelligence","다음 배송에 대한 좋은 의견을 전했어.",0,1],
    ["상자로 가족 사진 배경 만들기","creativity","charm","가족에게 재미있는 추억이 생겼어.",0,2],
    ["상자를 친구 집 앞에 몰래 쌓아 두기","charm","social","친구와 오해가 생겨 직접 치웠어.",0,-3]]],
-  ["동네 행사에서 태빈이 이름이 '무려 100억 씨'로 소개됐어.",[
+  ["동네 행사에서 태빈이 이름이 '무려 백 개 씨'로 소개됐어.",[
    ["정중히 이름을 바로잡기","social","charm","진행자가 바로 수정해 줬어.",0,1],
-   ["100억 목표를 유머로 소개하기","creativity","charm","행사에 참석한 사람들이 웃으며 응원했어.",0,2],
+   ["100가지 목표를 유머로 소개하기","creativity","charm","행사에 참석한 사람들이 웃으며 응원했어.",0,2],
    ["목표를 이루기 위한 계획 설명하기","intelligence","social","새로운 인연과 조언을 얻었어.",0,1],
    ["주변 사람에게 거짓 투자 약속하기","charm","social","신뢰를 잃고 말을 바로잡아야 했어.",-12,-4]]]
  ],
@@ -2633,7 +2614,7 @@ function nuriAbsurdReview(){
  const recent=state.absurdHistory.slice(-5);
  if(!recent.length)return '';
  return `<div class="life-review-title">태빈이의 황당한 기록 · ${state.absurdCount}회</div>
-  <p class="life-review-sub">진지하게 100억 원을 꿈꾸면서도 가끔은 엉뚱한 하루를 보냈어.</p>
+  <p class="life-review-sub">100가지 인생 목표를 하나씩 채우면서도 가끔은 엉뚱한 하루를 보냈어.</p>
   <div class="world-history">${recent.map(e=>`<div><strong>${e.age}살</strong><span>${nuriChoiceEscape(e.choice)} — ${nuriChoiceEscape(e.outcome)}</span></div>`).join('')}</div>`;
 }
 
@@ -2872,8 +2853,8 @@ function renderLifeReviewModal(){
   <div><small>내가 한 선택</small><b>${total.toLocaleString('ko-KR')}번</b></div>
   <div><small>기록된 이야기</small><b>${archive}장</b></div>
  </div>
-  <div class="life-review-title">₩ 태빈이의 재산과 꿈</div>
-  <p class="life-review-sub">최종 순자산 ${formatWon(nuriNetWorth())} (현금·통장·주식·비트코인·부동산·사업·탈것 가치 − 대출 잔액). ${state.goal100Achieved?`${state.goal100Age}살에 100억 원 목표를 달성했어.`:'100억 원이라는 목표를 향해 도전했지만 이번 인생에서는 달성하지 못했어.'}</p>
+  <div class="life-review-title">🌟 한태빈이 이룬 인생 목표</div>
+  <p class="life-review-sub">100가지 목표 중 ${typeof window.taebinGoalCount==='function'?window.taebinGoalCount():0}개 달성! ${state.taebinAllGoalsAchieved?'모든 버킷리스트를 완주했어.':'아직 남은 꿈은 다음 인생에서 다시 도전해 볼 수 있어.'} · 마지막 순자산 ${formatWon(nuriNetWorth())}</p>
   ${worldReviewMarkup()}
   ${nuriAbsurdReview()}
   <div class="life-review-title">♡ 관계의 이야기</div><p class="life-review-sub">${lifeReviewEscape(romanceLifeSummary())}</p>
@@ -3022,7 +3003,7 @@ function render(){
  worldRenderMain();
  renderTurningPoint();
  renderStoryOverlay();
- if(state.stockGoalPopup&&state.alive){state.stockGoalPopup=false;openAppModal('wealthGoal');save();}
+ if(state.stockGoalPopup){state.stockGoalPopup=false;}
  if(!state.alive&&!state.lifeReviewSeen){
   state.justEnded=false;
   state.lifeReviewSeen=true;
@@ -3174,6 +3155,7 @@ function openAppModal(view="menu"){
  else if(view==="relationship")renderRomanceModal();
  else if(view==="social")nuriRenderSocial();
  else if(view==="ranking")renderNuriPublicRanking();
+ else if(view==="goals" && typeof window.renderTaebinGoalModal==='function')window.renderTaebinGoalModal();
  else if(view==="stocks")renderStockModal();
  else if(view==="crypto")renderNuriCrypto();
  else if(view==="certificates")renderNuriCertificates();
@@ -3198,6 +3180,7 @@ function renderMenuModal(){
  modalHeader("메뉴","태빈이 키우기 · MENU");
  document.getElementById("appModalBody").innerHTML=`
   <div class="menu-grid">
+   <button type="button" class="menu-tile" onclick="openAppModal('goals')"><span class="tile-icon">🌟</span><span><b>인생의 목표 100가지</b><small>직접 도전 · 달성 체크 · 100/100 완주</small></span></button>
    <button type="button" class="menu-tile" id="nuriUpdateMenuTile" onclick="window.nuriOpenUpdateStatus&&window.nuriOpenUpdateStatus()"><span class="tile-icon">📢</span><span><b>업데이트 현황</b><small>최신 버전 · 배포 내역 확인</small></span></button>
    <button type="button" class="menu-tile" onclick="window.nuriPreviewPrologue&&window.nuriPreviewPrologue()"><span class="tile-icon">📖</span><span><b>프롤로그 다시 보기</b><small>기존 저장을 유지하며 횡단보도 이야기 감상</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('account')"><span class="tile-icon">●</span><span><b>내 계정</b><small>로그인 상태 · 저장 동기화 · 로그아웃</small></span></button>
@@ -3213,7 +3196,7 @@ function renderMenuModal(){
    <button class="menu-tile" onclick="openAppModal('talents')"><span class="tile-icon">◈</span><span><b>재능·특기</b><small>타고난 재능 · 훈련</small></span></button>
    <button class="menu-tile" onclick="openAppModal('achievements')"><span class="tile-icon">★</span><span><b>업적·엔딩</b><small>목표 · 인생 유형 · 보상</small></span></button>
    <button class="menu-tile" onclick="openAppModal('relationship')"><span class="tile-icon">♡</span><span><b>연애 · 결혼</b><small>만남, 교제, 결혼생활, 이혼</small></span></button>
-   <button class="menu-tile" onclick="openAppModal('stocks')"><span class="tile-icon">₩</span><span><b>주식 투자 · 100억 목표</b><small>가상 기업 매수·매도, 내 순자산 확인</small></span></button>
+   <button class="menu-tile" onclick="openAppModal('stocks')"><span class="tile-icon">₩</span><span><b>주식 투자 · 가상 시장</b><small>가상 기업 매수·매도, 내 순자산 확인</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('crypto')"><span class="tile-icon">₿</span><span><b>비트코인</b><small>게임 시세 · 소수점 단위 매수·매도</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('certificates')"><span class="tile-icon">🏅</span><span><b>자격증</b><small>공부 · 시험 · 취득하면 연봉 보너스</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('vehicles')"><span class="tile-icon">🚲</span><span><b>탈것 · 내 차고</b><small>자전거·차량 구매, 이용 및 판매</small></span></button>
@@ -3622,7 +3605,7 @@ const WORLD_ACHIEVEMENTS = [
  {id:'parent',name:'새로운 가족',desc:'자녀 맞이하기'},
  {id:'wealth100m',name:'1억의 벽',desc:'순자산 1억 원 달성'},
  {id:'wealth1b',name:'10억 달성',desc:'순자산 10억 원 달성'},
- {id:'wealth10b',name:'100억의 꿈',desc:'순자산 100억 원 달성'},
+ {id:'wealth10b',name:'여유로운 삶',desc:'순자산 5억 원 달성'},
  {id:'lateLife',name:'긴 여정',desc:'70살까지 인생 이어가기'},
  {id:'absurdMaster',name:'전설의 황당 인생',desc:'병맛 사건 10번 경험하기'}
 ];
@@ -3708,7 +3691,7 @@ function worldCheckAchievements(){
   creditGood:w.credit>=820,debtFree:!!w.everPaidOff,promotion:Number(state.jobLevel)>0,
   friendship:Object.values(w.friends).some(f=>Number(f.bond)>=85),rivalry:w.rival.respect>=85,
   talented:Object.values(w.talents).some(t=>Number(t)>=30),parent:w.children.length>0,
-  wealth100m:net>=100000,wealth1b:net>=1000000,wealth10b:net>=10000000,lateLife:state.age>=70,absurdMaster:(state.absurdCount||0)>=10
+  wealth100m:net>=100000,wealth1b:net>=1000000,wealth10b:net>=500000,lateLife:state.age>=70,absurdMaster:(state.absurdCount||0)>=10
  };
  for(const achievement of WORLD_ACHIEVEMENTS){
   if(checks[achievement.id]&&!w.achievements.includes(achievement.id)){
@@ -3976,7 +3959,7 @@ function worldChildTime(idx){
 }
 function worldEndingName(){
  const w=ensureWorld();
- if(state.goal100Achieved)return '100억의 꿈을 이룬 인생';
+ if(state.taebinAllGoalsAchieved)return '100가지 꿈을 모두 이룬 인생';
  if(w.business&&w.business.level>=3)return '회사를 키운 경영자의 인생';
  if(w.children.length&&w.children.some(x=>x.bond>=75))return '가족을 아끼며 살아온 인생';
  if(w.properties.length>=2)return '꾸준히 자산을 쌓은 인생';
