@@ -547,7 +547,7 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
   // 인생의 끝에 한 번만 판정되는 특수 버킷리스트. 게임 속 노년 자연 마무리만 인정.
   window.taebinGoalOnLifeEnd=function(reason){
     ensure();
-    if(state.age<80||!String(reason).includes('자연스럽게')||completed('t9_9'))return;
+    if(state.age<80||!(String(reason).includes('자연스럽게')||String(reason).includes('나이에 따른 건강 변화'))||completed('t9_9'))return;
     state.taebinGoalsDone.push('t9_9');
     state.taebinGoalHistory.push({id:'t9_9',age:state.age,day:state.day,automatic:true});
     record('🌿 오래 살아온 인생의 마지막 장','한태빈은 긴 생을 돌아보며 남겨 둔 수첩을 펼쳤어.','삶의 마무리','태빈이의 100가지 목표 중 삶의 자연스러운 마무리 항목이 기록됐어.');
