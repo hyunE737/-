@@ -993,6 +993,28 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 .taebin-quest-ending h3{margin:0 0 7px;color:#a0f6d3}.taebin-quest-ending p{color:#e3fae9}
 .taebin-quest-primary{width:100%;text-align:center}
 </style>
+<style>
+/* 태빈이 목표별 인터랙티브 미니게임 */
+.taebin-mini-intro,.taebin-mini-game{border:1px solid #91b8d788;background:linear-gradient(145deg,#243d55,#28324e);padding:18px;border-radius:16px;margin:15px 0;color:#f2f8ff}
+.taebin-mini-intro h3{font-size:18px;margin:0 0 8px;color:#d5ffef}
+.taebin-mini-intro p,.taebin-mini-game p{font-size:13px;line-height:1.7;color:#e1f1ff}
+.taebin-mini-primary{width:100%;cursor:pointer;background:#a5eed9;color:#17343b;border:0;border-radius:12px;padding:13px;font-weight:800;margin-top:10px}
+.taebin-mini-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:#ddfff6}
+.taebin-mini-head b{font-size:17px}
+.taebin-mini-head span{color:#ffdc98;font-size:12px}
+.taebin-mini-preview{display:flex;flex-wrap:wrap;gap:7px;padding:10px 0}
+.taebin-mini-preview span{display:inline-flex;justify-content:center;align-items:center;width:44px;height:46px;background:#395571;border-radius:9px;font-size:25px}
+.taebin-mini-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:12px 0}
+.taebin-mini-grid button{font:inherit;font-size:25px;min-width:0;min-height:50px;background:#3a536e;border:1px solid #719eb0;border-radius:9px;color:#fff;cursor:pointer;touch-action:manipulation}
+.taebin-mini-grid button:hover{background:#496d87}
+.taebin-mini-spot{grid-template-columns:repeat(6,minmax(0,1fr))}
+.taebin-mini-spot button{font-size:23px}
+.taebin-mini-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+.taebin-mini-rows button{font:inherit;min-width:0;min-height:44px;padding:10px;background:#35506c;color:#f1faff;border:1px solid #83a4bc;border-radius:11px;cursor:pointer;overflow-wrap:anywhere}
+.taebin-mini-rows button:disabled{opacity:.42}
+.taebin-mini-game>small{font-size:11px;color:#b6d1e6}
+@media(max-width:440px){.taebin-mini-grid,.taebin-mini-spot{grid-template-columns:repeat(4,minmax(0,1fr))}.taebin-mini-rows{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <!-- PC 전용 타이틀 로딩 화면. 모바일에서는 CSS로 완전히 숨겨서 터치를 차단하지 않음. -->
@@ -1236,7 +1258,7 @@ button:focus-visible{outline:2px solid #76ffd8;outline-offset:3px}
 <script src="./taebin-game.js?v=1.0.27"></script>
 <script src="./taebin-social.js?v=1.0.22"></script>
 <script src="./taebin-prologue.js?v=1.0.15"></script>
-<script src="./taebin-goals.js?v=1.1.0"></script>
+<script src="./taebin-goals.js?v=1.2.0"></script>
 <script src="./light-ui.js?v=1.0.0"></script>
 <script src="./taebin-mobile.js?v=1.0.16" defer></script>
 <script id="nuriPcIntroRuntime">
