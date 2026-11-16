@@ -576,7 +576,7 @@ function advanceOneDay(){
   state.age++;
   state.event++;
   if(state.age%3===0)state.money+=15;
-  maybeTriggerSpecialPhotoEvent();
+  // 태빈이 키우기에서는 특별 사진첩 이벤트를 진행하지 않음.
   worldAnnualUpdate();
   ensureLifeArc();
   if(state.lifeRoute==="military"&&state.age>=20&&state.age<22){state.money+=60;state.log.push("🪖 "+state.age+"살 · 복무 중 생활 지원금 수령");}
@@ -3184,12 +3184,12 @@ function openAppModal(view="menu"){
  else if(view==="absurd")renderAbsurdAlbum();
  else if(view==="story")renderStoryJournal();
  else if(view==="growth")renderGrowthGalleryModal();
- else if(view==="photoAlbum")renderSpecialPhotoAlbum();
+
  else if(view==="account")window.nuriRenderAccountPanel();
  else if(view==="lifeReview")renderLifeReviewModal();
  else if(view==="relationship")renderRomanceModal();
  else if(view==="social")nuriRenderSocial();
- else if(view==="ranking")renderNuriPublicRanking();
+ else if(view==="ranking")window.taebinRenderRanking?window.taebinRenderRanking():renderNuriPublicRanking();
  else if(view==="goals" && typeof window.renderTaebinGoalModal==='function')window.renderTaebinGoalModal();
  else if(view==="stocks")renderStockModal();
  else if(view==="crypto")renderNuriCrypto();
@@ -3217,7 +3217,7 @@ function renderMenuModal(){
   <div class="menu-grid">
    <button type="button" class="menu-tile" onclick="openAppModal('goals')"><span class="tile-icon">🌟</span><span><b>인생의 목표 100가지</b><small>직접 도전 · 달성 체크 · 100/100 완주</small></span></button>
    <button type="button" class="menu-tile" id="nuriUpdateMenuTile" onclick="window.nuriOpenUpdateStatus&&window.nuriOpenUpdateStatus()"><span class="tile-icon">📢</span><span><b>업데이트 현황</b><small>최신 버전 · 배포 내역 확인</small></span></button>
-   <button type="button" class="menu-tile" onclick="window.nuriPreviewPrologue&&window.nuriPreviewPrologue()"><span class="tile-icon">📖</span><span><b>프롤로그 다시 보기</b><small>기존 저장을 유지하며 횡단보도 이야기 감상</small></span></button>
+   <button type="button" class="menu-tile" onclick="window.nuriPreviewPrologue&&window.nuriPreviewPrologue()"><span class="tile-icon">📖</span><span><b>프롤로그 다시 보기</b><small>기존 저장을 유지하며 100칸 수첩 이야기 감상</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('account')"><span class="tile-icon">●</span><span><b>내 계정</b><small>로그인 상태 · 저장 동기화 · 로그아웃</small></span></button>
    <button class="menu-tile" onclick="openAppModal('absurd')"><span class="tile-icon">ㅋㅋ</span><span><b>황당 사건록</b><small>지나온 병맛 사건과 결과 모아보기</small></span></button>
    <button class="menu-tile" onclick="openAppModal('realestate')"><span class="tile-icon">🏠</span><span><b>부동산</b><small>매입 · 매도 · 임대 수익</small></span></button>
@@ -3236,7 +3236,7 @@ function renderMenuModal(){
    <button type="button" class="menu-tile" onclick="openAppModal('certificates')"><span class="tile-icon">🏅</span><span><b>자격증</b><small>공부 · 시험 · 취득하면 연봉 보너스</small></span></button>
    <button type="button" class="menu-tile" onclick="openAppModal('vehicles')"><span class="tile-icon">🚲</span><span><b>탈것 · 내 차고</b><small>자전거·차량 구매, 이용 및 판매</small></span></button>
    <button class="menu-tile" onclick="openAppModal('inventory')"><span class="tile-icon">🎒</span><span><b>아이템 창</b><small>아이템 구매와 사용</small></span></button>
-   <button class="menu-tile" onclick="openAppModal('photoAlbum')"><span class="tile-icon">📸</span><span><b>특별 이벤트 사진첩</b><small>플레이 중 해금하는 캐릭터 기념컷</small></span></button><button class="menu-tile" onclick="openAppModal('growth')"><span class="tile-icon">🧬</span><span><b>성장 앨범</b><small>아기부터 노년까지 실제 모습 비교</small></span></button><button class="menu-tile" onclick="openAppModal('story')"><span class="tile-icon">📖</span><span><b>스토리 앨범</b><small>나이에 따라 이어지는 태빈이의 이야기</small></span></button>
+<button class="menu-tile" onclick="openAppModal('growth')"><span class="tile-icon">🧬</span><span><b>성장 앨범</b><small>아기부터 노년까지 실제 모습 비교</small></span></button><button class="menu-tile" onclick="openAppModal('story')"><span class="tile-icon">📖</span><span><b>스토리 앨범</b><small>나이에 따라 이어지는 태빈이의 이야기</small></span></button>
    ${!state.alive?'<button class="menu-tile" onclick="openAppModal(&quot;lifeReview&quot;)"><span class="tile-icon">📜</span><span><b>인생 회고록</b><small>태빈이가 걸어온 길 다시 보기</small></span></button>':''}
    <button class="menu-tile" onclick="openAppModal('career')"><span class="tile-icon">🧭</span><span><b>진로·적성 창</b><small>태빈이의 선택으로 쌓인 진로 점수</small></span></button>
    <button class="menu-tile" onclick="openAppModal('settings')"><span class="tile-icon">⚙️</span><span><b>설정 창</b><small>화면과 플레이 설정</small></span></button>
