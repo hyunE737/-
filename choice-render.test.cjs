@@ -57,3 +57,68 @@ for(const [family,startIndex] of [['ordinary',0],['supportive',1],['frugal',2],[
  assert.equal(game.run('state.age'),100,family+' did not reach an ending');
 }
 console.log('PASS full script: adult route reloads, invalid saved choices, turning points, queued stories and all four families through age 100');
+
+const snapshot=game=>JSON.parse(game.run('JSON.stringify(state)'));
+for(const [family,speed] of [['ordinary','normal'],['wealthy','normal'],['supportive','fast'],['frugal','turbo']]){
+ let game=mount();
+ game.run(`selectFamily(${JSON.stringify(family)});startGame();state.settings.gameSpeed=${JSON.stringify(speed)};state.settings.realisticLife=false`);
+ const seen=new Set();
+ let birthdays=0;
+ for(let step=0;game.run('state.age<3')&&step<60;step++){
+  const prompt=game.get('story').textContent;
+  assert.ok(!seen.has(prompt),family+' repeated '+prompt);
+  seen.add(prompt);
+  const age=game.run('state.age');
+  if(prompt.includes('누리의 첫 생일')){
+   assert.equal(age,1);
+   birthdays++;
+   game=mount(snapshot(game));
+   assert.equal(game.get('story').textContent,prompt,'Pending birthday was lost on reload');
+  }
+  const [action,index]=readChoices(game)[0];
+  game.run(`${action}(${index})`);
+ }
+ assert.equal(game.run('state.age'),3);
+ assert.equal(birthdays,1,family+' birthday did not happen once');
+ assert.equal(game.run('state.storyJournal.filter(entry=>entry.age===1).length'),1);
+}
+
+const oldBaby=mount({...core,age:1,yearDay:2,sceneTurn:12,storySeen:[0]});
+assert.equal(oldBaby.run('state.pendingStory'),null,'Midyear legacy save replayed a birthday');
+assert.doesNotMatch(oldBaby.get('story').textContent,/첫 생일/);
+const oldChild=mount({...core,age:3,sceneTurn:8,storySeen:[0,3],log:['3살 · DAY 1 · 성장 2/5: ✂️ 종이 동물 접기']});
+assert.ok(oldChild.run('dailySceneCursor("child")')>0,'Legacy scene history was lost');
+assert.doesNotMatch(oldChild.get('story').textContent,/색종이로 무엇이든/);
+const resting=mount({...core,stats:{...core.stats,health:80},age:2,yearDay:0,storySeen:[0,1,2]});
+const beforeRest=resting.get('story').textContent;
+resting.run('restNow()');
+assert.notEqual(resting.get('story').textContent,beforeRest,'A new day repeated a scene after rest');
+
+let lifetime=mount();
+lifetime.run('startGame();state.settings.gameSpeed="normal";state.settings.realisticLife=false;state.settings.randomEvents=false');
+const lifetimeScenes=new Set();
+const recurring=new Map([[25,'졸업 발표를 준비할 때는'],[35,'하린은 처음 만났을 때'],[70,'앨범에서 한 살 때']]);
+let generated=0;
+let absurd=0;
+for(let step=0;lifetime.run('state.alive')&&step<1900;step++){
+ const [[action,index]]=readChoices(lifetime);
+ const age=lifetime.run('state.age');
+ const prompt=lifetime.get('story').textContent;
+ if(action==='choose'&&!lifetime.run('(state.age===16&&!state.schoolPath)||(state.age===19&&!state.adultPath)')){
+  assert.ok(!lifetimeScenes.has(prompt),`${age} years old repeated ${prompt}`);
+  lifetimeScenes.add(prompt);
+  if(prompt.includes('에 있을 때야.'))generated++;
+  if(prompt.startsWith('오늘의 황당 사건'))absurd++;
+ }
+ if(action==='chooseStoryOption'&&recurring.has(age)&&prompt.includes(recurring.get(age)))recurring.delete(age);
+ if(age===56&&lifetime.run('state.yearDay===0&&state.progress===0')){
+  lifetime=mount(snapshot(lifetime));
+  assert.equal(lifetime.get('story').textContent,prompt,'Reload changed the current scene');
+ }
+ lifetime.run(`${action}(${index})`);
+}
+assert.equal(lifetime.run('state.age'),100);
+assert.ok(generated>500,'Generated scenes were not exercised');
+assert.ok(absurd>10,'Special scenes were not exercised');
+assert.equal(recurring.size,0,'Recurring stories did not recall earlier decisions');
+console.log(`PASS ${lifetimeScenes.size} distinct life choices through age 100, one birthday, legacy saves, rest, and three recurring themes`);
