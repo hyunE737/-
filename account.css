@@ -23,3 +23,10 @@
 .nuri-account-panel{display:grid;gap:11px}.nuri-account-panel b{color:#fff}.nuri-account-panel small{color:#b4c4d8}.nuri-account-panel .nuri-auth-action{padding:12px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#eff5ff;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:46px}
 .nuri-account-panel .nuri-auth-action.danger{color:#ffd1d1}
 @media(max-width:520px){.nuri-account-shell{padding:25px 19px;border-radius:22px}.nuri-account-gate{place-items:start center}.nuri-account-heading h1{font-size:30px}}
+
+.nuri-start-guide{margin:0 0 16px;border:1px solid #c5d7cb;border-radius:13px;background:#eef4ec;color:#243e35}
+.nuri-start-guide summary{min-height:44px;padding:11px 14px;color:#235443;font-size:15px;font-weight:800;line-height:1.5;cursor:pointer;touch-action:manipulation}
+.nuri-start-guide summary:focus-visible{outline:2px solid #34735c;outline-offset:2px;border-radius:12px}
+.nuri-start-guide ol{margin:0 14px 14px;padding:11px 0 0 22px;border-top:1px solid #c5d7cb;font-size:14px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere}
+.nuri-start-guide li+li{margin-top:8px}
+.nuri-start-guide strong{color:#235443}
