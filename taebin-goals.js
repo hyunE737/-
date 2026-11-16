@@ -261,7 +261,7 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     ensure();activeQuest=null;
     modalHeader('한태빈의 인생 목표 100가지','TAEBIN LIFE · STORY QUEST');
     const done=count(),ongoing=Object.keys(state.taebinGoalRuns).filter(id=>!completed(id)).length;
-    const head='<div class="taebin-goal-head"><b>달성 '+done+' / 100</b><span>도전 중 '+ongoing+'개</span></div><div class="taebin-goal-progress"><i style="width:'+done+'%"></i></div><p class="taebin-goal-hint">목표를 누르면 고유 스토리가 시작돼. 쉬운 꿈은 2단계, 어려운 꿈은 최대 8단계에 걸쳐 도전해. 같은 목표의 다음 장면은 게임 속 다음 날에 열려.</p>';
+    const head='<div class="taebin-goal-head"><b>달성 '+done+' / 100</b><span>도전 중 '+ongoing+'개</span></div><div class="taebin-goal-progress"><i style="width:'+done+'%"></i></div><p class="taebin-goal-hint">목표를 누르면 이야기가 시작돼. 쉬운 꿈은 2단계, 전설 난이도는 8단계야. 실패하면 다시 준비하고, 다음 장면은 게임 속 다음 날에 도전할 수 있어.</p>';
     const menu='<div class="taebin-goal-filter"><button type="button" data-filter="all" onclick="taebinGoalFilter(\'all\')">전체</button>'+CATEGORIES.map(c=>'<button type="button" data-filter="'+c.id+'" onclick="taebinGoalFilter(\''+c.id+'\')">'+c.icon+' '+c.name+'</button>').join('')+'</div>';
     const selected=CATEGORIES.filter(c=>activeFilter==='all'||activeFilter===c.id);
     const groups=selected.map(c=>{
@@ -300,7 +300,8 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     const needsMoney=r.stage>=1&&!r.paid&&budget>0;
     if(needsMoney&&state.money<budget){showToast('준비 비용이 부족해. '+formatWon(budget)+'이 필요해.');return questPanel(id);}
     if(needsMoney){state.money=Math.max(0,Math.round((state.money-budget)*100)/100);r.paid=true;}
-    const [label,success,shortcoming]=CHOICE_VERBS[g.category][index];
+    const [label,success]=CHOICE_VERBS[g.category][index];
+    const shortcoming=success;
     const title='도전 · '+g.name+' · '+nameOfPhase(g,r);
     const intro=sceneFor(g,r);
     r.attempts++;
