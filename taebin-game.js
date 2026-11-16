@@ -1752,10 +1752,40 @@ const FAMILY_STORY_VARIANTS={
  }
 };
 
+
+/* 태빈이 전용 서사: 100개의 별 수첩과 친구 가온이를 중심으로 0~99살까지 매년 새로운 이야기 생성. */
+const TAEBIN_MAIN_BEATS=[[0,"하얀 표지의 100칸 수첩","한태빈이 태어난 날, 가족은 빈 별 모양 100개가 그려진 수첩을 침대 곁에 두었어. 돈이나 성적이 아닌, 스스로 살아가며 꼭 경험해 보고 싶은 일을 한 칸씩 채우자는 약속이야."],[3,"첫 번째 별이 반짝이는 날","세 살 태빈이는 창가에서 별을 세다 수첩에 손가락으로 동그라미를 그렸어. 가족은 태빈이가 좋아하는 것부터 찾아보자고 했지."],[7,"비밀 수첩의 짝꿍","학교에 입학한 태빈이는 운동장 벤치에 100칸 수첩을 두고 갔어. 같은 반 가온이가 수첩을 찾아주며 '나도 이런 걸 적고 싶다'고 말했어."],[10,"도서관의 봉인된 지도","가온이와 도서관을 찾은 태빈이는 동네의 오래된 장소를 표시한 지도를 발견했어. 평범한 골목에 숨은 새로운 경험을 찾기로 했어."],[13,"한 번뿐인 중학교 축제","축제 준비위원을 모집한다는 공고가 붙었어. 태빈이는 목표 수첩을 채우려면 직접 무대 뒤로 들어가야 한다는 걸 깨달았어."],[16,"수첩을 잃어버린 오후","누군가 태빈이의 목표 수첩을 장난으로 숨겼어. 수첩보다 더 중요한 건 그동안 쌓인 추억과 태빈이의 태도야."],[18,"갈림길에 놓인 백 개의 꿈","졸업을 앞둔 태빈이는 대학, 직업, 여행 중 어느 길부터 시작할지 고민해. 길마다 이룰 수 있는 목표의 모습도 달라질 거야."],[20,"첫 자취방의 벽 한쪽","새로운 생활이 시작되고, 태빈이는 벽 한쪽에 목표 100개의 현황표를 붙였어. 삶을 지탱할 돈과 꿈을 이룰 시간 사이의 균형을 고민해."],[25,"가온이의 뜻밖의 제안","어릴 때 수첩을 돌려준 가온이에게 연락이 왔어. 함께 지역 청소년을 위한 창작 행사를 열면 어떻겠냐는 제안이야."],[30,"인생의 첫 큰 전시","태빈이는 지금껏 배운 것과 만든 것을 작은 전시로 엮으려 해. 이름난 성공보다는 그 과정에서 함께한 사람들의 이야기를 보여주고 싶어."],[40,"별이 아닌 시간을 세는 법","40살이 된 태빈이는 목표 수첩을 펼쳤어. 체크하지 못한 목표도 있고 계획보다 오래 걸린 꿈도 있어. 무엇을 더 소중히 해야 할까?"],[50,"오래된 수첩, 새로운 목소리","정리하던 책장 속에서 첫 번째 수첩을 발견했어. 예전에는 세상에 보여주고 싶었던 일들이 이제 누군가를 도울 경험이 되었어."],[60,"첫 번째 별을 기억하며","태빈이는 수첩의 맨 앞장에 적힌 삐뚤빼뚤한 글씨를 읽었어. 어릴 적 작은 호기심이 지금의 삶을 만들어 왔다는 걸 느꼈어."],[70,"가온이에게 쓰는 긴 편지","아주 오랜 친구 가온이와 오래전 운동장 벤치 이야기를 나눴어. 사람들과 함께했던 시간이 수첩의 별보다 더 크게 남았어."],[80,"다음 세대의 수첩","태빈이의 기록을 본 젊은 사람이 자신만의 꿈 수첩을 만들고 싶다고 말해. 태빈이는 무엇을 알려줄까?"],[90,"마지막 페이지가 아니라","수첩의 낡은 표지를 고치며 태빈이는 아직도 배우고 싶은 것이 떠오른다는 사실을 깨달았어. 나이와 상관없이 새 목표를 만들 수 있지."]];
+const TAEBIN_YEAR_SCENES=[["동네 구석구석 관찰하기","익숙한 풍경을 새롭게 기록해 봤어.","intelligence"],["가온이와 근황 나누기","오래된 친구와 함께 일상 속 기쁨을 찾았어.","social"],["오늘의 순간을 사진으로 찍기","작은 사진 하나가 오래 남을 기억이 됐어.","creativity"],["안전한 새 활동 도전하기","새로운 경험으로 용기를 얻었어.","health"],["다른 사람의 이야기를 듣기","서로 다른 삶에서 배울 것을 발견했어.","social"],["읽고 싶은 책 고르기","책을 통해 전에는 몰랐던 세상을 만났어.","intelligence"],["가족을 위한 소박한 선물 준비하기","마음을 담은 행동이 가족에게 큰 기쁨이 됐어.","happiness"],["직접 작은 작품 완성하기","아이디어를 끝까지 실현하는 성취감을 느꼈어.","creativity"],["공원에서 자연 기록하기","바쁜 하루에 쉼표를 찍고 주변을 돌아봤어.","health"],["내일의 작은 약속 정하기","거창한 계획보다 지킬 수 있는 첫걸음이 중요했어.","intelligence"]];
+const TAEBIN_MAIN_CHOICES=[["가온이와 함께 해결 방법 찾기","혼자라면 놓쳤을 생각을 함께 발견했어.","social","people"],["직접 기록하고 작품으로 남기기","작은 경험도 오래 남을 이야기로 바뀌었어.","creativity","art"],["차근차근 계획을 세워 실천하기","한 번에 모든 걸 이루기보다 한 걸음 나아갔어.","intelligence","research"]];
+const TAEBIN_STORY_STAGE_NAMES=["첫 발견","호기심의 계절","작은 모험","우정의 기록","새로운 질문","자기만의 길","도전의 흔적","함께한 사람","다음 꿈","다시 시작"];
+const TAEBIN_FAMILY_WORLDS={
+ wealthy:'대저택에서 가족의 명예와 일정표 사이에 놓인 태빈이는 자유롭게 경험을 쌓을 방법을 찾아야 해. 넉넉한 자산보다 중요한 건 스스로 이룬 일이라는 약속이야.',
+ supportive:'부모님은 태빈이가 이루고 싶은 경험을 적은 수첩을 함께 읽으며 응원해 줬어. 단, 스스로 꿈을 포기하면 특별한 지원도 멈추기로 했어.',
+ ordinary:'평범한 동네의 작은 식탁에서 가족은 특별한 돈보다 서로의 약속을 먼저 챙겼어. 소박한 일상이 목표를 이루는 첫 무대가 됐어.',
+ frugal:'생활비가 빠듯한 집에서 태빈이는 비싼 준비물 없이 시작할 수 있는 목표부터 찾았어. 가족은 서로의 재능과 시간을 나누기로 했어.'
+};
+function taebinStoryChapter(age){
+ const main=TAEBIN_MAIN_BEATS.find(chapter=>chapter[0]===age);
+ const index=Math.floor(age)%TAEBIN_YEAR_SCENES.length;
+ const moment=TAEBIN_YEAR_SCENES[index];
+ const familyMessage=TAEBIN_FAMILY_WORLDS[state.family]||'한태빈은 자신만의 꿈을 찾아가고 있어.';
+ const complete=typeof window.taebinGoalCount==='function'?window.taebinGoalCount():0;
+ const start=age===0?'어떤 첫걸음을 남길까?':age<7?'오늘은 어떤 작은 경험이 좋을까?':age<18?'이번 해 수첩에는 무엇을 남길까?':'앞으로 어떤 꿈을 향해 나아갈까?';
+ const title=main?main[1]:age+'살 · '+TAEBIN_STORY_STAGE_NAMES[index];
+ const text=(main?main[2]:'태빈이의 '+age+'번째 생일이 지나고 새로운 한 해가 시작됐어. 이번에는 '+moment[0]+'. '+moment[1])
+  +' '+familyMessage+' '+start+' 지금까지 완료한 인생 목표는 '+complete+'/100개야.';
+ const options=TAEBIN_MAIN_CHOICES.map(([label,outcome,stat,careerId],idx)=>({
+  label:label,effect:[stat,4,'happiness',1],
+  outcome:outcome+' 수첩에 '+age+'살의 경험을 기록했어.',
+  careerId,flag:idx===0?'friends':idx===1?'art':'plans',bond:idx===0?1:0
+ }));
+ return {title,text,options};
+}
+
 function familyStoryChapter(age){
- const source=age===0?familyOpeningChapter():(STORY_CHAPTERS[age] || FAMILY_CHAPTERS[state.family]?.[age]);
+ const source=taebinStoryChapter(age);
  if(!source)return null;
- const variant=FAMILY_STORY_VARIANTS[state.family]?.[age];
+ const variant=null; // 태빈이 고유 에피소드를 누리 버전 공통 서사가 덮어쓰지 않도록 함
  const chapter={...source,family:state.family,options:source.options.map((option,index)=>({
   ...option,...(variant?{label:variant.choices[index][0],outcome:variant.choices[index][1]}:{})
  }))};
