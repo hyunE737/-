@@ -509,6 +509,7 @@ function finishLife(reason){
  if(!state.alive)return;
  state.alive=false;
  state.deathCause=reason;
+ if(typeof window.taebinGoalOnLifeEnd==='function')window.taebinGoalOnLifeEnd(reason);
  state.pendingStory=null;
  state.pendingTurningPoint=null;
  state.arcQueue=[];
