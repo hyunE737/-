@@ -122,3 +122,50 @@ assert.ok(generated>500,'Generated scenes were not exercised');
 assert.ok(absurd>10,'Special scenes were not exercised');
 assert.equal(recurring.size,0,'Recurring stories did not recall earlier decisions');
 console.log(`PASS ${lifetimeScenes.size} distinct life choices through age 100, one birthday, legacy saves, rest, and three recurring themes`);
+
+const progressPerDay=new Map();
+const relationshipPerChoice=new Map();
+const growthKeys=['intelligence','creativity','social','charm'];
+const skillTotal=game=>growthKeys.reduce((total,key)=>total+game.run(`state.stats.${key}`),0);
+let storyGrowth;
+for(const [mode,steps,multiplier] of [['normal',5,1],['fast',2,2.5],['turbo',1,5]]){
+ const game=mount({...core,age:10,storySeen:[10]});
+ game.run(`setGameSpeed('${mode}')`);
+ assert.equal(game.run('growthRequired(state.age)'),steps);
+ const initial=skillTotal(game);
+ const effect=game.run('actualEffect(currentChoices[0].effect,true)');
+ for(let i=0;i<effect.length;i+=2){
+  if(!growthKeys.includes(effect[i]))continue;
+  const base=game.run(`actualEffect(currentChoices[0].effect)[${i+1}]`);
+  assert.equal(effect[i+1],Math.round(base*multiplier*10)/10);
+  const name=game.run(`labels['${effect[i]}']`);
+  assert.ok(game.get('choices').innerHTML.includes(`${name} +${effect[i+1]}`));
+ }
+ for(let step=0;step<steps;step++)game.run('choose(0)');
+ assert.equal(game.run('state.yearDay'),1);
+ assert.equal(game.run('state.stats.health'),85-steps);
+ progressPerDay.set(mode,skillTotal(game)-initial);
+ assert.equal(mount(snapshot(game)).run('state.settings.gameSpeed'),mode);
+
+ const story=mount();
+ story.run(`startGame();setGameSpeed('${mode}')`);
+ const before=skillTotal(story);
+ story.run('chooseStoryOption(0)');
+ const gain=skillTotal(story)-before;
+ if(storyGrowth===undefined)storyGrowth=gain;
+ assert.equal(gain,storyGrowth,'A fixed-age chapter was multiplied');
+
+ const relationship=mount({...core,storySeen:[20],settings:{...core.settings,gameSpeed:mode}});
+ const beforeRelationship=skillTotal(relationship);
+ relationship.run('romanceAction("alone")');
+ relationshipPerChoice.set(mode,skillTotal(relationship)-beforeRelationship);
+
+ const otherEffects=game.run('JSON.stringify(actualEffect(["money",20,"happiness",2,"health",-1],true))');
+ assert.equal(otherEffects,game.run('JSON.stringify(actualEffect(["money",20,"happiness",2,"health",-1]))'));
+}
+for(const speed of ['fast','turbo']){
+ assert.ok(Math.abs(progressPerDay.get(speed)-progressPerDay.get('normal'))<=.21,'Daily stats not balanced');
+ const multiplier=speed==='fast'?2.5:5;
+ assert.ok(Math.abs(relationshipPerChoice.get(speed)-relationshipPerChoice.get('normal')*multiplier)<=.11);
+}
+console.log('PASS growth balance per game day, displayed totals, romance actions, fixed-age chapters and saved speed');

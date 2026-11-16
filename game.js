@@ -475,6 +475,7 @@ function extraChoices(age){
 const GAME_SPEEDS={normal:{name:"보통",steps:5,mark:"▶"},fast:{name:"빠름",steps:2,mark:"⏩"},turbo:{name:"초고속",steps:1,mark:"⚡"}};
 function gameSpeed(){return GAME_SPEEDS[state.settings?.gameSpeed]||GAME_SPEEDS.fast;}
 function growthRequired(age){return gameSpeed().steps;}
+function growthPerChoice(mode=gameSpeed()){return GAME_SPEEDS.normal.steps/mode.steps;}
 function setGameSpeed(speed){
  if(!GAME_SPEEDS[speed])return;
  ensurePlayerExtras();
@@ -1828,7 +1829,8 @@ function nuriChoiceEscape(value){
 }
 function nuriOptionCard(option,index,handler,extraClass=""){
  const label=nuriChoiceClean(option.label||"선택하기");
- const fx=Array.isArray(option.effect)?actualEffect(option.effect):[];
+ const fillsGrowth=handler==="choose";
+ const fx=Array.isArray(option.effect)?actualEffect(option.effect,fillsGrowth):[];
  const costAndGrowth=[];
  for(let i=0;i<fx.length;i+=2){
   const key=fx[i],val=Number(fx[i+1]);
@@ -1838,7 +1840,7 @@ function nuriOptionCard(option,index,handler,extraClass=""){
   const sign=val>0?"+":"−";
   costAndGrowth.push(`<span class="nuri-option-stat ${val>0?"is-gain":"is-cost"}">${nuriChoiceEscape(title)} ${sign}${nuriChoiceEscape(amount)}</span>`);
  }
- const summary=nuriChoiceClean(effectSummary(option.effect||[]));
+ const summary=nuriChoiceClean(effectSummary(option.effect||[],fillsGrowth));
  let description=nuriChoiceClean(option.desc||"");
  if(summary&&description.endsWith(summary))description=description.slice(0,-summary.length).replace(/[\s·•,;:]+$/u,"").trim();
  if(/^이 경험으로 두 가지 능력이 성장해[.!]?$/u.test(description))description="";
@@ -2100,21 +2102,23 @@ function restNow(){
  toast(state.age!==beforeAge?"충분히 쉬었어! "+state.age+"살로 성장했어.":"하루 쉬고 체력을 회복했어!");
 }
 
-function actualEffect(effect){
+function actualEffect(effect,fillsGrowth=false){
  const slow=state.settings?.slowGrowth!==false;
+ const multiplier=fillsGrowth?growthPerChoice():1;
  return effect.map((v,i)=>{
   if(i%2===0)return v;
   const key=effect[i-1];
   if(key==="health"&&v<0)return -1;
   let value=slow?(v>0?Math.max(.2,Math.round(v*.22*10)/10):Math.min(-.2,Math.round(v*.3*10)/10)):v;
-  if(v>0&&["intelligence","creativity","social","charm"].includes(key)){
+  if(v>0&&GROWTH_SKILLS.includes(key)){
    value=Math.max(.1,Math.round(value*fatigueEfficiency()*10)/10);
+   value=Math.round(value*multiplier*10)/10;
   }
   return value;
  });
 }
-function effectSummary(effect){
- effect=actualEffect(effect);
+function effectSummary(effect,fillsGrowth=false){
+ effect=actualEffect(effect,fillsGrowth);
  const parts=[];
  for(let i=0;i<effect.length;i+=2){
   const key=effect[i], value=effect[i+1];
@@ -2597,7 +2601,7 @@ function nuriAbsurdChoices(scene,age){
   const effect=growthEffect(source,label,index,used);
   if(mood)effect.push('happiness',mood);
   const risky=age>=13&&index===3;
-  return {label,effect,desc:(risky?'너무 무리한 선택은 후회가 남을 수 있어. ':'뜻밖의 하루를 어떻게 보낼까? ')+effectSummary(effect),
+  return {label,effect,desc:risky?'너무 무리한 선택은 후회가 남을 수 있어.':'뜻밖의 하루를 어떻게 보낼까?',
    outcome,detour:risky,absurd:true,absurdId:scene.id,absurdPrompt:scene.prompt,sceneId:scene.id};
  });
 }
@@ -2744,14 +2748,14 @@ function sceneChoices(scene,age){
      const label=age<20?"🤝 친구에게 실수를 인정하고 사과하기":"🤝 상대에게 책임을 인정하고 신뢰 회복하기";
      const effect=growthEffect(["social",5,"charm",2],label,index,used);
      return {label,effect,recovery:true,sceneId:scene.id,
-       desc:"사과하고 다시 시작할 기회 · "+effectSummary(effect),
+       desc:"사과하고 다시 시작할 기회",
        outcome:"잘못을 인정하고 진심으로 사과했어. 관계를 회복할 작은 기회가 생겼어."};
    }
    const gain=SCENE_STATS[gainCode], cost=SCENE_STATS[costCode];
    const risky=age>=13&&index===3;
    const original=[gain,gain==="money"?18:4,cost,cost==="money"?-12:-2];
    const effect=growthEffect(original,label,index,used);
-   const description=(risky?"⚠️ 관계나 미래에 좋지 않은 영향이 남을 수 있어. ":"이 경험으로 두 가지 능력이 성장해. ")+effectSummary(effect);
+   const description=risky?"⚠️ 관계나 미래에 좋지 않은 영향이 남을 수 있어.":"";
    return {label,effect,desc:description,detour:risky,sceneId:scene.id,
      outcome:risky?"순간의 편함을 택했지만 주변 사람의 신뢰에 영향을 남겼어.":"이번 경험으로 두 가지 능력을 키웠어. 체력은 조금 소모했어."};
  });
@@ -2997,8 +3001,8 @@ function render(){
    const used=new Set();
    opts=opts.map((o,i)=>{
      const fx=growthEffect(o.effect,o.label,i,used);
-     const intro=o.detour?"⚠️ 선택은 이후 관계에도 영향을 줄 수 있어. ":(o.desc?o.desc.split(" · ")[0]+" · ":"");
-     return {...o,effect:fx,desc:intro+effectSummary(fx)};
+     const intro=o.detour?"⚠️ 선택은 이후 관계에도 영향을 줄 수 있어.":(o.desc?o.desc.split(" · ")[0]:"");
+     return {...o,effect:fx,desc:intro};
    });
   }
   currentChoices=opts;
@@ -3045,7 +3049,7 @@ function choose(n){
  if(!state.alive||state.pendingTurningPoint||state.pendingStory)return;
  let age=state.age??0;
  let chosen=currentChoices[n]; if(!chosen)return;
- let effect=actualEffect(chosen.effect);
+ let effect=actualEffect(chosen.effect,true);
  const fatigueBefore=fatigueTier();
  state.totalChoices=Math.max(0,Number(state.totalChoices)||0)+1;
  if(/건강검진|정기검진|진료|건강 관리|꾸준히 운동|규칙적으로 운동/.test(chosen.label))adjustHealthRisk(-4);
@@ -3232,7 +3236,7 @@ function renderSettingsModal(){
  ensurePlayerExtras();
  modalHeader("설정","누리 키우기 · SETTINGS");
  const settings=state.settings;
- const speedButtons=Object.entries(GAME_SPEEDS).map(([key,mode])=>`<button type="button" class="tempo-mode ${settings.gameSpeed===key?"selected":""}" aria-pressed="${settings.gameSpeed===key}" onclick="setGameSpeed('${key}')"><b>${mode.mark} ${mode.name}</b><small>${mode.steps}번 선택 / 1일</small></button>`).join("");
+ const speedButtons=Object.entries(GAME_SPEEDS).map(([key,mode])=>`<button type="button" class="tempo-mode ${settings.gameSpeed===key?"selected":""}" aria-pressed="${settings.gameSpeed===key}" onclick="setGameSpeed('${key}')"><b>${mode.mark} ${mode.name}</b><small>하루 ${mode.steps}번 · 성장 ${growthPerChoice(mode)}배</small></button>`).join("");
  const rows=[
   ["slowGrowth","느린 능력치 성장","선택 한 번에 능력치가 조금씩 올라가도록 조절"],
   ["randomEvents","랜덤 생활 이벤트","아기 감기·성장통·학교생활 등 예상 밖의 상황"],
@@ -3245,7 +3249,7 @@ function renderSettingsModal(){
   ["confirmReset","초기화 전 확인","처음부터 다시 시작할 때 확인창 표시"],
   ["realisticLife","변동 수명 시스템","게임 속 건강 위험·질환·나이·드문 사건에 따라 100살 이전에도 인생 종료"]
  ];
- document.getElementById("appModalBody").innerHTML=`<div class="tempo-settings"><b>⚙ 게임 진행 속도 선택</b><p class="modal-hint">보통: 5회 선택 / 빠름: 2회 선택 / 초고속: 1회 선택하면 하루가 지나. 어느 모드든 3일 지나면 나이가 1살 늘어나.</p><div class="tempo-mode-list">${speedButtons}</div></div><div class="settings-list">${rows.map(([key,title,desc])=>`
+ document.getElementById("appModalBody").innerHTML=`<div class="tempo-settings"><b>⚙ 게임 진행 속도 선택</b><p class="modal-hint">빠른 속도일수록 성장 게이지를 채우는 선택 한 번에 지능·창의력·인간관계·매력이 더 많이 올라. 어느 모드든 3일 지나면 나이가 1살 늘어나.</p><div class="tempo-mode-list">${speedButtons}</div></div><div class="settings-list">${rows.map(([key,title,desc])=>`
   <div class="setting-row"><div><b>${title}</b><small>${desc}</small></div>
    <button class="switch-btn ${settings[key]?"on":""}" onclick="toggleGameSetting('${key}')">${settings[key]?"켜짐":"꺼짐"}</button>
   </div>`).join("")}</div>
@@ -3439,7 +3443,7 @@ function applyRomanceEvent(action,fromStory=false){
   // Relationship actions follow the same game balance: health -1, two skills up.
   const skillPairs={meet:['social','charm'],talk:['social','intelligence'],time:['social','creativity'],startDating:['charm','social'],marry:['social','charm'],disagree:['intelligence','charm'],repair:['social','intelligence'],breakup:['intelligence','creativity'],divorce:['intelligence','social'],alone:['creativity','intelligence']};
   const [a,b]=skillPairs[action]||['social','charm'];
-  const fx=actualEffect([a,3.4,b,2.8,'health',-1]);
+  const fx=actualEffect([a,3.4,b,2.8,'health',-1],true);
   for(let i=0;i<fx.length;i+=2){let key=fx[i],v=fx[i+1];state.stats[key]=limitStat(key,state.stats[key]+v);}
   state.totalChoices=Math.max(0,Number(state.totalChoices)||0)+1;
   advanceSceneTurn();
