@@ -1,0 +1,29 @@
+/* In-game social feed and character stories. */
+.social-feed{display:grid;gap:12px}
+.social-panel{min-width:0;margin:0 0 12px;padding:16px;border:1px solid #cddbd0;border-radius:16px;background:#f6f8f0;color:#25453a;overflow-wrap:anywhere}
+.social-feed>.social-panel{margin:0}
+.social-panel h3{margin:0 0 8px;font-size:18px;line-height:1.4}
+.social-panel p{margin:6px 0 10px;font-size:15px;line-height:1.75;white-space:pre-wrap}
+.social-panel small{color:#456457;font-size:13px;line-height:1.55}
+.social-callback{display:block;margin-bottom:8px;color:#41675a;font-size:14px;font-weight:700}
+.social-record{background:#fffdf5}
+.social-tabs,.social-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.social-actions{margin:10px 0 0}
+#appModal .social-tabs button{min-height:44px;padding:8px 14px;border:1px solid #bfcec3;border-radius:12px;background:#edf3eb;color:#274b3d;font:inherit;font-weight:750;cursor:pointer;touch-action:manipulation}
+#appModal .social-tabs button[aria-pressed="true"]{background:#245e51;border-color:#245e51;color:#fff}
+#appModal .social-actions .modal-action,#appModal .social-panel .modal-action{min-height:44px;white-space:normal;touch-action:manipulation}
+.social-compose{display:grid;gap:10px}
+.social-compose label{display:grid;gap:5px;font-weight:750}
+.social-compose .social-check{display:flex;align-items:center;gap:8px;min-height:44px;font-size:14px}
+#appModal .social-check input{min-height:0;flex:none;width:20px;height:20px;accent-color:#245e51}
+#appModal .social-compose textarea,#appModal .social-compose input:not([type=checkbox]):not([type=hidden]),#appModal .social-compose select{width:100%;min-width:0;padding:10px 12px;border:1px solid #acbfb2;border-radius:10px;background:#fffef9;font:inherit;font-size:16px}
+#appModal .social-compose select{width:auto;min-height:44px}
+.social-compose textarea{resize:vertical}
+.social-post .social-comment{margin:10px 0 0;padding-top:8px;border-top:1px solid #d9e2d8;font-size:14px}
+.social-comment summary{min-height:44px;line-height:1.6;padding:8px 0;font-weight:750;cursor:pointer}
+.social-post .social-portrait{display:block;width:100%;height:clamp(140px,40vw,225px);object-fit:contain;margin:10px 0;background:#e9f2e8;border-radius:12px;image-rendering:pixelated}
+@media(max-width:510px){
+ .social-panel{padding:14px}
+ .social-actions>.modal-action{flex:1 1 145px}
+ .social-tabs button{flex:1 1 auto}
+}

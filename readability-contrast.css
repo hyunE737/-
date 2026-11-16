@@ -77,8 +77,12 @@ body,#gameMain,#familyScreen,.app-modal-card,.feedback-area{color:#213a36!import
   color:#526158!important;border-color:#cbd6cb!important;
   box-shadow:none!important;cursor:not-allowed!important;
 }
-.stock-up{color:#116449!important}.stock-down{color:#9c302b!important}
-.stock-flat{color:#435e57!important}
+/* Korean market convention: red rises, blue falls, grey is unchanged. */
+#appModal .stock-up{color:#ad261f!important}
+#appModal .stock-down{color:#1c54a0!important}
+#appModal .stock-flat{color:#526169!important}
+.stock-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:12px 0;font-size:14px;line-height:1.6}
+.stock-legend span,.stock-delta{font-size:13px;font-weight:800;white-space:nowrap}
 .stock-trade-meta span,.stock-note,.stock-disclaimer{
   color:#3f584f!important;
 }

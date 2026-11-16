@@ -66,10 +66,16 @@ function formatWon(units){return Math.round((Number(units)||0)*1000).toLocaleStr
 const NURI_STOCK_FEE=.0015; // 거래당 0.15% 가상 수수료
 const NURI_GOAL_UNITS=10000000; // 100억 원 = 10,000,000 x 1,000원
 const NURI_STOCKS=[
- {id:'hanbit',name:'한빛전자',sector:'기술 · 성장형',start:22,drift:.125,vol:.070,about:'기술 개발에 따라 기회와 변동성이 있어.'},
- {id:'pureun',name:'푸른생활',sector:'생활 · 안정형',start:14,drift:.045,vol:.027,about:'오르내림이 비교적 작지만 수익도 완만해.'},
- {id:'mirae',name:'미래로봇',sector:'신기술 · 고변동형',start:34,drift:.19,vol:.125,about:'큰 폭으로 오르거나 급락할 수 있는 가상의 기업이야.'},
- {id:'haneul',name:'하늘에너지',sector:'에너지 · 변동형',start:19,drift:.09,vol:.080,about:'업계 뉴스에 따라 주가가 자주 움직여.'},
+ {id:'hanbit',name:'한빛전자',sector:'기술',profile:'성장형',start:22,drift:.125,vol:.070,about:'기술 개발에 따라 기회와 변동성이 있어.'},
+ {id:'pureun',name:'푸른생활',sector:'생활',profile:'안정형',start:14,drift:.045,vol:.027,about:'오르내림이 비교적 작지만 수익도 완만해.'},
+ {id:'mirae',name:'미래로봇',sector:'신기술',profile:'고변동형',start:34,drift:.19,vol:.125,about:'큰 폭으로 오르거나 급락할 수 있는 가상의 기업이야.'},
+ {id:'haneul',name:'하늘에너지',sector:'에너지',profile:'변동형',start:19,drift:.09,vol:.080,about:'업계 뉴스에 따라 주가가 자주 움직여.'},
+ {id:'doran',name:'도란게임즈',sector:'게임',profile:'고변동형',start:16,drift:.14,vol:.108,about:'신작 공개와 이용자 반응에 따라 등락이 커.'},
+ {id:'solbit',name:'솔빛바이오',sector:'바이오',profile:'고변동형',start:28,drift:.16,vol:.136,about:'연구 성과와 개발 일정에 민감해.'},
+ {id:'maru',name:'마루물류',sector:'물류',profile:'안정형',start:11,drift:.052,vol:.034,about:'배송 물량과 운송 비용에 영향을 받아.'},
+ {id:'yundam',name:'윤담식품',sector:'생활',profile:'안정형',start:9,drift:.04,vol:.022,about:'식품 소비와 원재료 가격에 반응해.'},
+ {id:'saegil',name:'새길모빌리티',sector:'에너지',profile:'변동형',start:24,drift:.091,vol:.085,about:'전동차 수요와 충전 비용에 따라 주가가 움직여.'},
+ {id:'byeol',name:'별마루미디어',sector:'콘텐츠',profile:'성장형',start:13,drift:.098,vol:.064,about:'새로운 콘텐츠의 흥행과 광고 수요에 반응해.'},
 ];
 const SPECIAL_EVENT_PHOTOS=[{"id": "photo1", "title": "첫 등교 기념", "desc": "친구를 만나는 등굣길을 기념했어.", "hint": "7살 이후 가끔 찾아오는 기념 촬영 이벤트에서 획득.", "src": "assets/nuri-b9023b7c01e1444d.webp"}, {"id": "photo2", "title": "슈퍼히어로 기분", "desc": "평범한 날에도 영웅 같은 기분이 들었어.", "hint": "13살 이후 병맛 이벤트에서 획득.", "src": "assets/nuri-d8bb5e18ecea3c0f.webp"}, {"id": "photo3", "title": "햇살 받는 오후", "desc": "밝은 햇살 아래 기분 좋은 하루를 보냈어.", "hint": "10살 이후 산책/셀카 이벤트에서 획득.", "src": "assets/nuri-93765d5a458889c6.webp"}, {"id": "photo4", "title": "카메라 장난 대작전", "desc": "익숙한 사진도 장난스러운 이야기로 남아.", "hint": "13살 이후 장난기 높은 이벤트에서 획득.", "src": "assets/nuri-f9059d33539f4408.webp"}, {"id": "photo5", "title": "느긋한 밤", "desc": "오랫동안 기억할 편안한 시간이었어.", "hint": "16살 이후 휴식/행복 이벤트에서 획득.", "src": "assets/nuri-0e83e4b3b01b6c4b.webp"}, {"id": "photo6", "title": "도시 탐험", "desc": "낯선 거리를 돌아다니며 새로운 풍경을 만났어.", "hint": "15살 이후 외출 이벤트에서 획득.", "src": "assets/nuri-5b1034624cefbf89.webp"}, {"id": "photo7", "title": "자신감 장착", "desc": "오늘 누리는 스스로를 응원했어.", "hint": "14살 이후 자신감 이벤트에서 획득.", "src": "assets/nuri-be6e77e7ae52000f.webp"}, {"id": "photo8", "title": "새로운 스타일", "desc": "새로운 모습으로 또 다른 도전을 시작했어.", "hint": "17살 이후 코미디 이벤트에서 획득.", "src": "assets/nuri-57a191206ddb6661.webp"}, {"id": "photo9", "title": "기분 좋은 날", "desc": "가장 많이 웃었던 순간을 간직했어.", "hint": "15살 이후 친구 이벤트에서 획득.", "src": "assets/nuri-5e44553e4c1e99f7.webp"},
  {"id":"photo10","title":"스튜디오 기념사진","desc":"카메라 앞에서 차분히 포즈를 취한 날.","hint":"18살 이후 특별 촬영 이벤트에서 가끔 획득.","src":"assets/special-album/studio-portrait.jpg","hideLockedPreview":true},
@@ -180,13 +186,18 @@ function stockProfitRate(sym){
  const prev=arr.length>1?Number(arr[arr.length-2]):Number(state.stocks[sym]);
  return prev>0?((state.stocks[sym]-prev)/prev*100):0;
 }
-function stockSpark(sym){
+function stockTrend(value){
+ return value>0?{className:'stock-up',label:'상승',mark:'▲'}:value<0?{className:'stock-down',label:'하락',mark:'▼'}:{className:'stock-flat',label:'보합',mark:'–'};
+}
+function stockMarketHeadline(){
+ return String(state.marketNews||'').split(' · ')[0];
+}
+function stockSpark(sym,trend){
  const series=(state.stockChart[sym]||[]).slice(-12);
  if(series.length<2)return '<div class="stock-note" style="margin:4px 0;padding:8px">첫 거래일 이후 주가 그래프가 나타나.</div>';
  const min=Math.min(...series),max=Math.max(...series),span=Math.max(.1,max-min);
  const path=series.map((v,i)=>[3+(i/(series.length-1))*294,43-((v-min)/span)*36].map(n=>n.toFixed(1)).join(',')).join(' ');
- const cls=series.at(-1)>=series[0]?'#337c66':'#b45146';
- return `<svg class="stock-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-label="최근 주가 흐름"><polyline points="${path}" fill="none" stroke="${cls}" stroke-width="2.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ return `<svg class="stock-spark ${trend.className}" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" aria-label="최근 주가 흐름 · 전일 대비 ${trend.label}"><polyline points="${path}" fill="none" stroke="currentColor" stroke-width="2.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function updateStockMarket(){
  if(!state.alive||state.age<18)return;
@@ -198,22 +209,24 @@ function updateStockMarket(){
   {name:'🧊 전반적인 시장 관망',sector:'전체',impact:-.010},
   {name:'📊 기업 실적 개선',sector:'전체',impact:.011},
   {name:'🌧️ 경제 불확실성 확대',sector:'전체',impact:-.022},
-  {name:'🔬 신기술 연구 성과',sector:'신기술',impact:.026}
+  {name:'🔬 신기술 연구 성과',sector:'신기술',impact:.026},
+  {name:'🎮 신작 게임 기대감',sector:'게임',impact:.023},
+  {name:'🧪 바이오 연구 성과 발표',sector:'바이오',impact:.028},
+  {name:'📦 운송비 부담 확대',sector:'물류',impact:-.016},
+  {name:'🎬 신규 콘텐츠 흥행',sector:'콘텐츠',impact:.019}
  ];
  const event=events[Math.floor(Math.random()*events.length)];
  const market=(Math.random()-.5)*.022;
- const lines=[];
  for(const k of NURI_STOCKS){
   const own=(Math.random()-.5)*k.vol*.66;
-  const sectorImpact=event.sector==='전체'?event.impact:event.sector==='기술'&&k.id==='hanbit'||event.sector==='생활'&&k.id==='pureun'||event.sector==='에너지'&&k.id==='haneul'||event.sector==='신기술'&&k.id==='mirae'?event.impact:0;
+  const sectorImpact=event.sector==='전체'||event.sector===k.sector?event.impact:0;
   const change=Math.max(-.14,Math.min(.14,(k.drift/360)+own+market+sectorImpact));
   const next=Math.round(state.stocks[k.id]*(1+change)*100)/100;
   state.stocks[k.id]=Math.max(1,Math.min(1e9,next));
   state.stockChart[k.id].push(state.stocks[k.id]);
   if(state.stockChart[k.id].length>30)state.stockChart[k.id].shift();
-  lines.push(k.name+' '+(change>=0?'+':'')+(change*100).toFixed(1)+'%');
  }
- state.marketNews=event.name+' · '+lines.join(' / ');
+ state.marketNews=event.name;
  checkWealthGoal();
 }
 function checkWealthGoal(){
@@ -240,7 +253,7 @@ function updateWealthHud(){
  const detail=document.getElementById('wealthDetail');if(detail){const p=worldWorthParts();detail.textContent='현금 '+formatWon(p.cash)+' · 주식 '+formatWon(p.stocks)+' · 부동산 '+formatWon(p.property)+' · 사업 '+formatWon(p.business)+' − 대출 '+formatWon(p.debt);}
  const portfolio=document.getElementById('stockPortfolioValue');if(portfolio)portfolio.textContent=formatWon(holdingsValue());
  const held=document.getElementById('stockHeldCount');if(held)held.textContent=NURI_STOCKS.filter(k=>state.holdings[k.id]>0).length+'개';
- const note=document.getElementById('stockMainNote');if(note)note.textContent=state.age<18?'18살이 되면 가상 주식 거래가 열려.':(state.goal100Achieved?'100억 목표를 달성했어! 계속 인생을 즐겨 봐.':state.marketNews||'가상 기업의 가격이 게임 하루마다 변해.');
+ const note=document.getElementById('stockMainNote');if(note)note.textContent=state.age<18?'18살이 되면 가상 주식 거래가 열려.':(state.goal100Achieved?'100억 목표를 달성했어! 계속 인생을 즐겨 봐.':stockMarketHeadline()||'가상 기업의 가격이 게임 하루마다 변해.');
  const hud=document.getElementById('cashHud');if(hud)hud.textContent=state.goal100Achieved?'100억 달성!':'순자산 '+formatWon(wealth);
 }
 function buyOrSellStock(id,side,all=false){
@@ -284,12 +297,14 @@ function renderStockModal(){
  const locked=state.age<18;
  const details=NURI_STOCKS.map(k=>{
   const count=state.holdings[k.id];
-  const rate=stockProfitRate(k.id);
-  const change=rate>0.005?'stock-up':rate<-.005?'stock-down':'stock-flat';
+  const rate=Number(stockProfitRate(k.id).toFixed(2));
+  const trend=stockTrend(rate);
+  const gain=(state.stocks[k.id]-state.stockAvgCost[k.id])*count;
+  const gainTrend=stockTrend(Math.round(gain*1000));
   return `<section class="stock-trade-card">
-   <div class="stock-trade-title"><div><b>${k.name}</b><small>${k.sector} · ${k.about}</small></div><div><div class="stock-trade-price">${formatWon(state.stocks[k.id])}</div><span class="stock-delta ${change}">${rate>=0?'+':''}${rate.toFixed(2)}%</span></div></div>
-   ${stockSpark(k.id)}
-   <div class="stock-trade-meta"><span>보유 ${count.toLocaleString('ko-KR')}주</span><span>평가 ${formatWon(count*state.stocks[k.id])}</span><span class="${(state.stocks[k.id]-state.stockAvgCost[k.id])*count>=0?'stock-up':'stock-down'}">평가손익 ${(state.stocks[k.id]-state.stockAvgCost[k.id])*count>=0?'+':''}${formatWon((state.stocks[k.id]-state.stockAvgCost[k.id])*count)} · 수익률 ${count&&state.stockAvgCost[k.id]>0?((state.stocks[k.id]/state.stockAvgCost[k.id]-1)*100).toFixed(1):'0.0'}%</span></div>
+   <div class="stock-trade-title"><div><b>${k.name}</b><small>${k.sector} · ${k.profile} · ${k.about}</small></div><div><div class="stock-trade-price ${trend.className}">${formatWon(state.stocks[k.id])}</div><span class="stock-delta ${trend.className}" aria-label="전일 대비 ${trend.label} ${Math.abs(rate).toFixed(2)} 퍼센트">${trend.mark} ${rate>0?'+':''}${rate.toFixed(2)}%</span></div></div>
+   ${stockSpark(k.id,trend)}
+   <div class="stock-trade-meta"><span>보유 ${count.toLocaleString('ko-KR')}주</span><span>평가 ${formatWon(count*state.stocks[k.id])}</span><span class="${gainTrend.className}">평가손익 ${Math.round(gain*1000)>0?'+':''}${formatWon(gain)} · 수익률 ${count&&state.stockAvgCost[k.id]>0?((state.stocks[k.id]/state.stockAvgCost[k.id]-1)*100).toFixed(1):'0.0'}%</span></div>
    <div class="stock-controls"><input id="stock-qty-${k.id}" aria-label="${k.name} 거래 수량" type="number" inputmode="numeric" value="1" min="1" step="1" ${locked||!state.alive?'disabled':''}/>
    <button type="button" class="buy" onclick="buyOrSellStock('${k.id}','buy')" ${locked||!state.alive?'disabled':''}>매수</button>
    <button type="button" class="sell" onclick="buyOrSellStock('${k.id}','sell')" ${locked||!state.alive||count===0?'disabled':''}>매도</button>
@@ -299,7 +314,8 @@ function renderStockModal(){
  }).join('');
  document.getElementById('appModalBody').innerHTML=`
   <div class="stock-overview"><div><small>현금</small><b>${formatWon(state.money)}</b></div><div><small>주식 평가액</small><b>${formatWon(holdingsValue())}</b></div><div><small>현재 순자산</small><b>${formatWon(total)}</b></div><div><small>100억까지</small><b>${formatWon(Math.max(0,NURI_GOAL_UNITS-total))}</b></div><div><small>매도해서 얻은 실현손익</small><b>${state.stockRealizedProfit>=0?'+':''}${formatWon(state.stockRealizedProfit)}</b></div></div>
-  <p class="stock-note"><b>🗞️ 오늘의 시장 뉴스</b> ${state.marketNews||'아직 첫 거래일이야.'}<br/><b>거래 수수료</b> 매수·매도 각각 0.15% · 수수료 포함 평균 매입가 적용<br/>${locked?'18살이 되면 주식 거래를 시작할 수 있어. 성장하면서 원하는 진로를 먼저 찾아 봐.':(!state.alive?'누리의 인생이 끝나 주식 거래가 종료됐어.':'주가는 하루마다 뉴스와 무작위 시장 상황에 따라 오르거나 내려. 수익과 손실은 보장되지 않아.')}<br/>가상 종목과 임의의 가격 변동으로 만든 게임 시스템이야. 실제 주식 투자 정보는 아니며 손실도 발생할 수 있어.</p>
+  <p class="stock-note"><b>🗞️ 오늘의 시장 뉴스</b> ${worldSafe(stockMarketHeadline())||'아직 첫 거래일이야.'}<br/><b>거래 수수료</b> 매수·매도 각각 0.15% · 수수료 포함 평균 매입가 적용<br/>${locked?'18살이 되면 주식 거래를 시작할 수 있어. 성장하면서 원하는 진로를 먼저 찾아 봐.':(!state.alive?'누리의 인생이 끝나 주식 거래가 종료됐어.':'주가는 하루마다 뉴스와 무작위 시장 상황에 따라 오르거나 내려. 수익과 손실은 보장되지 않아.')}<br/>가상 종목과 임의의 가격 변동으로 만든 게임 시스템이야. 실제 주식 투자 정보는 아니며 손실도 발생할 수 있어.</p>
+  <p class="stock-legend"><b>전체 ${NURI_STOCKS.length}종목</b><span class="stock-up">▲ 상승</span><span class="stock-down">▼ 하락</span><span class="stock-flat">– 보합</span></p>
   <div class="stock-market-grid">${details}</div>
   <div class="stock-history"><h3>거래 기록</h3><ul>${state.stockLedger.length?state.stockLedger.slice(0,10).map(x=>`<li>${String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</li>`).join(''):'<li>아직 거래 기록이 없어.</li>'}</ul></div>
   <div class="menu-actions"><button type="button" class="modal-action" onclick="openAppModal('menu')">메뉴로 돌아가기</button><button type="button" class="modal-action" onclick="closeAppModal()">게임 계속하기</button></div>`;
@@ -2945,6 +2961,7 @@ function openAppModal(view="menu"){
  else if(view==="account")window.nuriRenderAccountPanel();
  else if(view==="lifeReview")renderLifeReviewModal();
  else if(view==="relationship")renderRomanceModal();
+ else if(view==="social")nuriRenderSocial();
  else if(view==="stocks")renderStockModal();
  else if(view==="wealthGoal")renderWealthGoalModal();
  else if(['realestate','business','children','credit','careerWorld','friends','talents','achievements'].includes(view))worldRender(view);
@@ -2975,7 +2992,8 @@ function renderMenuModal(){
    <button class="menu-tile" onclick="openAppModal('children')"><span class="tile-icon">👪</span><span><b>자녀·가족</b><small>자녀 성장 · 가족 관계</small></span></button>
    <button class="menu-tile" onclick="openAppModal('credit')"><span class="tile-icon">🏦</span><span><b>대출·신용</b><small>대출 · 이자 · 상환</small></span></button>
    <button class="menu-tile" onclick="openAppModal('careerWorld')"><span class="tile-icon">💼</span><span><b>월급·승진</b><small>연봉 · 실적 · 승진</small></span></button>
-   <button class="menu-tile" onclick="openAppModal('friends')"><span class="tile-icon">🤝</span><span><b>친구·라이벌</b><small>우정 · 경쟁 · 관계</small></span></button>
+   <button class="menu-tile" onclick="openAppModal('friends')"><span class="tile-icon">🤝</span><span><b>주변 인물 · 친구와 라이벌</b><small>우정 · 경쟁 · 인물별 이야기</small></span></button>
+   <button class="menu-tile" onclick="openAppModal('social')"><span class="tile-icon">📱</span><span><b>누리스타</b><small>게임 속 피드 · 팔로우 · 메시지</small></span></button>
    <button class="menu-tile" onclick="openAppModal('talents')"><span class="tile-icon">◈</span><span><b>재능·특기</b><small>타고난 재능 · 훈련</small></span></button>
    <button class="menu-tile" onclick="openAppModal('achievements')"><span class="tile-icon">★</span><span><b>업적·엔딩</b><small>목표 · 인생 유형 · 보상</small></span></button>
    <button class="menu-tile" onclick="openAppModal('relationship')"><span class="tile-icon">♡</span><span><b>연애 · 결혼</b><small>만남, 교제, 결혼생활, 이혼</small></span></button>
@@ -3350,7 +3368,9 @@ const WORLD_ACHIEVEMENTS = [
 const WORLD_FRIENDS = [
  {id:'harin',name:'하린',trait:'어린 시절부터 이어진 소중한 친구'},
  {id:'eunwoo',name:'은우',trait:'배우고 도전하는 걸 좋아하는 친구'},
- {id:'junho',name:'준호',trait:'함께 일하며 성장하는 친구'}
+ {id:'junho',name:'준호',trait:'함께 일하며 성장하는 친구'},
+ {id:'seoyun',name:'서윤',trait:'동네 사진 동아리 친구',minAge:10},
+ {id:'jia',name:'지아',trait:'진로를 함께 고민하는 선배',minAge:16}
 ];
 function worldRound(v){return Math.round((Number(v)||0)*100)/100;}
 function worldSafe(v){return lifeReviewEscape(v);}
@@ -3594,9 +3614,8 @@ function worldAskPromotion(){
  worldCommit('승진에 성공했어! 직급 '+state.jobLevel+'단계','careerWorld');
 }
 function worldMeetFriend(id){
- if(!worldCanAct(7))return;
  const w=ensureWorld(),person=w.friends[id],def=WORLD_FRIENDS.find(f=>f.id===id);
- if(!person||!def)return;
+ if(!person||!def||!worldCanAct(def.minAge||7))return;
  if(person.lastAge===state.age)return toast('올해는 이미 시간을 보냈어. 다음 해에 또 만나 봐.');
  person.lastAge=state.age;person.bond=Math.min(100,person.bond+12);
  state.stats.social=limitStat('social',state.stats.social+.8);
@@ -3750,9 +3769,13 @@ function worldRender(view){
   html+=`<div class="world-feature"><div class="world-mini-grid"><div><small>근무 상태</small><b>${state.workStatus==='employed'?'재직 중':'구직·준비 중'}</b></div><div><small>게임 월급(연봉의 1/12)</small><b>${formatWon(worldFictionalIncome()/12)}</b></div><div><small>연봉</small><b>${formatWon(worldFictionalIncome())}</b></div><div><small>직급</small><b>${Number(state.jobLevel||0)+1}단계</b></div><div><small>업무 실적</small><b>${Math.round(w.performance)}점</b></div></div><p class="modal-hint">${worldSafe(state.jobCompany||'회사 미정')} · ${worldSafe(state.jobTitle||'내 적성과 맞는 직업을 찾는 중')} / 월급은 매년 합산해 한 살 성장할 때 정산돼.</p><div class="world-actions">${button('취업 면접 지원',`worldApplyJob()`,state.age<19||state.workStatus==='employed'||state.lifeRoute==='military'&&state.age<22)}${button('승진 심사 도전',`worldAskPromotion()`,state.workStatus!=='employed'||w.performance<22)}</div></div>`;
  }
  if(view==='friends'){
-  html+='<p class="modal-hint">어릴 때 만난 친구와 우정을 키우거나 라이벌과 경쟁할 수 있어. 각 인물과의 특별 활동은 매년 한 번씩 가능해.</p><div class="world-list">';
-  for(const f of WORLD_FRIENDS){const p=w.friends[f.id];html+=`<article class="world-item"><div><b>${f.name}</b><small>${f.trait}</small><small>친밀도 ${Math.round(p.bond)} / 100</small></div>${button('만나기',`worldMeetFriend('${f.id}')`,state.age<7||p.lastAge===state.age)}</article>`;}
-  html+=`<article class="world-item"><div><b>라이벌 ${worldSafe(w.rival.name)}</b><small>상대의 인정 ${Math.round(w.rival.respect)} / 100</small></div>${button('선의의 경쟁',`worldFaceRival()`,state.age<13||w.rival.lastAge===state.age)}</article></div>`;
+  html+=nuriPeopleSummary()+'<div class="world-list">';
+  for(const f of WORLD_FRIENDS){
+   const p=w.friends[f.id],minAge=f.minAge||7;
+   html+=`<article class="world-item"><div><b>${f.name}</b><small>${f.trait}</small><small>${state.age<minAge?`${minAge}살부터 만날 수 있어`:`친밀도 ${Math.round(p.bond)} / 100`}</small></div><div class="world-actions">${button('만나기',`worldMeetFriend('${f.id}')`,state.age<minAge||p.lastAge===state.age)}${button('이야기',`nuriOpenPerson('${f.id}')`,state.age<minAge)}</div></article>`;
+  }
+  html+=`<article class="world-item"><div><b>라이벌 ${worldSafe(w.rival.name)}</b><small>${state.age<13?'13살부터 만날 수 있어':`상대의 인정 ${Math.round(w.rival.respect)} / 100`}</small></div><div class="world-actions">${button('선의의 경쟁','worldFaceRival()',state.age<13||w.rival.lastAge===state.age)}${button('이야기',"nuriOpenPerson('minjun')",state.age<13)}</div></article></div>`;
+  html+='<div class="social-actions"><button type="button" class="modal-action" onclick="openAppModal(\'social\')">누리스타 열기</button></div>';
  }
  if(view==='talents'){
   html+='<p class="modal-hint">가족의 영향으로 시작한 재능과 직접 키운 특기는 달라. 평소 선택과 연 1회 훈련으로 성장하고, 직업·사업 수익에도 반영돼.</p><div class="world-list">';
