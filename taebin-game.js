@@ -2735,6 +2735,10 @@ function advanceSceneTurn(){
  if(activeDailyScene){
   const key=activeDailyScene.poolKey;
   state.dailySceneProgress={...state.dailySceneProgress,[key]:dailySceneCursor(key)+1};
+  // Preserve a bounded history across saves to stop back-to-back duplicate plots.
+  if(!Array.isArray(state.recentScenePrompts))state.recentScenePrompts=[];
+  state.recentScenePrompts.push(String(activeDailyScene.prompt||"").replace(/^(?:요즘 |오늘의 황당 사건 · )/,"").trim());
+  state.recentScenePrompts=state.recentScenePrompts.slice(-12);
   activeDailyScene=null;
  }
  state.sceneTurn=Math.max(0,Number(state.sceneTurn)||0)+1;
@@ -2758,7 +2762,15 @@ function sceneForTurn(age){
   else if(age>=19&&age<25&&state.adultPath&&sequence%3===2)lead=state.lifeRoute==="military"?"복무 중, ":state.lifeRoute==="work"?"직장에서, ":state.lifeRoute==="university"?"대학생 태빈이, ":"진로를 준비하며, ";
   else if(age>=25&&sequence%6===3)lead="요즘 "+bestCareer().name+" 분야에 관심이 많은 태빈이. ";
  }
- return {prompt:lead+scene[0],actions:scene[1],id:poolKey+"-"+turn,poolKey};
+ let prompt=lead+scene[0],actions=scene[1],displayId=poolKey+"-"+turn;
+ const recent=Array.isArray(state.recentScenePrompts)?state.recentScenePrompts:[];
+ if(recent.includes(prompt.replace(/^(?:요즘 |오늘의 황당 사건 · )/,"").trim())){
+  const alternate=newLifeSituation(band,turn+Math.max(3,sequence*7),age);
+  if(alternate&&alternate[0]&&!recent.includes(alternate[0])){
+   prompt=alternate[0];actions=alternate[1];displayId=poolKey+"-alt-"+turn;
+  }
+ }
+ return {prompt,actions,id:displayId,poolKey};
 }
 function sceneChoices(scene,age){
  if(scene.absurd)return nuriAbsurdChoices(scene,age);
@@ -2783,7 +2795,11 @@ function sceneChoices(scene,age){
 }
 function choiceOutcome(chosen,age){
  const clean=String(chosen.label).replace(/^[^가-힣]+/u,"");
- const consequence=chosen.outcome||"태빈이는 그 선택으로 새로운 경험을 쌓았어.";
+ const sceneTitle=activeDailyScene?.prompt||"오늘의 선택";
+ const generic=chosen.outcome==="이번 경험으로 두 가지 능력을 키웠어. 체력은 조금 소모했어.";
+ const consequence=generic
+  ?"이번에는 '"+clean+"' 선택을 통해 "+sceneTitle.replace(/[.!?]+$/g,"")+" 상황을 풀어나갔어. 결과를 수첩에 기록했어."
+  :(chosen.outcome||"태빈이는 그 선택으로 새로운 경험을 쌓았어.");
  state.lastOutcome="📌 "+age+"살 · "+clean+" → "+consequence;
 }
 
