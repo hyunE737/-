@@ -229,12 +229,24 @@ if(GOALS.length!==100||new Set(GOALS.map(g=>g.id)).size!==100)throw Error('한�
     return SPECIAL_SCENES[g.id]?.[run.stage]||PHASE_NAMES[phase];
   }
   function sceneFor(g,run){
-    const phase=goalSteps(g)[run.stage];
-    const title= nameOfPhase(g,run);
-    const previous=Array.isArray(run.notes)&&run.notes.length?(' 지난 장면: '+run.notes.at(-1)):'';
-    return '한태빈의 버킷리스트 《'+g.name+'》 · '+title+'. '+(g.custom?g.story+' '+CATEGORY_SCENES[g.category][phase]:CATEGORY_SCENES[g.category][phase])+previous;
+    const phase=goalSteps(g)[run.stage], title=nameOfPhase(g,run);
+    const attempt=Math.max(0,Number(run.attempts)||0), retries=Math.max(0,Number(run.misses)||0);
+    const contexts=[
+      '태빈이는 현장으로 향하기 전에 지난 계획을 다시 읽었어.',
+      '가온이가 진행 상황을 물으며 새롭게 바꿔 볼 방법을 제안했어.',
+      '준비해 둔 기록을 비교하자 전에는 놓쳤던 문제가 보이기 시작했어.',
+      '이번에는 다른 순서로 일을 처리하면 도움이 될 것 같아.',
+      '팀에서 새로운 의견을 전해 왔어. 방법을 한 번 더 살펴볼 차례야.',
+      '태빈이는 이번에 배운 내용을 정리하고 새로운 해결책을 찾고 있어.',
+      '날짜가 바뀌면서 준비 여건도 달라졌어. 다시 계획을 조정할 수 있어.',
+      '지난 실수에서 배운 덕분에 조금 더 신중하게 선택할 수 있게 됐어.'
+    ];
+    const context=contexts[(attempt+run.stage*3)%contexts.length];
+    const prev=Array.isArray(run.notes)&&run.notes.length?run.notes.at(-1):'';
+    const lesson=retries>0?' 이번 단계는 '+(retries+1)+'번째 도전이야. '+(prev?'지난 결과: '+prev:''):'';
+    return '한태빈의 버킷리스트 《'+g.name+'》 · '+title+'. '+
+      (g.custom?g.story+' ':'')+CATEGORY_SCENES[g.category][phase]+' '+context+lesson;
   }
-
   /* 인생 목표에 포함된 실제 미니게임 4종: 기억력, 순서, 계산, 숨은 표시 찾기 */
   const MINI_SYMBOLS=['🌟','🎵','🌈','🍀','🎨','🧩'];
   const MINI_KIND={가족:'memory',우정:'memory',나눔:'memory',창작:'order',탐험:'order',기록:'order',배움:'math',자립:'math',건강:'spot',도전:'spot'};
